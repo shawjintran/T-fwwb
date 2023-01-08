@@ -1,5 +1,7 @@
 package com.t.medicaldocument.Controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,6 +29,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/paddleocr")
+@Api
 public class test {
 
 	@PostMapping("/upload")
