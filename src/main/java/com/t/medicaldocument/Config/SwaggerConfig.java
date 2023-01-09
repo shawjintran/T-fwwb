@@ -24,15 +24,15 @@ public class SwaggerConfig implements WebMvcConfigurer {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.apiInfo(apiInfo())
 				.select()
-				.apis(RequestHandlerSelectors.basePackage("com.shaw.txclass.Controller"))
+				.apis(RequestHandlerSelectors.basePackage("com.t.medicaldocument.Controller"))
 				.paths(PathSelectors.any())
 				.build();
 	}
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder()
-				.title("课堂")
+				.title("文献")
 				.version("1.0")
-				.description("tx课堂接口文档")
+				.description("文献检索接口文档")
 				.build();
 	}
 }
