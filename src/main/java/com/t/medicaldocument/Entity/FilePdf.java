@@ -4,11 +4,11 @@ import io.swagger.annotations.ApiModel;
 
 import java.time.LocalDateTime;
 
-@ApiModel("pdf文件")
-public class file_pdf {
+@ApiModel(description = "Pdf file object")
+public class FilePdf {
 
-	public long pdfId;
-
+	public Long pdfId;
+	public Integer count;
 	public LocalDateTime createTime;
 	public LocalDateTime updateTime;
 

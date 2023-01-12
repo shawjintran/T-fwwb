@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Api("与文件的相关请求，包括上传文件，查看文献详情")
+@Api(tags = "与文件的相关请求，包括上传文件，查看文献详情")
 @RestController
 @RequestMapping("/file")
 public class FileController {

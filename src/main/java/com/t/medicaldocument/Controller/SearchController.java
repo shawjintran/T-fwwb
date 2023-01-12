@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api("与检索信息的相关请求，检索文献等")
+@Api(tags = "与检索信息的相关请求，检索文献等")
 @RestController
 @RequestMapping("/search")
 public class SearchController {
