@@ -1,11 +1,9 @@
-package com.t.medicaldocument.Controller;
+package com.t.medicaldocument.controller;
 
 import io.swagger.annotations.Api;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;

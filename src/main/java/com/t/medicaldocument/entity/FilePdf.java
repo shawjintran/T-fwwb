@@ -1,4 +1,4 @@
-package com.t.medicaldocument.Entity;
+package com.t.medicaldocument.entity;
 
 import io.swagger.annotations.ApiModel;
 
