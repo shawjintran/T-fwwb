@@ -4,12 +4,14 @@ import io.swagger.annotations.ApiModel;
 
 import java.time.LocalDateTime;
 
-@ApiModel(description = "Pdf file object")
+@ApiModel(description = "Pdf文件对象")
 public class FilePdf {
 
-	public Long pdfId;
-	public Integer count;
-	public LocalDateTime createTime;
-	public LocalDateTime updateTime;
+	private Long pdfId;
+	private String author;
+	private Integer pageCount;
+	private LocalDateTime createTime;
+	private LocalDateTime updateTime;
+	private Integer delete;
 
 }

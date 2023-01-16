@@ -1,5 +1,6 @@
 package com.t.medicaldocument.controller;
 
+import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,11 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "与检索信息的相关请求，检索文献等")
 @RestController
-@RequestMapping("/search")
+@RequestMapping("/search/")
 public class SearchController {
-	@GetMapping("/{key}")
+	@GetMapping("{key}")
 	@ApiOperation("输入检索的关键信息key，进行搜索")
-	public void searchBy(@PathVariable String key){
-
+	public R searchBy(@PathVariable String key){
+		return null;
 	}
 }
