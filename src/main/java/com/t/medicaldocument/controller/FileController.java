@@ -5,6 +5,7 @@ import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.models.auth.In;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -31,7 +32,7 @@ import java.util.*;
 @Api(tags = "与文件的相关请求，包括上传文件，查看文献详情")
 @RestController
 @RequestMapping("/file")
-
+@Slf4j
 public class FileController {
 	@PostMapping("/upload/")
 	@ApiOperation("文献的上传")
@@ -57,7 +58,7 @@ public class FileController {
 		destFile.getParentFile().mkdirs();
 		//将文件保存
 		file.transferTo(destFile);
-		String[] split = fileName.split(".");
+		String[] split = fileName.split("\\.");
 		return R.ok().setData(split[0]);
 	}
 	@GetMapping("/divide/{filename}")
@@ -79,7 +80,7 @@ public class FileController {
 			PDPageTree pages = doc.getPages();
 			pageCount = pages.getCount();
 			for (int i = 0; i < pageCount; i++) {
-				BufferedImage bim = pdfRenderer.renderImageWithDPI(i, 200);
+				BufferedImage bim = pdfRenderer.renderImageWithDPI(i, 300);
 				os = new ByteArrayOutputStream();
 				ImageIO.write(bim, "jpg", os);
 				byte[] dataList = os.toByteArray();
@@ -111,15 +112,17 @@ public class FileController {
 	@GetMapping("/analyze/structure")
 	public R fileAnalyzeStructure(String filename, Integer count) throws FileNotFoundException {
 		String picUrl=System.getProperty("user.dir")+File.separator+"pic"+File.separator+filename+File.separator;
-		for (int i = 0; i < count; i++) {
+		HttpHeaders headers = new HttpHeaders();
+
 		//对每页进行版面分析+ocr
-			HttpHeaders headers = new HttpHeaders();
-			//设置请求头格式
-			//Set the request header format
-			headers.setContentType(MediaType.APPLICATION_JSON);
-			//构建请求参数
-			//Build request parameters
-			MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		//设置请求头格式
+		//Set the request header format
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		//构建请求参数
+		//Build request parameters
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		for (int i = 0; i < count; i++) {
+
 			//读入静态资源文件
 			//Read the static resource file
 			InputStream imagePath = new FileInputStream(picUrl+i+".jpg");
@@ -132,11 +135,17 @@ public class FileController {
 			RestTemplate restTemplate = new RestTemplate();
 			//发送请求
 			//Send the request
-			Map json = restTemplate.postForEntity("http://127.0.0.1:8868/predict/structure_system", request, Map.class).getBody();
-			System.out.println(json);
-			//解析Json返回值
-			//Parse the Json return value
-			List<List<Map>> json1 = (List<List<Map>>) json.get("results");
+			Map json = restTemplate.postForEntity("http://127.0.0.1:8868/predict/structure_", request, Map.class).getBody();
+			log.info(json.toString());
+
+			//根据返回数据格式,用对应的数据结构 进行读取值
+
+
+
+			// System.out.println(json);
+			// //解析Json返回值
+			// //Parse the Json return value
+			// List<List<Map>> json1 = (List<List<Map>>) json.get("results");
 
 		}
 		return null;

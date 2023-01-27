@@ -20,8 +20,8 @@ public class SwaggerConfig  {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.apiInfo(apiInfo())
 				.select()
-				.apis(RequestHandlerSelectors.basePackage("com.t.medicaldocument.Controller"))
-				.paths(PathSelectors.any())
+				.apis(RequestHandlerSelectors.basePackage("com.t.medicaldocument.controller"))
+				// .paths(PathSelectors.any())
 				.build();
 	}
 	private ApiInfo apiInfo() {

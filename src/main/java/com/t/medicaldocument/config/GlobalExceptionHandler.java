@@ -10,6 +10,7 @@ public class GlobalExceptionHandler {
 	public R error(Exception e){
 		//
 		System.out.println("global exception");
+		e.printStackTrace();
 		return R.fail(e);
 	}
 }
