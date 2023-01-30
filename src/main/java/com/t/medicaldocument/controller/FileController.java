@@ -79,6 +79,7 @@ public class FileController {
 			PDFRenderer pdfRenderer = new PDFRenderer(doc);
 			PDPageTree pages = doc.getPages();
 			pageCount = pages.getCount();
+			log.info(String.valueOf(pages.get(0).getMediaBox().getWidth()));
 			for (int i = 0; i < pageCount; i++) {
 				BufferedImage bim = pdfRenderer.renderImageWithDPI(i, 300);
 				os = new ByteArrayOutputStream();
