@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-	@ExceptionHandler
+	@ExceptionHandler(MException.class)
 	public R error(Exception e){
-		//
 		System.out.println("global exception");
 		e.printStackTrace();
 		return R.fail(e);
 	}
+
 }

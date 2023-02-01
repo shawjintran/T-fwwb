@@ -1,6 +1,10 @@
 package com.t.medicaldocument.controller;
 
 import ch.qos.logback.core.util.FileUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.t.medicaldocument.utils.FileUtils;
 import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -9,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,6 +37,7 @@ import java.util.*;
 @RequestMapping("/file")
 @Slf4j
 public class FileController {
+	FileUtils utils=new FileUtils();
 	@PostMapping("/upload/")
 	@ApiOperation("文献的上传")
 	/**
@@ -52,7 +56,7 @@ public class FileController {
 		String fileName = UUID.randomUUID()
 				.toString()
 				.replace("-","")
-				+file.getOriginalFilename();
+				+".pdf";
 		String end = System.getProperty("user.dir")+File.separator+"pdf"+File.separator+fileName;
 		File destFile = new File(end);
 		destFile.getParentFile().mkdirs();
@@ -111,7 +115,7 @@ public class FileController {
 		return R.ok().setData(map);
 	}
 	@GetMapping("/analyze/structure")
-	public R fileAnalyzeStructure(String filename, Integer count) throws FileNotFoundException {
+	public R fileAnalyzeStructure(String filename, Integer count) throws Exception {
 		String picUrl=System.getProperty("user.dir")+File.separator+"pic"+File.separator+filename+File.separator;
 		HttpHeaders headers = new HttpHeaders();
 
@@ -121,7 +125,8 @@ public class FileController {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		//构建请求参数
 		//Build request parameters
-		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+
+		ArrayList<HashMap<String, Object>> list = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
 
 			//读入静态资源文件
@@ -129,6 +134,7 @@ public class FileController {
 			InputStream imagePath = new FileInputStream(picUrl+i+".jpg");
 			//添加请求参数images，并将Base64编码的图片传入
 			//Add the request parameter Images and pass in the Base64 encoded image
+			MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
 			map.add("images", ImageToBase64(imagePath));
 			//构建请求
 			//Build request
@@ -136,12 +142,17 @@ public class FileController {
 			RestTemplate restTemplate = new RestTemplate();
 			//发送请求
 			//Send the request
-			Map json = restTemplate.postForEntity("http://127.0.0.1:8868/predict/structure_", request, Map.class).getBody();
-			log.info(json.toString());
+			Map json = restTemplate.postForEntity("http://127.0.0.1:8868/predict/structure_system", request, Map.class).getBody();
+			JSONObject o = new JSONObject(json);
+			if (o.get("results")==null)
+				return R.fail();
+			JSONArray res = new JSONArray((List) o.get("results"));
+			if (res.size()<=0)
+				return R.fail();
+			HashMap<String, Object> results = utils.PdfStructure(new JSONObject((Map) res.get(0)));
 
 			//根据返回数据格式,用对应的数据结构 进行读取值
-
-
+			list.add(results);
 
 			// System.out.println(json);
 			// //解析Json返回值
@@ -149,7 +160,7 @@ public class FileController {
 			// List<List<Map>> json1 = (List<List<Map>>) json.get("results");
 
 		}
-		return null;
+		return R.ok(list);
 	}
 	@GetMapping("/analyze/ocr")
 	public R fileAnalyzeOcr(String filename, Integer count){
