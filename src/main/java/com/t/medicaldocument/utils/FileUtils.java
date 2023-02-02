@@ -1,187 +1,94 @@
 package com.t.medicaldocument.utils;
 
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.t.medicaldocument.config.MException;
-import org.springframework.util.ObjectUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.springframework.web.multipart.MultipartFile;
+import sun.misc.BASE64Encoder;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import java.util.Objects;
 
 /**
  * 对文件进行相关操作处理
  */
 public class FileUtils {
 
-	/**
-	 * PDF文件呈双列排布
-	 * @param map
-	 * @return
-	 */
-
-	StringBuilder DoubleTextSort(HashMap<int[], StringBuilder> map){
-
-		int side3=Integer.MIN_VALUE;
-		HashMap<Integer, StringBuilder> left=new HashMap<>();
-		HashMap<Integer, StringBuilder> right=new HashMap<>();
-
-		for (int[] ints : map.keySet()) {
-			if (side3<ints[0]&&Math.abs(side3-ints[0])>30)
-				side3=ints[0];
-		}
-		for (int[] ints : map.keySet()) {
-			if (ints[2]<=side3)
-			{
-			// 左边
-				left.put(ints[1],map.get(ints));
-			}else
-			{
-			//	右边
-				right.put(ints[1],map.get(ints));
-			}
-		}
-		//按y进行排序
-		StringBuilder text = new StringBuilder();
-		for (Integer integer : left.keySet()) {
-			text.append(left.get(integer));
-		}
-		for (Integer integer :right.keySet()) {
-			text.append(right.get(integer));
-		}
-		return text;
-	}
-	/**
-	 * 对pdf版面分析 通过 hubserving服务 返回数据 需要进行基于阅读顺序的排序时
-	 * @param res
-	 */
-	public HashMap<String, Object> PdfStructure(JSONObject res)  {
-		if(res==null)
-			return null;
-		JSONArray result = new JSONArray((List) res.get("regions"));
-		//对当前pdf文档页的汉字ocr描述 进行重塑
-		// if (ObjectUtils.isEmpty(result)) {
-		// 	return null;
-		// }
-		HashMap<int[], StringBuilder> map = new HashMap<>();
-		HashMap<String, Object> pdf = new HashMap<>();
-
-		for (Object o : result) {
-			JSONObject json =  new JSONObject((HashMap)o);
-			String type=(String)json.get("type");
-			if("text".equals(type)) {
-				//用数据结构存储,方便后继 根据阅读顺序进行重排
-
-				JSONArray bbox = new JSONArray((List) json.get("bbox"));
-				int[]ints = new int[bbox.size()];
-				for (int i = 0; i < bbox.size(); i++) {
-					ints[i]=(int)bbox.get(i);
-				}
-				//处理文档分析后的某一段的详细字段
-				StringBuilder text = Textfield(new JSONArray((List) json.get("res")));
-				map.put(ints,text);
-			}
-			else if ("table".equals(type)) {
-				StringBuilder table = Tablefield(new JSONObject((Map<String, Object>) json.get("res")) );
-				put(pdf,"table",table);
-			}
-			else {
-				StringBuilder table = Textfield(new JSONArray((List) json.get("res")));
-				put(pdf,type,table);
-			}
-		}
-		//文档中的文字顺序的逻辑判定
-		//文字阅读顺序算法
-		StringBuilder textSort = DoubleTextSort(map);
-		put(pdf,"text",textSort);
-		return pdf;
+	static public void savePDF(MultipartFile file,String filename) throws IOException {
+		String end = System.getProperty("user.dir")+File.separator+"pdf"+File.separator+filename;
+		File destFile = new File(end);
+		destFile.getParentFile().mkdirs();
+		//将文件保存
+		file.transferTo(destFile);
 	}
 
-	/**
-	 * 对pdf版面分析 通过python 返回数据 从TXT文件中读取
-	 * @param file_path
-	 * @return
-	 */
-	public HashMap<String, Object> PdfStructure2(String file_path) throws IOException {
-		StringBuilder builder = new StringBuilder();
-		BufferedInputStream buf = null;
+	static public int dividePDF(String filename) throws IOException {
+		String pdfUrl=System.getProperty("user.dir")+File.separator+"pdf"+File.separator+filename+".pdf";
+		String picUrl=System.getProperty("user.dir")+File.separator+"pic"+File.separator+filename;
+		PDDocument doc = null;
+		ByteArrayOutputStream os = null;
+		InputStream stream = null;
+		OutputStream out = null;
+		int pageCount;
 		try {
-			int len = 1024*5;
-			byte[] bytes = new byte[len];
-			buf = new BufferedInputStream(new FileInputStream(file_path+ File.separator+"res_0.txt"));
-			while ((len = buf.read(bytes, 0, len)) != -1) {
-				builder.append(bytes);
+			// pdf路径
+			stream = new FileInputStream(pdfUrl);
+			// 加载解析PDF文件
+			doc = PDDocument.load(stream);
+			PDFRenderer pdfRenderer = new PDFRenderer(doc);
+			PDPageTree pages = doc.getPages();
+			for (int i = 0; i < pages.getCount(); i++) {
+				BufferedImage bim = pdfRenderer.renderImageWithDPI(i, 300);
+				os = new ByteArrayOutputStream();
+				ImageIO.write(bim, "jpg", os);
+				byte[] dataList = os.toByteArray();
+				// jpg文件转出路径
+				File file = new File(picUrl+"\\" +i + ".jpg");
+
+				if (!file.getParentFile().exists()) {
+					// 不存在则创建父目录及子文件
+					file.getParentFile().mkdirs();
+					file.createNewFile();
+				}
+				out = new FileOutputStream(file);
+				out.write(dataList);
 			}
-		}finally {
-			if (buf!=null)
-				buf.close();
+			pageCount = pages.getCount();
+		} finally {
+			if (doc != null) doc.close();
+			if (os != null) os.close();
+			if (stream != null) stream.close();
+			if (out != null) out.close();
 		}
-
-		JSONArray result = JSONArray.parseArray(builder.toString());
-
-		HashMap<String, Object> pdf = new HashMap<>();
-
-		for (Object o : result) {
-			JSONObject json =  new JSONObject((HashMap)o);
-			String type=(String)json.get("type");
-			 if ("table".equals(type)) {
-				StringBuilder table = Tablefield(new JSONObject((Map<String, Object>) json.get("res")) );
-				put(pdf,"table",table);
-			}
-			else {
-				StringBuilder table = Textfield(new JSONArray((List) json.get("res")));
-				put(pdf,type,table);
-			}
-		}
-
-		return pdf;
+		return pageCount;
 	}
-	/**
-	 * 对 ocr识别 返回一般类型的 数据字段进行处理
-	 * @param res
-	 */
-	StringBuilder Textfield(JSONArray res){
-		if (res==null)
-			return null;
-		// if (ObjectUtils.isEmpty(res))
-		// 	return null;
-		//长文本
-		StringBuilder text=new StringBuilder();
-		for (Object o : res) {
-			JSONObject json = new JSONObject((Map<String, Object>) o);
-			text.append((json.get("text")));
-			// (json).get("confidence");
-		//	整合之后,对每一句进行数据结构存储
-		}
-		return text;
+
+	void downloadPDF(){
+
 	}
-	StringBuilder Tablefield(JSONObject res){
-		if (res==null)
-			return null;
-		// if (ObjectUtils.isEmpty(res))
-		// 	return null;
-		StringBuilder table=new StringBuilder();
-		table.append(res.get("html"));
-		return table;
-	}
-	void put(HashMap<String, Object> pdf,String key,StringBuilder value){
-		if (value==null)
-			return;
-		// if (ObjectUtils.isEmpty(value)) {
-		// 	return;
-		// }
-	if(pdf.containsKey(key))
-		{
-			((ArrayList<StringBuilder>) (pdf.get(key))).add(value);
-		}else
-		{
-			ArrayList<StringBuilder> list = new ArrayList<>();
-			list.add(value);
-			pdf.put(key,list);
+	static public String ImageToBase64(InputStream imgPath) {
+		byte[] data = null;
+		// 读取图片字节数组
+		//Read the image byte array
+		try {
+			InputStream in = imgPath;
+			System.out.println(imgPath);
+			data = new byte[in.available()];
+			in.read(data);
+			in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		// 对字节数组Base64编码
+		//Base64 encoding of byte array
+		BASE64Encoder encoder = new BASE64Encoder();
+		// 返回Base64编码过的字节数组字符串
+		//Returns a Base64 encoded byte array string
+		//System.out.println("图片转换Base64:" + encoder.encode(Objects.requireNonNull(data)));
+		return encoder.encode(Objects.requireNonNull(data));
 	}
 }

@@ -52,11 +52,8 @@ public class UserController {
 	}
 	@PostMapping("login")
 	public R login(String phone,String pwd){
-
 		if(ObjectUtils.isEmpty(phone)||ObjectUtils.isEmpty(pwd))
-		{
 			return R.fail().setMes("手机或密码为空");
-		}
 		QueryWrapper<User> wrapper = new QueryWrapper<>();
 		wrapper.eq("user_phone",phone);
 		wrapper.eq("user_pwd",pwd);

@@ -1,0 +1,45 @@
+package com.t.medicaldocument.config;
+
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.t.medicaldocument.entity.PdfDescription;
+import com.t.medicaldocument.service.PdfDescriptionService;
+import com.t.medicaldocument.utils.Cmd;
+import com.t.medicaldocument.utils.FileUtils;
+import com.t.medicaldocument.utils.PdfDataUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+
+@Component
+@Slf4j
+public class AsyncTask {
+	PdfDataUtils utils=new PdfDataUtils();
+	@Autowired
+	PdfDescriptionService descriptionService;
+	@Async
+	public void saveDescription(Long id,String file_name, int i) throws IOException, InterruptedException {
+		Process process = Runtime.getRuntime().exec(Cmd.create().toString(file_name,i));
+		process.waitFor();
+		log.info(file_name+"_"+i+" predict success");
+		// D:\CodeOfJava\Medical-Document\res\2ee320bcb7eb41e28744b9c39348b5b0\structure\0
+		String pic_path="D:\\CodeOfJava\\Medical-Document\\res\\"
+				+ file_name + "\\structure\\" + i;
+		HashMap<String, Object> map = utils.PdfStructure2(pic_path);
+		PdfDescription desc = new PdfDescription();
+		String s = JSON.toJSONString(map);
+		desc.setPdfTextStructure(JSONObject.toJSONString(map));
+		desc.setPdfId(id);
+		desc.setPdfPicUrl(pic_path);
+		descriptionService.save(desc);
+		log.info(file_name+"_"+i+" save success");
+	}
+
+}

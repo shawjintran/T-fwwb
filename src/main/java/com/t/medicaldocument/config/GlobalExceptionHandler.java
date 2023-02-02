@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-	@ExceptionHandler(MException.class)
+	@ExceptionHandler(Exception.class)
 	public R error(Exception e){
 		System.out.println("global exception");
 		e.printStackTrace();

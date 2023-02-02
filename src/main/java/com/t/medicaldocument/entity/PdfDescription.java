@@ -10,41 +10,36 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
- * @TableName pdf_file
+ * @TableName pdf_description
  */
-@TableName(value ="pdf_file")
+@TableName(value ="pdf_description")
 @Data
-public class PdfFile implements Serializable {
+public class PdfDescription implements Serializable {
     /**
-     * pdf文件id
+     *
      */
     @TableId
+    private Long pdfDescId;
+
+    /**
+     *
+     */
     private Long pdfId;
 
     /**
-     * pdf文件名
+     *
      */
-    private String pdfFileName;
+    private Integer pdfPage;
 
     /**
-     * pdf文件标题
+     * pdf文件page页的文本json结构
      */
-    private String pdfTitle;
+    private Object pdfTextStructure;
 
     /**
-     * pdf文件作者
+     *
      */
-    private String pdfAuthor;
-
-    /**
-     * pdf文件页数
-     */
-    private Integer pdfPagecount;
-
-    /**
-     * pdf文件状态
-     */
-    private Integer pdfStatus;
+    private String pdfPicUrl;
 
     /**
      *
