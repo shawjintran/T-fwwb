@@ -20,6 +20,10 @@ import java.util.HashMap;
 
 @Component
 @Slf4j
+/**
+ * 异步任务
+ * 调用命令行,通过Python进行推测,同时将返回结果进行处理后,存入到数据库中
+ */
 public class AsyncTask {
 	PdfDataUtils utils=new PdfDataUtils();
 	@Autowired

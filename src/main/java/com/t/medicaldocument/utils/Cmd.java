@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 
 @Slf4j
+/**
+ * Python 推理参数设置
+ */
 public class Cmd {
 	// python  predict_system.py
 	// --det_model_dir=../inference/ch_PP-OCRv3_det_infer
@@ -22,9 +25,11 @@ public class Cmd {
 	String det_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\ch_PP-OCRv3_det_infer\\";
 	String rec_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\ch_PP-OCRv3_rec_infer\\";
 	String table_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\ch_ppstructure_mobile_v2.0_SLANet_infer\\";
-	String layout_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\picodet_lcnet_x1_0_fgd_layout_cdla_infer\\";
+	String layout_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\picodet_lcnet_x1_0_fgd_layout_infer\\";
+	// String layout_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\picodet_lcnet_x1_0_fgd_layout_cdla_infer\\";
 	String rec_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\ppocr_keys_v1.txt";
-	String layout_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\dict\\layout_dict\\layout_cdla_dict.txt";
+	String layout_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\dict\\layout_dict\\layout_publaynet_dict.txt";
+	// String layout_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\dict\\layout_dict\\layout_cdla_dict.txt";
 	String table_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\dict\\table_structure_dict_ch.txt";
 	String image_dir="D:\\CodeOfJava\\Medical-Document\\pic\\";
 	String output="D:\\CodeOfJava\\Medical-Document\\res\\";
@@ -48,8 +53,8 @@ public class Cmd {
 		File file = new File(output + image);
 		if(!file.exists())
 			file.mkdirs();
-		// log.info(call.toString()+" --output="+output+image+" "
-		// 		+"--image_dir="+image_dir+image+File.separator+ i + ".jpg");
+		log.info(call.toString()+" --output="+output+image+" "
+				+"--image_dir="+image_dir+image+File.separator+ i + ".jpg");
 		return call.toString()+" --output="+output+image+" "
 				+" --image_dir="+image_dir+image+File.separator+ i + ".jpg";
 	}

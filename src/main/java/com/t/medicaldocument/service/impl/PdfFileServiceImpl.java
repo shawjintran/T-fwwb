@@ -23,7 +23,7 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	public HashMap<String, Object> uploadPdfFile(MultipartFile file, PdfFile pdf) throws IOException {
 		String filename = UUID.randomUUID()
 				.toString()
-				.replace("-","");
+				.replace("-","").substring(0,8);
 		pdf.setPdfFileName(filename);
 		pdf.setPdfStatus(0);
 		FileUtils.savePDF(file,filename+".pdf");

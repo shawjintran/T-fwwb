@@ -24,9 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.util.*;
 
-@Api(tags = "与文件的相关请求，包括上传文件，查看文献详情")
+@Api(tags = "与文件的相关请求，包括上传文件，查看文献详情,修改删除文献.")
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/file/")
 @Slf4j
 /**
  * 1.上传Pdf文件,并保存
@@ -45,7 +45,7 @@ public class FileController {
 	@Autowired
 	PdfDescriptionService descriptionService;
 
-	@PostMapping("/upload/")
+	@PostMapping("upload/")
 	@ApiOperation("文献的上传,并转换为图片")
 	public R fileUploadAndDivide(@RequestParam("file") @RequestPart MultipartFile file, PdfFile pdf) throws IOException {
 		//接收上传文件
@@ -102,7 +102,8 @@ public class FileController {
 		}
 		return R.ok(list);
 	}
-	@GetMapping("/analyze/structure")
+	@GetMapping("analyze/structure")
+	@ApiOperation("基于python对文献图片进行分析")
 	public R fileAnalyzeStructure2(Long id,String filename, Integer count) throws IOException, InterruptedException {
 		for (Integer i = 0; i < count; i++) {
 			task.saveDescription(id,filename,i);
@@ -114,5 +115,24 @@ public class FileController {
 	public R fileDownload(@PathVariable Long pdfId,HttpServletRequest hsr){
 		return null;
 	}
-
+	@PostMapping("update")
+	@ApiOperation("文献信息的修改")
+	public R fileUpdate(@RequestBody PdfFile pdf){
+		return R.fail();
+	}
+	@DeleteMapping("delete/{pdfId}")
+	@ApiOperation("文献的删除")
+	public R fileDelete(@PathVariable Long pdfId){
+		return R.fail();
+	}
+	@PutMapping("place")
+	@ApiOperation("文献的归档")
+	public R placeFile(@RequestBody List<Long> ids){
+		return  R.fail();
+	}
+	@PutMapping("remove")
+	@ApiOperation("移除文件夹的文献")
+	public R removeFile(){
+		return R.fail();
+	}
 }

@@ -6,6 +6,8 @@
 
     <resultMap id="BaseResultMap" type="com.t.medicaldocument.entity.PdfFile">
             <id property="pdfId" column="pdf_id" jdbcType="BIGINT"/>
+            <id property="userId" column="user_id" jdbcType="BIGINT"/>
+            <id property="docId" column="doc_id" jdbcType="BIGINT"/>
             <result property="pdfFileName" column="pdf_file_name" jdbcType="VARCHAR"/>
             <result property="pdfTitle" column="pdf_title" jdbcType="VARCHAR"/>
             <result property="pdfAuthor" column="pdf_author" jdbcType="VARCHAR"/>
@@ -17,7 +19,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        pdf_id,pdf_file_name,pdf_title,
+        pdf_id,doc_id,user_id,pdf_file_name,pdf_title,
         pdf_author,pdf_pagecount,pdf_status,
         create_time,update_time,is_delete
     </sql>

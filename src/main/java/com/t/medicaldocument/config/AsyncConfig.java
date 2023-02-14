@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.Executor;
 
 @Component
+/**
+ * 线程池参数
+ */
 public class AsyncConfig implements AsyncConfigurer {
 	// private static final Logger log = LoggerFactory.getLogger(MyAsyncConfigurer.class);
 

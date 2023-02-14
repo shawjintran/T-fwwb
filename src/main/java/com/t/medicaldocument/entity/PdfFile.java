@@ -20,6 +20,16 @@ public class PdfFile implements Serializable {
      */
     @TableId
     private Long pdfId;
+    /**
+     * pdf文件id
+     */
+    @TableId
+    private Long userId;
+    /**
+     * pdf文件id
+     */
+    @TableId
+    private Long docId;
 
     /**
      * pdf文件名
