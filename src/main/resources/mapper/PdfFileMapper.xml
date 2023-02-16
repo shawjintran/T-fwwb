@@ -23,4 +23,13 @@
         pdf_author,pdf_pagecount,pdf_status,
         create_time,update_time,is_delete
     </sql>
+    <update id = "modifyDocId" >
+        update pdf_file set doc_id= #{docId},update_time= now() where pdf_id in
+    <foreach collection = "ids" item="item" index="index" open="(" close=")" separator=",">
+        #{item}
+    </foreach>
+    </update>
+    <select id = "fileSearchByDocId" resultType="com.t.medicaldocument.entity.Vo.PdfFileVo">
+        select pdf_id, pdf_title, pdf_author,pdf_status from pdf_file where doc_id=#{docId} and is_delete = 0;
+    </select>
 </mapper>

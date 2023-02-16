@@ -25,11 +25,11 @@ public class Cmd {
 	String det_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\ch_PP-OCRv3_det_infer\\";
 	String rec_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\ch_PP-OCRv3_rec_infer\\";
 	String table_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\ch_ppstructure_mobile_v2.0_SLANet_infer\\";
-	String layout_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\picodet_lcnet_x1_0_fgd_layout_infer\\";
-	// String layout_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\picodet_lcnet_x1_0_fgd_layout_cdla_infer\\";
+	// String layout_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\picodet_lcnet_x1_0_fgd_layout_infer\\";
+	String layout_model="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\inference\\picodet_lcnet_x1_0_fgd_layout_cdla_infer\\";
 	String rec_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\ppocr_keys_v1.txt";
-	String layout_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\dict\\layout_dict\\layout_publaynet_dict.txt";
-	// String layout_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\dict\\layout_dict\\layout_cdla_dict.txt";
+	// String layout_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\dict\\layout_dict\\layout_publaynet_dict.txt";
+	String layout_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\dict\\layout_dict\\layout_cdla_dict.txt";
 	String table_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\dict\\table_structure_dict_ch.txt";
 	String image_dir="D:\\CodeOfJava\\Medical-Document\\pic\\";
 	String output="D:\\CodeOfJava\\Medical-Document\\res\\";

@@ -7,6 +7,7 @@ import com.t.medicaldocument.service.UserService;
 import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,9 @@ public class UserController {
 	UserService userService;
 
 	@PostMapping("signup")
+	@ApiOperation("注册用户")
 	public R signup(String phone, String pwd, Integer code){
+		//Todo: 用户生成默认文件夹
 		if(ObjectUtils.isEmpty(phone)||ObjectUtils.isEmpty(pwd)||ObjectUtils.isEmpty(code))
 		{
 			return R.fail().setMes("手机号,密码或验证码为空");
@@ -46,11 +49,13 @@ public class UserController {
 
 	}
 	@GetMapping("SMS")
+	@ApiOperation("发送验证码")
 	public R sendSMS(String phone){
 		//通过电话号通过相关服务,发送验证码
 		return null;
 	}
 	@PostMapping("login")
+	@ApiOperation("登录用户")
 	public R login(String phone,String pwd){
 		if(ObjectUtils.isEmpty(phone)||ObjectUtils.isEmpty(pwd))
 			return R.fail().setMes("手机或密码为空");

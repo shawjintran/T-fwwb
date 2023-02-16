@@ -2,10 +2,13 @@ package com.t.medicaldocument.service;
 
 import com.t.medicaldocument.entity.PdfFile;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.t.medicaldocument.entity.Vo.PdfFileVo;
+import com.t.medicaldocument.entity.Vo.PdfFileVo2;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 /**
 * @author sky
@@ -15,4 +18,9 @@ import java.util.HashMap;
 public interface PdfFileService extends IService<PdfFile> {
 	HashMap<String, Object> uploadPdfFile(MultipartFile file, PdfFile pdf) throws IOException;
 	Integer dividePDF(String filename) throws IOException;
+	boolean removeFile(List<Long> ids, Long docId, Integer mode);
+	List<PdfFileVo> fileSearchByDocId(Long docId);
+	boolean fileDelete(List<Long> ids, Long docId);
+	public boolean statusUpdate(Long pdfId,Integer status);
+	boolean fileUpdate(PdfFileVo2 pdf);
 }

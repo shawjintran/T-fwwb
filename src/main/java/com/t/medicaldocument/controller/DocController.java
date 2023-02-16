@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/doc/")
-@Api(tags = "用户文件夹归档的相关操作")
+@Api(tags = "用户文件夹的相关操作")
 public class DocController {
 	@Autowired
 	DocumentService documentService;
@@ -23,8 +23,9 @@ public class DocController {
 	@ApiOperation("根据用户Id查询文件夹")
 	public R searchDocById(@PathVariable Long uId){
 		if (uId==null)
-			return R.fail();
+			return R.fail("请先登录");
 		List<Map<String, Object>> map = documentService.searchDocById(uId);
+		//预期是装入 docid,docname,docsize,
 		Map<String,Object> data= new HashMap<>();
 		data.put("data",map);
 		data.put("size",map.size());
@@ -37,6 +38,7 @@ public class DocController {
 			return R.fail("先登录");
 		if (doc.getDocName()==null)
 			return R.fail("请输入文件夹名字");
+		// Todo: 文件夹名重复条件 缺少userID
 		if (documentService.nameRepeat(doc.getDocName()))
 			return R.fail("文件夹名重复");
 
@@ -48,17 +50,19 @@ public class DocController {
 	@DeleteMapping("delete/{docId}")
 	@ApiOperation("删除文件夹")
 	public R deleteDoc(@PathVariable Long docId){
+		//Todo: 默认文件夹不可删除;
 		boolean b = documentService.removeById(docId);
 		if (b)
-			return R.ok();
-		return R.fail();
+			return R.ok("删除成功");
+		return R.fail("删除失败");
 	}
 	@PutMapping("update/name")
 	@ApiOperation("更改文件夹的名字")
 	public R updateDoc(@RequestBody DocumentVo doc ){
+		//Todo:缺少时间变化
 		boolean updateDoc = documentService.updateDoc(doc);
 		if (updateDoc)
-			return R.ok();
-		return R.fail();
+			return R.ok("更改成功");
+		return R.fail("更改失败");
 	}
 }

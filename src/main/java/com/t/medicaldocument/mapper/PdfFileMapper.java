@@ -2,6 +2,9 @@ package com.t.medicaldocument.mapper;
 
 import com.t.medicaldocument.entity.PdfFile;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.t.medicaldocument.entity.Vo.PdfFileVo;
+
+import java.util.List;
 
 /**
 * @author sky
@@ -11,6 +14,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface PdfFileMapper extends BaseMapper<PdfFile> {
 
+	Integer modifyDocId(List<Long> ids, Long docId);
+
+	List<PdfFileVo> fileSearchByDocId(Long docId);
 }
 
 

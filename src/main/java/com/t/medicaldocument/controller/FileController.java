@@ -4,6 +4,8 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.t.medicaldocument.config.AsyncTask;
 import com.t.medicaldocument.entity.PdfFile;
+import com.t.medicaldocument.entity.Vo.PdfFileVo;
+import com.t.medicaldocument.entity.Vo.PdfFileVo2;
 import com.t.medicaldocument.service.PdfDescriptionService;
 import com.t.medicaldocument.service.PdfFileService;
 import com.t.medicaldocument.utils.FileUtils;
@@ -23,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 @Api(tags = "与文件的相关请求，包括上传文件，查看文献详情,修改删除文献.")
 @RestController
@@ -42,12 +45,11 @@ public class FileController {
 	AsyncTask task;
 	@Autowired
 	PdfFileService pdfFileService;
-	@Autowired
-	PdfDescriptionService descriptionService;
 
 	@PostMapping("upload/")
 	@ApiOperation("文献的上传,并转换为图片")
 	public R fileUploadAndDivide(@RequestParam("file") @RequestPart MultipartFile file, PdfFile pdf) throws IOException {
+		//Todo:缺少用户id
 		//接收上传文件
 		//Receiving uploaded files
 		if (file.isEmpty())
@@ -55,6 +57,7 @@ public class FileController {
 		if(pdf.getPdfAuthor()==null||pdf.getPdfTitle()==null)
 			return R.fail().setMes("请输入pdf文献的作者与题目");
 		HashMap<String, Object> map = pdfFileService.uploadPdfFile(file, pdf);
+		//Todo:添加到用户的默认文件夹中
 		if(map==null)
 			return R.fail().setMes("上传文件失败");
 		Integer count = pdfFileService.dividePDF((String) map.get("filename"));
@@ -104,10 +107,8 @@ public class FileController {
 	}
 	@GetMapping("analyze/structure")
 	@ApiOperation("基于python对文献图片进行分析")
-	public R fileAnalyzeStructure2(Long id,String filename, Integer count) throws IOException, InterruptedException {
-		for (Integer i = 0; i < count; i++) {
-			task.saveDescription(id,filename,i);
-		}
+	public R fileAnalyzeStructure2(Long id,String filename, Integer count) throws IOException, InterruptedException, ExecutionException {
+		task.predictByPython(id, filename, count);
 		return R.ok("系统将对文献进行分析");
 	}
 	@GetMapping("download/{pdfId}")
@@ -117,22 +118,58 @@ public class FileController {
 	}
 	@PostMapping("update")
 	@ApiOperation("文献信息的修改")
-	public R fileUpdate(@RequestBody PdfFile pdf){
-		return R.fail();
+	public R fileUpdate(@RequestBody PdfFileVo2 pdf){
+		boolean update=pdfFileService.fileUpdate(pdf);
+		if (update)
+			return R.ok("修改成功");
+		return R.fail("修改失败");
 	}
-	@DeleteMapping("delete/{pdfId}")
-	@ApiOperation("文献的删除")
-	public R fileDelete(@PathVariable Long pdfId){
-		return R.fail();
+	@DeleteMapping("delete/{docId}")
+	@ApiOperation("同个文件夹中文献的删除")
+	public R fileDelete(@RequestBody List<Long> ids,@PathVariable Long docId){
+		//Todo:注释 这是旧还是新docId
+		boolean fileDelete=pdfFileService.fileDelete(ids,docId);
+		if (fileDelete)
+			return R.ok("删除成功");
+		return R.fail("删除失败");
 	}
-	@PutMapping("place")
+	@GetMapping("search/{docId}")
+	@ApiOperation("根据文件夹id查询文献")
+	public R fileSearchByDocId(@PathVariable Long docId){
+		List<PdfFileVo> list=pdfFileService.fileSearchByDocId(docId);
+		return R.ok(list);
+	}
+	@PutMapping("place/{docId}")
 	@ApiOperation("文献的归档")
-	public R placeFile(@RequestBody List<Long> ids){
-		return  R.fail();
+	public R filePlace(@RequestBody List<Long> ids,@PathVariable Long docId){
+		//Todo:缺少用户id
+		if (ids==null)
+			return R.fail("");
+		if (ids.isEmpty())
+			return R.fail("");
+		boolean b = pdfFileService.removeFile(ids, docId, 1);
+		if (b)
+			return R.ok("归档成功");
+		return R.fail("归档失败");
 	}
 	@PutMapping("remove")
-	@ApiOperation("移除文件夹的文献")
-	public R removeFile(){
-		return R.fail();
+	@ApiOperation("移除文件夹中的文献")
+	public R fileRemove(@RequestBody List<Long> ids){
+		//Todo: 缺少旧的docId 修改原文件夹大小
+		if (ids==null)
+			return R.fail("请选择文献");
+		if (ids.isEmpty())
+			return R.fail("请选择文献");
+		pdfFileService.removeFile(ids,0L,2);
+		return R.ok("移除文献成功");
 	}
+	// @PutMapping("removeTo/{docId}/{mode}")
+	// @ApiOperation("修改文献文件的信息")
+	// public R removeFile(@PathVariable Long id,@PathVariable Long docId,@PathVariable Integer mode){
+	// 	if (id==null)
+	// 		return R.fail();
+	// 	pdfFileService.
+	// 	pdfFileService.removeFile(ids,mode);
+	// 	return R.fail();
+	// }
 }

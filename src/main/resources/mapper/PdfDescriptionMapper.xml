@@ -20,4 +20,14 @@
         pdf_text_structure,pdf_pic_url,create_time,
         update_time,is_delete
     </sql>
+    <!--直接删除-->
+    <delete id = "deleteByPdfIds">
+        delete from pdf_description where pdf_id in
+    <foreach collection = "ids" open="(" close=")" separator="," item="pdfId">
+        #{pdfId}
+    </foreach>
+    </delete>
+    <select id = "descSearchByPdfId" resultType="com.t.medicaldocument.entity.Vo.PdfDescVo">
+        select pdf_desc_id,pdf_text_structure,pdf_page from pdf_description  where pdf_id=#{pdfId} order by  pdf_page  asc ;
+    </select>
 </mapper>
