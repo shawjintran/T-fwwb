@@ -20,7 +20,7 @@
         is_delete
     </sql>
     <select id = "nameRepeat" resultType="string" parameterType="string">
-        select  doc_name from document where doc_name = #{name};
+        select  doc_name from document where doc_name = #{name} and user_id=#{uId};
     </select>
     <select id="searchDocById" resultType="java.util.HashMap">
         select  doc_name as name, doc_size as size, doc_id as docId from document where user_id = #{uId};

@@ -21,11 +21,11 @@ public class PdfFile implements Serializable {
     @TableId
     private Long pdfId;
     /**
-     * pdf文件id
+     * 用户id
      */
     private Long userId;
     /**
-     * pdf文件id
+     * pdf文件夹id
      */
     private Long docId;
 

@@ -2,7 +2,10 @@ package com.t.medicaldocument.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.t.medicaldocument.entity.Document;
 import com.t.medicaldocument.entity.User;
+import com.t.medicaldocument.entity.Vo.DocumentVo;
+import com.t.medicaldocument.service.DocumentService;
 import com.t.medicaldocument.service.UserService;
 import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
@@ -20,10 +23,12 @@ public class UserController {
 	@Autowired
 	UserService userService;
 
+	@Autowired
+	DocumentService documentService;
+
 	@PostMapping("signup")
 	@ApiOperation("注册用户")
 	public R signup(String phone, String pwd, Integer code){
-		//Todo: 用户生成默认文件夹
 		if(ObjectUtils.isEmpty(phone)||ObjectUtils.isEmpty(pwd)||ObjectUtils.isEmpty(code))
 		{
 			return R.fail().setMes("手机号,密码或验证码为空");
@@ -39,13 +44,19 @@ public class UserController {
 		{
 			return R.fail().setMes("验证码已失效,请重新发送");
 		}
-		boolean save = userService.save(new User()
+		User user = new User()
 				.setUserPhone(phone)
-				.setUserPwd(pwd));
-		if(save)
-			return R.ok().setMes("注册成功,请登录");
-		else
+				.setUserPwd(pwd);
+		boolean save = userService.save(user);
+		if(!save)
 			return R.fail().setMes("系统错误");
+		//生成默认文件夹
+		DocumentVo documentVo = new DocumentVo();
+		documentVo.setDocId(0L);
+		documentVo.setUserId(user.getUserId());
+		documentVo.setDocName("默认文件夹");
+		documentService.addDoc(documentVo);
+		return R.ok().setMes("注册成功,请登录");
 
 	}
 	@GetMapping("SMS")
@@ -68,19 +79,23 @@ public class UserController {
 		return R.ok().setData(one);
 	}
 	@GetMapping("logout")
+	@ApiOperation("登出账户")
 	public R logout(){
 
 		return null;
 	}
 	@PostMapping("update")
-	public R update(@RequestBody User user){
+	@ApiOperation("更新账户信息")
+	public R update( User user){
 		boolean update = userService.updateById(user);
 		if(update)
 			return R.ok().setMes("修改成功");
 		return R.fail().setMes("未知原因:修改失败");
 	}
 	@DeleteMapping("delete/{id}")
+	@ApiOperation("注销账户")
 	public R delete(@PathVariable Long id){
+		boolean delete=userService.deleteUser(id);
 		boolean remove = userService.removeById(id);
 		if(remove)
 			return R.ok().setMes("删除成功");

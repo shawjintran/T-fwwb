@@ -16,15 +16,15 @@ import java.util.Map;
 * @Entity com.t.medicaldocument.entity.Document
 */
 public interface DocumentMapper extends BaseMapper<Document> {
-	String nameRepeat(String name);
+	String nameRepeat(String name,Long uId);
 	List<Map<String,Object>> searchDocById(Long uId);
 
 	@Update("update document set doc_name = #{docName},update_time =now() where doc_id =#{docId}")
 	Integer updateDoc(Long docId, String docName);
-	@Update("update document set doc_size = doc_size+${size} ,update_time =now() where doc_id=#{docId}")
-	Integer AddSize(Long docId,Integer size);
-	@Update("update document set doc_size = doc_size-${size} ,update_time =now() where doc_id=#{docId}")
-	Integer SubSize(Long docId,Integer size);
+	@Update("update document set doc_size = doc_size+${size} ,update_time =now() where doc_id=#{docId} and user_id=#{userId}")
+	Integer AddSize(Long docId, Integer size, Long userId);
+	@Update("update document set doc_size = doc_size-${size} ,update_time =now() where doc_id=#{docId} and user_id=#{userId}")
+	Integer SubSize(Long docId, Integer size, Long userId);
 }
 
 

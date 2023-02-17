@@ -52,6 +52,7 @@ public class Document implements Serializable {
      */
     private Integer isDelete;
 
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

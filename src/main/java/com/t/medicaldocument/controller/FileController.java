@@ -12,6 +12,7 @@ import com.t.medicaldocument.utils.FileUtils;
 import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -48,23 +49,34 @@ public class FileController {
 
 	@PostMapping("upload/")
 	@ApiOperation("文献的上传,并转换为图片")
-	public R fileUploadAndDivide(@RequestParam("file") @RequestPart MultipartFile file, PdfFile pdf) throws IOException {
-		//Todo:缺少用户id
+	public R fileUploadAndDivide(@RequestParam("file") @RequestPart MultipartFile file,
+								 PdfFile pdf) throws IOException {
 		//接收上传文件
 		//Receiving uploaded files
+		if(pdf.getUserId()==null)
+			return R.fail("请先登录");
 		if (file.isEmpty())
 			return R.fail().setMes("上传文件为空");
 		if(pdf.getPdfAuthor()==null||pdf.getPdfTitle()==null)
 			return R.fail().setMes("请输入pdf文献的作者与题目");
 		HashMap<String, Object> map = pdfFileService.uploadPdfFile(file, pdf);
-		//Todo:添加到用户的默认文件夹中
 		if(map==null)
-			return R.fail().setMes("上传文件失败");
+			return R.fail().setMes("文件上传出现错误");
+
 		Integer count = pdfFileService.dividePDF((String) map.get("filename"));
 		if (count==null)
 			return R.fail("未知错误");
+		//count 为 页数
+		pdf.setPdfPagecount(count);
+		//添加到默认的文件夹
+		pdf.setDocId(0L);
+		boolean save = pdfFileService.save(pdf);
 		map.put("count",count);
-		return R.ok().setData(map);
+		map.put("id",pdf.getPdfId());
+		if (save)
+			return R.ok().setData(map);
+		//Todo:不成功 需要将本地文件进行删除
+		return R.fail("未知错误");
 	}
 
 	// @GetMapping("/analyze/structure")
@@ -107,61 +119,76 @@ public class FileController {
 	}
 	@GetMapping("analyze/structure")
 	@ApiOperation("基于python对文献图片进行分析")
-	public R fileAnalyzeStructure2(Long id,String filename, Integer count) throws IOException, InterruptedException, ExecutionException {
-		task.predictByPython(id, filename, count);
+	public R fileAnalyzeStructure2(@ApiParam(name="pdf文件的id") Long pdfId,
+								   String filename,
+								   Integer count) throws IOException, InterruptedException, ExecutionException {
+		task.predictByPython(pdfId, filename, count);
 		return R.ok("系统将对文献进行分析");
 	}
 	@GetMapping("download/{pdfId}")
 	@ApiOperation("文献的下载")
-	public R fileDownload(@PathVariable Long pdfId,HttpServletRequest hsr){
+	public R fileDownload(@PathVariable Long pdfId,
+						  HttpServletRequest hsr){
 		return null;
 	}
 	@PostMapping("update")
-	@ApiOperation("文献信息的修改")
-	public R fileUpdate(@RequestBody PdfFileVo2 pdf){
+	@ApiOperation("文献信息的修改(可以实现文献的文件夹的变动)")
+	public R fileUpdate( PdfFileVo2 pdf){
 		boolean update=pdfFileService.fileUpdate(pdf);
 		if (update)
 			return R.ok("修改成功");
 		return R.fail("修改失败");
 	}
-	@DeleteMapping("delete/{docId}")
+	@DeleteMapping("delete/{userId}/{docId}")
 	@ApiOperation("同个文件夹中文献的删除")
-	public R fileDelete(@RequestBody List<Long> ids,@PathVariable Long docId){
-		//Todo:注释 这是旧还是新docId
-		boolean fileDelete=pdfFileService.fileDelete(ids,docId);
+	public R fileDelete( List<Long> ids,
+						@ApiParam(name="当前同个文件夹的docId") @PathVariable Long docId,
+						@PathVariable Long userId){
+		boolean fileDelete=pdfFileService.fileDelete(ids,docId,userId);
 		if (fileDelete)
 			return R.ok("删除成功");
 		return R.fail("删除失败");
 	}
-	@GetMapping("search/{docId}")
-	@ApiOperation("根据文件夹id查询文献")
-	public R fileSearchByDocId(@PathVariable Long docId){
-		List<PdfFileVo> list=pdfFileService.fileSearchByDocId(docId);
+	@GetMapping("search/{userId}/{docId}")
+	@ApiOperation("根据文件夹id和用户id查询文献")
+	public R fileSearchByDocId(@PathVariable Long docId,
+							   @PathVariable Long userId){
+		List<PdfFileVo> list=pdfFileService.fileSearchByDocId(docId,userId);
 		return R.ok(list);
 	}
-	@PutMapping("place/{docId}")
-	@ApiOperation("文献的归档")
-	public R filePlace(@RequestBody List<Long> ids,@PathVariable Long docId){
-		//Todo:缺少用户id
+	@PutMapping("place/{userId}/{newDocId}")
+	@ApiOperation("(归档)文献们从默认文件夹归入到同一个文档(非默认0)")
+	public R filePlace( List<Long> ids,
+					   @PathVariable Long userId,
+					   @PathVariable Long newDocId){
+		if(newDocId==0)
+			//Todo: 需要在服务层进行 先查询再更新
+			log.error("系统接口暴露,被攻击");
 		if (ids==null)
-			return R.fail("");
+			return R.fail("请选择文献");
 		if (ids.isEmpty())
-			return R.fail("");
-		boolean b = pdfFileService.removeFile(ids, docId, 1);
+			return R.fail("请选择文献");
+		//重写方法
+		boolean b = pdfFileService.placeFile(ids, newDocId, userId);
 		if (b)
 			return R.ok("归档成功");
 		return R.fail("归档失败");
 	}
-	@PutMapping("remove")
-	@ApiOperation("移除文件夹中的文献")
-	public R fileRemove(@RequestBody List<Long> ids){
-		//Todo: 缺少旧的docId 修改原文件夹大小
+	@DeleteMapping("remove/{userId}/{oldDocId}")
+	@ApiOperation("移除同个文件夹中的文献(到默认文件夹中)")
+	public R fileRemove( List<Long> ids,
+						@PathVariable Long oldDocId,
+						@PathVariable Long userId){
+		if(oldDocId==0)
+			log.error("系统接口暴露,被攻击");
 		if (ids==null)
 			return R.fail("请选择文献");
 		if (ids.isEmpty())
 			return R.fail("请选择文献");
-		pdfFileService.removeFile(ids,0L,2);
-		return R.ok("移除文献成功");
+		boolean b = pdfFileService.removeFile(ids, oldDocId, userId);
+		if (b)
+			return R.ok("移除文献成功");
+		return R.fail("移除文献失败");
 	}
 	// @PutMapping("removeTo/{docId}/{mode}")
 	// @ApiOperation("修改文献文件的信息")

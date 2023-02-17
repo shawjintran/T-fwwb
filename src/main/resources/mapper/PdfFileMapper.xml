@@ -30,6 +30,9 @@
     </foreach>
     </update>
     <select id = "fileSearchByDocId" resultType="com.t.medicaldocument.entity.Vo.PdfFileVo">
-        select pdf_id, pdf_title, pdf_author,pdf_status from pdf_file where doc_id=#{docId} and is_delete = 0;
+        select pdf_id, pdf_title, pdf_author,pdf_status from pdf_file where doc_id=#{docId} and user_id=#{userId} and is_delete = 0;
     </select>
+   <update id = "placeFile">
+
+   </update>
 </mapper>

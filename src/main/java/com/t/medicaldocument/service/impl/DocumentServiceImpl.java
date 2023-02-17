@@ -24,8 +24,8 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 
 
 	@Override
-	public boolean nameRepeat(String name) {
-		String repeat = baseMapper.nameRepeat(name);
+	public boolean nameRepeat(String name,Long uId) {
+		String repeat = baseMapper.nameRepeat(name,uId);
 		if (repeat==null)
 			return false;
 		return true;
@@ -36,6 +36,8 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 		Document document = new Document();
 		document.setDocName(doc.getDocName());
 		document.setUserId(doc.getUserId());
+		if(document.getUserId()!=null)
+			document.setDocId(doc.getDocId());
 		int insert = baseMapper.insert(document);
 		if (insert==1)
 			return true;
@@ -57,12 +59,12 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 	}
 
 	@Override
-	public boolean updateSize(Integer mode,Long docId,Integer size) {
+	public boolean updateSize(Integer mode,Long docId,Integer size,Long userId) {
 		Integer integer=0;
 		if (mode==1)
-			integer=baseMapper.AddSize(docId,size);
+			integer=baseMapper.AddSize(docId,size,userId);
 		else if (mode==2)
-			integer=baseMapper.SubSize(docId,size);;
+			integer=baseMapper.SubSize(docId,size,userId);;
 		if (integer==1)
 			return true;
 		return false;

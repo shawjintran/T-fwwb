@@ -69,19 +69,21 @@ public class AsyncTask {
 		return new AsyncResult<>(0);
 	}
 	@Async
-	public void predictByPython(Long id,String filename, Integer count) throws IOException, InterruptedException, ExecutionException {
+	public void predictByPython(Long pdfId,String filename, Integer count) throws IOException, InterruptedException, ExecutionException {
 		TransactionStatus transaction = platformTransaction.getTransaction(transactionDefinition);
 		PdfFileService bean = applicationContext.getBean(PdfFileService.class);
 		for (Integer i = 0; i < count; i++) {
-			Future<Integer> future = applicationContext.getBean(AsyncTask.class).saveDescription(id, filename, i);
+			Future<Integer> future = applicationContext.getBean(AsyncTask.class)
+					.saveDescription(pdfId, filename, i);
 			if (future.get()==0)
 			{
 				platformTransaction.rollback(transaction);
-				bean.statusUpdate(id,2);
+				//推测出现异常,设置
+				bean.statusUpdate(pdfId,2);
 				return;
 			}
 		}
 		platformTransaction.commit(transaction);
-		bean.statusUpdate(id,1);
+		bean.statusUpdate(pdfId,1);
 	}
 }

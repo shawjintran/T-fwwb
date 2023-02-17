@@ -14,11 +14,11 @@ import java.util.Map;
 */
 public interface DocumentService extends IService<Document> {
 
-	boolean nameRepeat(String name);
+	boolean nameRepeat(String name,Long uId);
 	boolean addDoc(DocumentVo doc);
 
 	List<Map<String,Object>> searchDocById(Long uId);
 
 	boolean updateDoc(DocumentVo doc);
-	boolean updateSize(Integer mode,Long docId,Integer size);
+	boolean updateSize(Integer mode,Long docId,Integer size,Long userId);
 }

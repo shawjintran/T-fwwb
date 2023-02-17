@@ -18,9 +18,12 @@ import java.util.List;
 public interface PdfFileService extends IService<PdfFile> {
 	HashMap<String, Object> uploadPdfFile(MultipartFile file, PdfFile pdf) throws IOException;
 	Integer dividePDF(String filename) throws IOException;
-	boolean removeFile(List<Long> ids, Long docId, Integer mode);
-	List<PdfFileVo> fileSearchByDocId(Long docId);
-	boolean fileDelete(List<Long> ids, Long docId);
+	boolean removeFile(List<Long> ids, Long docId, Long userId);
+	List<PdfFileVo> fileSearchByDocId(Long docId,Long userId);
+	boolean fileDelete(List<Long> ids, Long docId,Long userId);
 	public boolean statusUpdate(Long pdfId,Integer status);
 	boolean fileUpdate(PdfFileVo2 pdf);
+
+	boolean placeFile(List<Long> ids, Long docId, Long userId);
+
 }

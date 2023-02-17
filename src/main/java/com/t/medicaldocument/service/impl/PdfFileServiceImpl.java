@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
 * @author sky
@@ -42,11 +43,7 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		pdf.setPdfFileName(filename);
 		pdf.setPdfStatus(0);
 		FileUtils.savePDF(file,filename+".pdf");
-		int insert = baseMapper.insert(pdf);
-		if (insert==0)
-			return null;
 		HashMap<String,Object> map=new HashMap<>(3);
-		map.put("id",pdf.getPdfId());
 		map.put("filename",filename);
 		return map;
 	}
@@ -56,27 +53,42 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public boolean removeFile(List<Long> ids, Long docId,Integer mode) {
-		Integer integer = baseMapper.modifyDocId(ids, docId);
+	public boolean removeFile(List<Long> ids, Long oldDocId,Long userId) {
+		if (oldDocId==0)
+			return false;
+		//移入到用户默认文件夹
+		List<PdfFile> pdfFiles = baseMapper.selectBatchIds(ids);
+		//Todo: 需要优化select语句
+		List<PdfFile> collect = pdfFiles.stream().filter((file) -> {
+			if (file.getDocId() != oldDocId)
+				return true;
+			return false;
+		}).collect(Collectors.toList());
+		if (collect.size()>0)
+			return false;
+		Integer integer = baseMapper.modifyDocId(ids, 0L,userId);
 		if (integer<1)
 			return false;
-		//更改文件夹的大小
-		documentService.updateSize(mode,docId,integer);
-		return true;
+		//更改文件夹的大小,先减少原文件夹大小,再增加默认文件夹大小
+		boolean b1 = documentService.updateSize(2, oldDocId, integer, userId);
+		boolean b2 = documentService.updateSize(1, 0L, integer, userId);
+		if (b1&&b2)
+			return true;
+		return false;
 	}
 
 	@Override
-	public List<PdfFileVo> fileSearchByDocId(Long docId) {
-		List<PdfFileVo> list=baseMapper.fileSearchByDocId(docId);
+	public List<PdfFileVo> fileSearchByDocId(Long docId,Long userId) {
+		List<PdfFileVo> list=baseMapper.fileSearchByDocId(docId,userId);
 		return list;
 	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public boolean fileDelete(List<Long> ids, Long docId) {
+	public boolean fileDelete(List<Long> ids, Long docId, Long useId) {
 		int deleteFile = baseMapper.deleteBatchIds(ids);
 		boolean deleteDesc=descriptionService.deleteByPdfIds(ids);
-		boolean deleteDoc=documentService.updateSize(2,docId,deleteFile);
+		boolean deleteDoc=documentService.updateSize(2,docId,deleteFile,useId);
 		if(deleteDesc&&deleteDoc)
 			return true;
 		return false;
@@ -89,6 +101,7 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 			return false;
 		UpdateWrapper<PdfFile> wrapper = new UpdateWrapper<>();
 		wrapper.eq("pdf_id",pdf.getPdfId())
+				.eq("user_id",pdf.getUserId())
 				.set("pdf_title",pdf.getPdfTitle())
 				.set("pdf_author",pdf.getPdfAuthor());
 		int doc_id=0;
@@ -98,11 +111,35 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		{
 			doc_id = baseMapper.update(null, wrapper.set("doc_id", pdf.getNewDocId()));
 			if (doc_id==1){
-				documentService.updateSize(2,pdf.getDocId(),1);
-				documentService.updateSize(1,pdf.getNewDocId(),1);
+				documentService.updateSize(2,pdf.getDocId(),1,pdf.getUserId());
+				documentService.updateSize(1,pdf.getNewDocId(),1,pdf.getUserId());
 			}
 		}
 		if (doc_id==1)
+			return true;
+		return false;
+	}
+
+	/**
+	 * 此方法
+	 * @param ids
+	 * @param newDocId
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean placeFile(List<Long> ids, Long newDocId, Long userId) {
+		if (newDocId==0)
+			return false;
+		//移入到新的文件夹
+		Integer integer = baseMapper.modifyDocId(ids, newDocId,userId);
+		if (integer<1)
+			return false;
+		//更改文件夹的大小,先减少原文件夹大小,再增加新文件夹大小
+		boolean b1 = documentService.updateSize(2, 0L, integer, userId);
+		boolean b2 = documentService.updateSize(1, newDocId, integer, userId);
+		if(b1&&b2)
 			return true;
 		return false;
 	}

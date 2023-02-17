@@ -33,13 +33,12 @@ public class DocController {
 	}
 	@PostMapping("add")
 	@ApiOperation("添加文件夹")
-	public R addDoc(@RequestBody DocumentVo doc){
+	public R addDoc( DocumentVo doc){
 		if(doc.getUserId()==null)
 			return R.fail("先登录");
 		if (doc.getDocName()==null)
 			return R.fail("请输入文件夹名字");
-		// Todo: 文件夹名重复条件 缺少userID
-		if (documentService.nameRepeat(doc.getDocName()))
+		if (documentService.nameRepeat(doc.getDocName(),doc.getUserId()))
 			return R.fail("文件夹名重复");
 
 		boolean b = documentService.addDoc(doc);
@@ -47,10 +46,12 @@ public class DocController {
 			return R.ok("创建成功");
 		return R.fail("未知错误,请等待");
 	}
-	@DeleteMapping("delete/{docId}")
-	@ApiOperation("删除文件夹")
-	public R deleteDoc(@PathVariable Long docId){
-		//Todo: 默认文件夹不可删除;
+	@DeleteMapping("delete/{userId}/{docId}")
+	@ApiOperation("删除文件夹(不涉及账号删除)")
+	public R deleteDoc(@PathVariable Long userId,@PathVariable Long docId){
+		//Todo: 根据双Id进行删除
+		if (docId==0L)
+			return R.fail("默认文件夹不可删除");
 		boolean b = documentService.removeById(docId);
 		if (b)
 			return R.ok("删除成功");
@@ -58,8 +59,7 @@ public class DocController {
 	}
 	@PutMapping("update/name")
 	@ApiOperation("更改文件夹的名字")
-	public R updateDoc(@RequestBody DocumentVo doc ){
-		//Todo:缺少时间变化
+	public R updateDoc( DocumentVo doc ){
 		boolean updateDoc = documentService.updateDoc(doc);
 		if (updateDoc)
 			return R.ok("更改成功");
