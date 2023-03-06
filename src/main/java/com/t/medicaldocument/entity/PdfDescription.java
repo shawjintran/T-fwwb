@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -13,6 +15,8 @@ import org.springframework.format.annotation.DateTimeFormat;
  * @TableName pdf_description
  */
 @TableName(value ="pdf_description")
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class PdfDescription implements Serializable {
     /**
@@ -62,4 +66,6 @@ public class PdfDescription implements Serializable {
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+
 }

@@ -1,5 +1,8 @@
 package com.t.medicaldocument.controller;
 
+import com.t.medicaldocument.entity.Bo.DocumentBo;
+import com.t.medicaldocument.entity.PdfDescription;
+import com.t.medicaldocument.entity.Vo.SearchShow;
 import com.t.medicaldocument.service.impl.SearchServiceImpl;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +25,14 @@ public class SearchController {
 
 
 	@GetMapping("/{keyword}/{pageNo}/{pageSize}")
-	public List<Map<String, Object>> search(@PathVariable String keyword, @PathVariable int pageNo, @PathVariable int pageSize) throws IOException {
-		List<Map<String, Object>> maps = searchService.searchPage(keyword, pageNo, pageSize);
+	public Object search(@PathVariable String keyword, @PathVariable int pageNo, @PathVariable int pageSize) throws IOException {
+		List<SearchShow> maps = searchService.searchPage(keyword, pageNo, pageSize);
 
 		///TODO 需要实现文献合并,map里是页数据条,需要转成文献数据条
 		return maps;
 	}
+
+
+
+
 }
