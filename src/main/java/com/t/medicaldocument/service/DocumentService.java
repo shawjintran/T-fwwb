@@ -21,4 +21,5 @@ public interface DocumentService extends IService<Document> {
 
 	boolean updateDoc(DocumentVo doc);
 	boolean updateSize(Integer mode,Long docId,Integer size,Long userId);
+	boolean removeByDocIdAndUserId(Long DocId,Long UserId);
 }

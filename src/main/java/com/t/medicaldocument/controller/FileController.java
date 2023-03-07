@@ -9,6 +9,7 @@ import com.t.medicaldocument.entity.Vo.PdfFileVo2;
 import com.t.medicaldocument.service.PdfDescriptionService;
 import com.t.medicaldocument.service.PdfFileService;
 import com.t.medicaldocument.utils.FileUtils;
+import com.t.medicaldocument.utils.PdfDataUtils;
 import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,7 +50,8 @@ public class FileController {
 
 	@PostMapping("upload/")
 	@ApiOperation("文献的上传,并转换为图片")
-	public R fileUploadAndDivide(@RequestParam("file") @RequestPart MultipartFile file,
+	public R fileUploadAndDivide(@RequestParam("file")
+									 @RequestPart MultipartFile file,
 								 PdfFile pdf) throws IOException {
 		//接收上传文件
 		//Receiving uploaded files
@@ -129,6 +131,9 @@ public class FileController {
 	@ApiOperation("文献的下载")
 	public R fileDownload(@PathVariable Long pdfId,
 						  HttpServletRequest hsr){
+		PdfFile pdfFile = pdfFileService.getById(pdfId);
+		String pdfFileName = pdfFile.getPdfFileName();
+		//文件下载
 		return null;
 	}
 	@PostMapping("update")
@@ -142,7 +147,8 @@ public class FileController {
 	@DeleteMapping("delete/{userId}/{docId}")
 	@ApiOperation("同个文件夹中文献的删除")
 	public R fileDelete( List<Long> ids,
-						@ApiParam(name="当前同个文件夹的docId") @PathVariable Long docId,
+						@ApiParam(name="当前同个文件夹的docId")
+							@PathVariable Long docId,
 						@PathVariable Long userId){
 		boolean fileDelete=pdfFileService.fileDelete(ids,docId,userId);
 		if (fileDelete)
@@ -162,8 +168,7 @@ public class FileController {
 					   @PathVariable Long userId,
 					   @PathVariable Long newDocId){
 		if(newDocId==0)
-			//Todo: 需要在服务层进行 先查询再更新
-			log.error("系统接口暴露,被攻击");
+			log.error("系统接口暴露,逻辑失效");
 		if (ids==null)
 			return R.fail("请选择文献");
 		if (ids.isEmpty())
@@ -180,7 +185,7 @@ public class FileController {
 						@PathVariable Long oldDocId,
 						@PathVariable Long userId){
 		if(oldDocId==0)
-			log.error("系统接口暴露,被攻击");
+			log.error("系统接口暴露,逻辑失效");
 		if (ids==null)
 			return R.fail("请选择文献");
 		if (ids.isEmpty())

@@ -49,10 +49,9 @@ public class DocController {
 	@DeleteMapping("delete/{userId}/{docId}")
 	@ApiOperation("删除文件夹(不涉及账号删除)")
 	public R deleteDoc(@PathVariable Long userId,@PathVariable Long docId){
-		//Todo: 根据双Id进行删除
 		if (docId==0L)
 			return R.fail("默认文件夹不可删除");
-		boolean b = documentService.removeById(docId);
+		boolean b = documentService.removeByDocIdAndUserId(docId,userId);
 		if (b)
 			return R.ok("删除成功");
 		return R.fail("删除失败");

@@ -5,15 +5,19 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.t.medicaldocument.entity.Document;
 import com.t.medicaldocument.entity.User;
 import com.t.medicaldocument.entity.Vo.DocumentVo;
+import com.t.medicaldocument.entity.Vo.UserVo;
 import com.t.medicaldocument.service.DocumentService;
 import com.t.medicaldocument.service.UserService;
 import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/user/")
@@ -69,13 +73,14 @@ public class UserController {
 	@ApiOperation("登录用户")
 	public R login(String phone,String pwd){
 		if(ObjectUtils.isEmpty(phone)||ObjectUtils.isEmpty(pwd))
-			return R.fail().setMes("手机或密码为空");
+			return R.fail().setMes("手机号或密码为空");
 		QueryWrapper<User> wrapper = new QueryWrapper<>();
 		wrapper.eq("user_phone",phone);
 		wrapper.eq("user_pwd",pwd);
 		User one = userService.getOne(wrapper);
 		if(ObjectUtils.isEmpty(one))
 			return R.fail().setMes("");
+		one.setUserPwd("");
 		return R.ok().setData(one);
 	}
 	@GetMapping("logout")
@@ -86,11 +91,18 @@ public class UserController {
 	}
 	@PostMapping("update")
 	@ApiOperation("更新账户信息")
-	public R update( User user){
+	public R update(UserVo vo){
+		User user = new User();
+		BeanUtils.copyProperties(vo,user);
 		boolean update = userService.updateById(user);
 		if(update)
 			return R.ok().setMes("修改成功");
 		return R.fail().setMes("未知原因:修改失败");
+	}
+	@PostMapping("generate")
+	public R generatePwd(@RequestBody Long userId,
+						 @RequestBody String pwd){
+		return null;
 	}
 	@DeleteMapping("delete/{id}")
 	@ApiOperation("注销账户")

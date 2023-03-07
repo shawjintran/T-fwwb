@@ -2,8 +2,11 @@ package com.t.medicaldocument.mapper;
 
 import com.t.medicaldocument.entity.Document;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +20,7 @@ import java.util.Map;
 */
 public interface DocumentMapper extends BaseMapper<Document> {
 	String nameRepeat(String name,Long uId);
+	@MapKey("docId")
 	List<Map<String,Object>> searchDocById(Long uId);
 
 	@Update("update document set doc_name = #{docName},update_time =now() where doc_id =#{docId}")
@@ -25,6 +29,8 @@ public interface DocumentMapper extends BaseMapper<Document> {
 	Integer AddSize(Long docId, Integer size, Long userId);
 	@Update("update document set doc_size = doc_size-${size} ,update_time =now() where doc_id=#{docId} and user_id=#{userId}")
 	Integer SubSize(Long docId, Integer size, Long userId);
+	@Delete("delete from document where user_id =#{userId} and doc_id =#{docId}")
+	Integer removeByDouble(Long docId, Long userId);
 }
 
 

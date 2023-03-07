@@ -42,28 +42,29 @@ public class AsyncTask {
 	private ApplicationContext applicationContext;
 	@Autowired
 	PlatformTransactionManager platformTransaction;
-	// 事务定义  ：事务的一些基础信息，如超时时间、隔离级别、传播属性等
+	// 事务定义:事务的一些基础信息，如超时时间、隔离级别、传播属性等
 	@Autowired
 	TransactionDefinition transactionDefinition;
 
 	@Async
-	public Future<Integer> saveDescription(Long id, String file_name, int i) throws IOException, InterruptedException {
+	public Future<Integer> saveDescription(Long id, String file_name, Integer page) throws IOException, InterruptedException {
 		Process process = Runtime.getRuntime()
-				.exec(Cmd.create().toString(file_name,i));
+				.exec(Cmd.create().toString(file_name,page));
 		process.waitFor();
-		log.info(file_name+"_"+i+" predict success");
+		log.info(file_name+"_"+page+" predict success");
 		// D:\CodeOfJava\Medical-Document\res\2ee320bcb7eb41e28744b9c39348b5b0\structure\0
 		String pic_path="D:\\CodeOfJava\\Medical-Document\\res\\"
-				+ file_name + "\\structure\\" + i;
+				+ file_name + "\\structure\\" + page;
 		HashMap<String, Object> map = utils.PdfStructure2(pic_path);
 		PdfDescription desc = new PdfDescription();
 		// String s = JSON.toJSONString(map);
 		desc.setPdfTextStructure(JSONObject.toJSONString(map));
 		desc.setPdfId(id);
+		desc.setPdfPage(page);
 		desc.setPdfPicUrl(pic_path);
 		boolean save=false;
 		save= descriptionService.save(desc);
-		log.info(file_name+"_"+i+" save success");
+		log.info(file_name+"_"+page+" save success");
 		if (save)
 			return new AsyncResult<>(1);
 		return new AsyncResult<>(0);

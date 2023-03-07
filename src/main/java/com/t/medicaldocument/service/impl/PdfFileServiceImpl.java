@@ -16,9 +16,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -47,6 +51,15 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		map.put("filename",filename);
 		return map;
 	}
+	public void downloadPdfFile(HttpServletResponse response,String filename)
+			throws UnsupportedEncodingException {
+		//Todo: pdf文件下载
+		response.setContentType("application/pdf");
+		response.setCharacterEncoding("utf-8");
+		String fileName = URLEncoder.encode(filename, "UTF-8");
+
+	}
+	@Override
 	public Integer dividePDF(String filename) throws IOException{
 		return FileUtils.dividePDF(filename);
 	}
@@ -54,7 +67,9 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean removeFile(List<Long> ids, Long oldDocId,Long userId) {
-		if (oldDocId==0)
+		//限制只能同时，从同一个文件夹进行移动
+		List<Long> longs = baseMapper.judgeIfRational(ids);
+		if (longs.size()!=1)
 			return false;
 		//移入到用户默认文件夹
 		List<PdfFile> pdfFiles = baseMapper.selectBatchIds(ids);
@@ -74,6 +89,8 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		boolean b2 = documentService.updateSize(1, 0L, integer, userId);
 		if (b1&&b2)
 			return true;
+		//出现错误,事务回滚
+		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		return false;
 	}
 
@@ -91,6 +108,8 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		boolean deleteDoc=documentService.updateSize(2,docId,deleteFile,useId);
 		if(deleteDesc&&deleteDoc)
 			return true;
+		//出现错误,事务回滚
+		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		return false;
 	}
 
@@ -117,11 +136,13 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		}
 		if (doc_id==1)
 			return true;
+		//出现错误,事务回滚
+		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		return false;
 	}
 
 	/**
-	 * 此方法
+	 *
 	 * @param ids
 	 * @param newDocId
 	 * @param userId
@@ -130,7 +151,9 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean placeFile(List<Long> ids, Long newDocId, Long userId) {
-		if (newDocId==0)
+		//限制只能同时，从同一个文件夹进行移动
+		List<Long> longs = baseMapper.judgeIfRational(ids);
+		if (longs.size()!=1)
 			return false;
 		//移入到新的文件夹
 		Integer integer = baseMapper.modifyDocId(ids, newDocId,userId);
@@ -141,6 +164,8 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		boolean b2 = documentService.updateSize(1, newDocId, integer, userId);
 		if(b1&&b2)
 			return true;
+		//出现错误,事务回滚
+		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		return false;
 	}
 

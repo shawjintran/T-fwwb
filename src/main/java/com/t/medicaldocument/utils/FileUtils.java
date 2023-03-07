@@ -19,13 +19,17 @@ import java.util.Objects;
 public class FileUtils {
 
 	static public void savePDF(MultipartFile file,String filename) throws IOException {
-		String end = System.getProperty("user.dir")+File.separator+"pdf"+File.separator+filename;
+		String end = System.getProperty("user.dir")+File.separator+"pdf"+File.separator+
+				filename;
 		File destFile = new File(end);
 		destFile.getParentFile().mkdirs();
 		//将文件保存
 		file.transferTo(destFile);
 	}
+	static public void removePDF(){
+	//	Todo：文件删除
 
+	}
 	static public int dividePDF(String filename) throws IOException {
 		String pdfUrl=System.getProperty("user.dir")+File.separator+"pdf"+File.separator+filename+".pdf";
 		String picUrl=System.getProperty("user.dir")+File.separator+"pic"+File.separator+filename;
@@ -67,9 +71,7 @@ public class FileUtils {
 		return pageCount;
 	}
 
-	void downloadPDF(){
 
-	}
 	static public String ImageToBase64(InputStream imgPath) {
 		byte[] data = null;
 		// 读取图片字节数组
@@ -91,4 +93,5 @@ public class FileUtils {
 		//System.out.println("图片转换Base64:" + encoder.encode(Objects.requireNonNull(data)));
 		return encoder.encode(Objects.requireNonNull(data));
 	}
+
 }

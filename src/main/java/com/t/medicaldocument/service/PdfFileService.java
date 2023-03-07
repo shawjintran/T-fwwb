@@ -21,9 +21,8 @@ public interface PdfFileService extends IService<PdfFile> {
 	boolean removeFile(List<Long> ids, Long docId, Long userId);
 	List<PdfFileVo> fileSearchByDocId(Long docId,Long userId);
 	boolean fileDelete(List<Long> ids, Long docId,Long userId);
-	public boolean statusUpdate(Long pdfId,Integer status);
+	boolean statusUpdate(Long pdfId,Integer status);
 	boolean fileUpdate(PdfFileVo2 pdf);
-
 	boolean placeFile(List<Long> ids, Long docId, Long userId);
 
 }

@@ -70,6 +70,14 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 		return false;
 	}
 
+	@Override
+	public boolean removeByDocIdAndUserId(Long DocId, Long UserId) {
+		Integer delete=baseMapper.removeByDouble(DocId,UserId);
+		if (delete==1)
+			return true;
+		return false;
+	}
+
 }
 
 

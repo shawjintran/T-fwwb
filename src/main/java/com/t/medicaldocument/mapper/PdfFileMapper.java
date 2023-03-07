@@ -19,7 +19,7 @@ public interface PdfFileMapper extends BaseMapper<PdfFile> {
 
 	List<PdfFileVo> fileSearchByDocId(Long docId,Long userId);
 
-	Integer placeFile(List<Long> ids, Long newDocId, Long userId);
+	List<Long> judgeIfRational(List<Long> ids);
 }
 
 
