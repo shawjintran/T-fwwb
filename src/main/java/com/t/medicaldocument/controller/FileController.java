@@ -2,14 +2,12 @@ package com.t.medicaldocument.controller;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.t.medicaldocument.config.AsyncTask;
+import com.t.medicaldocument.common.Job.AsyncTask;
 import com.t.medicaldocument.entity.PdfFile;
 import com.t.medicaldocument.entity.Vo.PdfFileVo;
 import com.t.medicaldocument.entity.Vo.PdfFileVo2;
-import com.t.medicaldocument.service.PdfDescriptionService;
 import com.t.medicaldocument.service.PdfFileService;
 import com.t.medicaldocument.utils.FileUtils;
-import com.t.medicaldocument.utils.PdfDataUtils;
 import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,7 +22,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -59,8 +57,8 @@ public class FileController {
 			return R.fail("请先登录");
 		if (file.isEmpty())
 			return R.fail().setMes("上传文件为空");
-		if(pdf.getPdfAuthor()==null||pdf.getPdfTitle()==null)
-			return R.fail().setMes("请输入pdf文献的作者与题目");
+		if(pdf.getPdfTitle()==null)
+			return R.fail().setMes("出现错误");
 		HashMap<String, Object> map = pdfFileService.uploadPdfFile(file, pdf);
 		if(map==null)
 			return R.fail().setMes("文件上传出现错误");
@@ -70,8 +68,6 @@ public class FileController {
 			return R.fail("未知错误");
 		//count 为 页数
 		pdf.setPdfPagecount(count);
-		//添加到默认的文件夹
-		pdf.setDocId(0L);
 		boolean save = pdfFileService.save(pdf);
 		map.put("count",count);
 		map.put("id",pdf.getPdfId());
@@ -127,14 +123,21 @@ public class FileController {
 		task.predictByPython(pdfId, filename, count);
 		return R.ok("系统将对文献进行分析");
 	}
-	@GetMapping("download/{pdfId}")
+	@GetMapping(value = "download/{pdfId}", produces = "application/pdf")
 	@ApiOperation("文献的下载")
-	public R fileDownload(@PathVariable Long pdfId,
-						  HttpServletRequest hsr){
+	public void fileDownload(@PathVariable Long pdfId,
+						  HttpServletResponse response) {
 		PdfFile pdfFile = pdfFileService.getById(pdfId);
+
 		String pdfFileName = pdfFile.getPdfFileName();
 		//文件下载
-		return null;
+		try{
+			pdfFileService.downloadPdfFile(response,pdfFileName);
+		}catch (Exception e){
+			log.error(e.getMessage());
+			return;
+		}
+		return ;
 	}
 	@PostMapping("update")
 	@ApiOperation("文献信息的修改(可以实现文献的文件夹的变动)")

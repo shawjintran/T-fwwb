@@ -100,12 +100,11 @@ public class PdfDataUtils {
 	 * @param file_path
 	 * @return
 	 */
-	public HashMap<String, Object> PdfStructure2(String file_path) throws IOException {
+	 static public HashMap<String, Object> PdfStructure2(String file_path) throws IOException {
 
 		byte[] bytes = Files.readAllBytes(Paths.get(file_path + File.separator + "res_0.txt"));
 		// System.out.println(builder.toString());
 		JSONArray result = JSONArray.parseArray(new String(bytes));
-
 		HashMap<String, Object> pdf = new HashMap<>();
 
 		for (Object o : result) {
@@ -126,7 +125,7 @@ public class PdfDataUtils {
 	 * 对 ocr识别 返回一般类型的 数据字段进行处理
 	 * @param res
 	 */
-	private StringBuilder Textfield(JSONArray res){
+	static private StringBuilder Textfield(JSONArray res){
 		if (res==null)
 			return null;
 		//长文本
@@ -143,7 +142,7 @@ public class PdfDataUtils {
 	 * 对 ocr识别 返回一般类型的 数据字段进行处理
 	 * @param res
 	 */
-	private StringBuilder Tablefield(JSONObject res){
+	static private StringBuilder Tablefield(JSONObject res){
 		if (res==null)
 			return null;
 		StringBuilder table=new StringBuilder();
@@ -157,7 +156,7 @@ public class PdfDataUtils {
 	 * @param key
 	 * @param value
 	 */
-	private void put(HashMap<String, Object> pdf, String key, StringBuilder value){
+	static private void put(HashMap<String, Object> pdf, String key, StringBuilder value){
 		if (value==null)
 			return;
 		if(pdf.containsKey(key))

@@ -1,4 +1,4 @@
-package com.t.medicaldocument.config;
+package com.t.medicaldocument.handler;
 
 import com.t.medicaldocument.utils.R;
 import org.springframework.web.bind.annotation.ControllerAdvice;

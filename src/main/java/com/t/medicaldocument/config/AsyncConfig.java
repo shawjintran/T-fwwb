@@ -4,6 +4,7 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 
 @Component
@@ -11,7 +12,6 @@ import java.util.concurrent.Executor;
  * 线程池参数
  */
 public class AsyncConfig implements AsyncConfigurer {
-	// private static final Logger log = LoggerFactory.getLogger(MyAsyncConfigurer.class);
 
 	@Override
 	public Executor getAsyncExecutor() {

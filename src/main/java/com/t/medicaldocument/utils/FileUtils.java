@@ -1,6 +1,7 @@
 package com.t.medicaldocument.utils;
 
 
+import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -8,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sun.misc.BASE64Encoder;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 
@@ -18,8 +20,11 @@ import java.util.Objects;
  */
 public class FileUtils {
 
-	static public void savePDF(MultipartFile file,String filename) throws IOException {
-		String end = System.getProperty("user.dir")+File.separator+"pdf"+File.separator+
+	static String pdf_location= System.getProperty("user.dir")+File.separator+"pdf"+File.separator;
+	static String pic_location= System.getProperty("user.dir")+File.separator+"pic"+File.separator;
+	static public void savePDF(MultipartFile file,String filename)
+			throws IOException {
+		String end = pdf_location+
 				filename;
 		File destFile = new File(end);
 		destFile.getParentFile().mkdirs();
@@ -30,9 +35,19 @@ public class FileUtils {
 	//	Todo：文件删除
 
 	}
-	static public int dividePDF(String filename) throws IOException {
-		String pdfUrl=System.getProperty("user.dir")+File.separator+"pdf"+File.separator+filename+".pdf";
-		String picUrl=System.getProperty("user.dir")+File.separator+"pic"+File.separator+filename;
+	static public Boolean downloadPDF(OutputStream out, String filename)
+			throws IOException {
+		File file = new File(pdf_location + filename + ".pdf");
+		if (!file.exists())
+			return false;
+		IOUtils.copy(new FileInputStream(file),out);
+		out.flush();
+		return true;
+	}
+	static public int dividePDF(String filename)
+			throws IOException {
+		String pdfUrl=pdf_location+filename+".pdf";
+		String picUrl=pic_location+filename;
 		PDDocument doc = null;
 		ByteArrayOutputStream os = null;
 		InputStream stream = null;

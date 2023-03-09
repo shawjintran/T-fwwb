@@ -1,4 +1,4 @@
-package com.t.medicaldocument.config;
+package com.t.medicaldocument.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import lombok.extern.slf4j.Slf4j;

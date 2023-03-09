@@ -4,12 +4,14 @@ package com.t.medicaldocument;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.annotations.Mapper;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -65,7 +67,12 @@ class MedicalDocumentApplicationTests {
 	// 	}
 	// }
 	@Test
-	void r(){
+	void r() throws IOException {
+		File file = new File("D:\\CodeOfJava\\Medical-Document\\pdf\\53a042b1.pdf");
+		File file1 = new File("53a042b1.pdf");
 
+		FileOutputStream outputStream = new FileOutputStream(file1);
+		FileInputStream inputStream = new FileInputStream(file);
+		IOUtils.copy(inputStream, outputStream);
 	}
 }

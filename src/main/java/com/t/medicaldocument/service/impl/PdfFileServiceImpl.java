@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.t.medicaldocument.config.MException;
 import com.t.medicaldocument.entity.PdfFile;
 import com.t.medicaldocument.entity.Vo.PdfFileVo;
 import com.t.medicaldocument.entity.Vo.PdfFileVo2;
@@ -19,8 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -45,6 +49,9 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 				.toString()
 				.replace("-","").substring(0,8);
 		pdf.setPdfFileName(filename);
+		//添加到默认的文件夹
+		pdf.setDocId(0L);
+		//文件未开始预测,状态为0;
 		pdf.setPdfStatus(0);
 		FileUtils.savePDF(file,filename+".pdf");
 		HashMap<String,Object> map=new HashMap<>(3);
@@ -52,11 +59,31 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		return map;
 	}
 	public void downloadPdfFile(HttpServletResponse response,String filename)
-			throws UnsupportedEncodingException {
-		//Todo: pdf文件下载
+			 {
 		response.setContentType("application/pdf");
-		response.setCharacterEncoding("utf-8");
-		String fileName = URLEncoder.encode(filename, "UTF-8");
+		OutputStream outputStream=null;
+		BufferedOutputStream buffer=null;
+		try{
+			String fileName = URLEncoder.encode(filename, "UTF-8");
+			response.addHeader("Content-Disposition", "attachment;filename="+ fileName + ".pdf");
+			outputStream = response.getOutputStream();
+			//使用BufferOutPutStream 有问题
+			buffer = new BufferedOutputStream(outputStream);
+			Boolean down = FileUtils.downloadPDF(buffer, filename);
+			if (down)
+				return;
+			throw new Exception();
+		}catch (Exception e){
+			log.error("文件流出现问题");
+		}finally {
+			try {
+				buffer.close();
+				outputStream.close();
+			} catch (Exception e) {
+				log.error("关闭流出现问题");
+			}
+
+		}
 
 	}
 	@Override

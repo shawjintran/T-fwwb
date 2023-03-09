@@ -6,6 +6,7 @@ import com.t.medicaldocument.entity.Vo.PdfFileVo;
 import com.t.medicaldocument.entity.Vo.PdfFileVo2;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -24,5 +25,5 @@ public interface PdfFileService extends IService<PdfFile> {
 	boolean statusUpdate(Long pdfId,Integer status);
 	boolean fileUpdate(PdfFileVo2 pdf);
 	boolean placeFile(List<Long> ids, Long docId, Long userId);
-
+	void downloadPdfFile(HttpServletResponse response, String filename) throws IOException;
 }
