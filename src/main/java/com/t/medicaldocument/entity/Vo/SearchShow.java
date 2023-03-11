@@ -22,7 +22,7 @@ public class SearchShow {
     /**
      * 图片展示
      */
-    private String imgUrl;
+    // private String imgUrl;
     /**
      * pdf的id
      */

@@ -6,6 +6,7 @@ import com.t.medicaldocument.common.Job.AsyncTask;
 import com.t.medicaldocument.entity.PdfFile;
 import com.t.medicaldocument.entity.Vo.PdfFileVo;
 import com.t.medicaldocument.entity.Vo.PdfFileVo2;
+import com.t.medicaldocument.entity.Vo.PdfFileVo3;
 import com.t.medicaldocument.service.PdfFileService;
 import com.t.medicaldocument.utils.FileUtils;
 import com.t.medicaldocument.utils.R;
@@ -158,12 +159,23 @@ public class FileController {
 			return R.ok("删除成功");
 		return R.fail("删除失败");
 	}
-	@GetMapping("search/{userId}/{docId}")
-	@ApiOperation("根据文件夹id和用户id查询文献")
-	public R fileSearchByDocId(@PathVariable Long docId,
-							   @PathVariable Long userId){
-		List<PdfFileVo> list=pdfFileService.fileSearchByDocId(docId,userId);
-		return R.ok(list);
+	@GetMapping("search/{page}/{size}")
+	@ApiOperation("根据文件夹id和用户id 分页 查询文件夹中的文献")
+	public R fileSearchByDoc(@PathVariable Integer page,
+							   @PathVariable Integer size, PdfFileVo3 vo){
+		if(vo==null)
+			return R.fail();
+		if (vo.getUserId()==null)
+			return R.fail();
+		Integer total = pdfFileService.fileCount(vo.getDocId(), vo.getUserId());
+		HashMap<String, Object> map = new HashMap<>(2);
+		map.put("all",total);
+		map.put("data",null);
+		if (total/size+1<page)
+			return R.ok(map);
+		List<PdfFileVo> list=pdfFileService.fileSearchPageById(page, size, total, vo);
+		map.put("data",list);
+		return R.ok(map);
 	}
 	@PutMapping("place/{userId}/{newDocId}")
 	@ApiOperation("(归档)文献们从默认文件夹归入到同一个文档(非默认0)")

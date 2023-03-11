@@ -102,6 +102,7 @@ public class UserController {
 	@PostMapping("generate")
 	public R generatePwd(@RequestBody Long userId,
 						 @RequestBody String pwd){
+		//todo: 用户更改密码
 		return null;
 	}
 	@DeleteMapping("delete/{id}")

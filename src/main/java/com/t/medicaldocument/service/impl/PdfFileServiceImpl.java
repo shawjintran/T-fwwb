@@ -1,23 +1,22 @@
 package com.t.medicaldocument.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.t.medicaldocument.config.MException;
+
 import com.t.medicaldocument.entity.PdfFile;
 import com.t.medicaldocument.entity.Vo.PdfFileVo;
 import com.t.medicaldocument.entity.Vo.PdfFileVo2;
+import com.t.medicaldocument.entity.Vo.PdfFileVo3;
 import com.t.medicaldocument.service.DocumentService;
 import com.t.medicaldocument.service.PdfDescriptionService;
 import com.t.medicaldocument.service.PdfFileService;
 import com.t.medicaldocument.mapper.PdfFileMapper;
 import com.t.medicaldocument.utils.FileUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
@@ -39,7 +38,7 @@ import java.util.stream.Collectors;
 */
 @Service
 public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
-    implements PdfFileService{
+		implements PdfFileService{
 	@Autowired
 	DocumentService documentService;
 	@Autowired
@@ -122,9 +121,23 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	}
 
 	@Override
-	public List<PdfFileVo> fileSearchByDocId(Long docId,Long userId) {
-		List<PdfFileVo> list=baseMapper.fileSearchByDocId(docId,userId);
+	@Transactional(rollbackFor = Exception.class)
+	public boolean moveFile(List<Long> ids,Long userId,Long oldDocId,Long newDocId){
+		//todo: 整合函数逻辑
+		return null;
+	}
+
+	@Override
+	public List<PdfFileVo> fileSearchPageById(Integer page, Integer size,
+											  Integer total, PdfFileVo3 vo) {
+		Integer offset=(page-1)*size;
+		List<PdfFileVo> list=baseMapper.fileSearchPageById(offset,size, vo.getDocId(), vo.getUserId());
 		return list;
+	}
+
+	@Override
+	public Integer fileCount(Long docId, Long userId) {
+		return baseMapper.fileCount(docId, userId);
 	}
 
 	@Override

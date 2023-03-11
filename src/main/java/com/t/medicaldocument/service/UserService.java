@@ -9,7 +9,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2023-01-24 12:40:55
 */
 public interface UserService extends IService<User> {
-
 	boolean deleteUser(Long id);
-
 }

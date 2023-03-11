@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
@@ -47,21 +48,31 @@ public class AsyncTask {
 		TransactionStatus transaction = platformTransaction.
 				getTransaction(transactionDefinition);
 		PdfFileService bean = BeanContext.getBean(PdfFileService.class);
-		List<Future<Boolean>> futures = new ArrayList<>();
+		List<Future<HashMap>> futures = new ArrayList<>();
 		AsyncConfig asyncConfig = BeanContext.getBean(AsyncConfig.class);
 		ThreadPoolTaskExecutor executor = (ThreadPoolTaskExecutor)asyncConfig.getAsyncExecutor();
 		for (Integer i = 0; i < count; i++) {
 			futures.add(executor.submit(new DescCallable(pdfId, filename, i)));
 		}
-		for (Future<Boolean> future : futures) {
-			if (future.get())
+		ArrayList<HashMap<String,Object>> pdfEs=new ArrayList<>();
+		//将要存储进Es的先收集起
+		for (Future<HashMap> future : futures) {
+			if (future.get()!=null)
+			{
+				pdfEs.add(future.get());
 				continue;
+			}
 			platformTransaction.rollback(transaction);
 			//推测出现异常,设置为2
 			bean.statusUpdate(pdfId,2);
 			return;
 		}
-		bean.statusUpdate(pdfId,1);
+		synchronized (this){
+			bean.statusUpdate(pdfId,1);
+			// todo：修改逻辑，结合ES
+		}
+
+
 		platformTransaction.commit(transaction);
 
 	}

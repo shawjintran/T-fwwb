@@ -8,21 +8,20 @@ import com.t.medicaldocument.utils.Cmd;
 import com.t.medicaldocument.utils.PdfDataUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.AsyncResult;
-import org.springframework.stereotype.Component;
-
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 @AllArgsConstructor
 @Slf4j
-public class DescCallable implements Callable<Boolean> {
+public class DescCallable implements Callable<HashMap> {
 	Long id;
 	String file_name;
 	Integer page;
 
 	@Override
-	public Boolean call() throws Exception {
+	public HashMap call() throws Exception {
 		Process process = Runtime.getRuntime()
 				.exec(Cmd.create().toString(file_name,page));
 		process.waitFor();
@@ -31,7 +30,7 @@ public class DescCallable implements Callable<Boolean> {
 		String pic_path="D:\\CodeOfJava\\Medical-Document\\res\\"
 				+ file_name + "\\structure\\" + page;
 		//路径映射
-		HashMap<String, Object> map = PdfDataUtils.PdfStructure2(pic_path);
+		HashMap<String, ArrayList> map = PdfDataUtils.PdfStructure2(pic_path);
 		PdfDescription desc = new PdfDescription();
 		desc.setPdfTextStructure(JSONObject.toJSONString(map));
 		desc.setPdfId(id);
@@ -40,8 +39,14 @@ public class DescCallable implements Callable<Boolean> {
 		PdfDescriptionService bean = BeanContext.getBean(PdfDescriptionService.class);
 		boolean save= bean.save(desc);
 		log.info(file_name+"_"+page+" save success");
-		if (save)
-			return true;
-		return false;
+		if (save){
+			Long pdfDescId = desc.getPdfDescId();
+			HashMap<String, Object> pdfDesc = new HashMap<>(1);
+			pdfDesc.put("descId",pdfDescId);
+			pdfDesc.put("page",page);
+			pdfDesc.put("desc",map);
+			return pdfDesc;
+		}
+		return null;
 	}
 }

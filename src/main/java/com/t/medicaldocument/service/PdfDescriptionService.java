@@ -13,8 +13,6 @@ import java.util.List;
 * @createDate 2023-02-02 20:41:15
 */
 public interface PdfDescriptionService extends IService<PdfDescription> {
-
 	boolean deleteByPdfIds(List<Long> ids);
-
 	List<PdfDescVo>  descSearchByPdfId(Long pdfId);
 }

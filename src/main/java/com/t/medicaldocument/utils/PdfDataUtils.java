@@ -53,7 +53,7 @@ public class PdfDataUtils {
 	 * 对pdf版面分析 通过 hubserving服务 返回数据 需要进行基于阅读顺序的排序时
 	 * @param res
 	 */
-	public HashMap<String, Object> PdfStructure(JSONObject res)  {
+	 HashMap<String, ArrayList> PdfStructure(JSONObject res)  {
 		if(res==null)
 			return null;
 		JSONArray result = new JSONArray((List) res.get("regions"));
@@ -62,7 +62,7 @@ public class PdfDataUtils {
 		// 	return null;
 		// }
 		HashMap<int[], StringBuilder> map = new HashMap<>();
-		HashMap<String, Object> pdf = new HashMap<>();
+		HashMap<String, ArrayList> pdf = new HashMap<>();
 
 		for (Object o : result) {
 			JSONObject json =  new JSONObject((HashMap)o);
@@ -100,12 +100,13 @@ public class PdfDataUtils {
 	 * @param file_path
 	 * @return
 	 */
-	 static public HashMap<String, Object> PdfStructure2(String file_path) throws IOException {
+	 static public HashMap<String, ArrayList> PdfStructure2(String file_path)
+			 throws IOException {
 
 		byte[] bytes = Files.readAllBytes(Paths.get(file_path + File.separator + "res_0.txt"));
 		// System.out.println(builder.toString());
 		JSONArray result = JSONArray.parseArray(new String(bytes));
-		HashMap<String, Object> pdf = new HashMap<>();
+		HashMap<String, ArrayList> pdf = new HashMap<>();
 
 		for (Object o : result) {
 			JSONObject json =  new JSONObject((JSONObject)o);
@@ -119,6 +120,7 @@ public class PdfDataUtils {
 				put(pdf,type,text);
 			}
 		}
+
 		return pdf;
 	}
 	/**
@@ -156,7 +158,7 @@ public class PdfDataUtils {
 	 * @param key
 	 * @param value
 	 */
-	static private void put(HashMap<String, Object> pdf, String key, StringBuilder value){
+	static private void put(HashMap<String, ArrayList> pdf, String key, StringBuilder value){
 		if (value==null)
 			return;
 		if(pdf.containsKey(key))
@@ -168,5 +170,20 @@ public class PdfDataUtils {
 			list.add(value.toString());
 			pdf.put(key,list);
 		}
+	}
+
+	static public void parseList(ArrayList<HashMap<String,Object>> list){
+
+		for (HashMap<String, Object> map : list) {
+			HashMap<String,ArrayList> pdf = (HashMap<String,ArrayList>)map.get("desc");
+			parseMapToEsObject(pdf,new Object());
+		}
+	}
+	static void parseMapToEsObject(HashMap<String,ArrayList> map,Object EsObject){
+		//todo: 需要ES对象
+		for (String s : map.keySet()) {
+		//	todo：使用反射进行映射字段名
+		}
+
 	}
 }

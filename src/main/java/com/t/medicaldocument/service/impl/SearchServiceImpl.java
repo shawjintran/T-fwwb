@@ -131,7 +131,7 @@ public class SearchServiceImpl {
                    searchShow.setPdfId(documentBo.getPdfId());
 
                    searchShow.setTitle("");//TODO 获取标题
-                   searchShow.setImgUrl("");//TODO 设置图片
+                   // searchShow.setImgUrl("");// 设置图片
                    searchShow.setPageString("命中页数有:");
                    searchShow.setScore(0f);
                }

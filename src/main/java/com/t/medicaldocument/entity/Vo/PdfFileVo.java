@@ -24,4 +24,9 @@ public class PdfFileVo {
 	 */
 	private String pdfAuthor;
 
+	/**
+	 * pdf文件状态
+	 */
+	private Integer pdfStatus;
+
 }
