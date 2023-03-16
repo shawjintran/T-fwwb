@@ -3,9 +3,11 @@ package com.t.medicaldocument.utils;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @Accessors(chain = true)
-public class R<T> {
+public class R<T> implements Serializable {
 	private int code;
 	private String mes;
 	private T data;

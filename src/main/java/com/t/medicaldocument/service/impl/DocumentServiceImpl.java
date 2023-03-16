@@ -5,8 +5,13 @@ import com.t.medicaldocument.entity.Document;
 import com.t.medicaldocument.entity.Vo.DocumentVo;
 import com.t.medicaldocument.service.DocumentService;
 import com.t.medicaldocument.mapper.DocumentMapper;
+import com.t.medicaldocument.service.PdfFileService;
 import com.t.medicaldocument.utils.R;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,7 +27,8 @@ import java.util.Map;
 public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
     implements DocumentService{
 
-
+	@Autowired
+	PdfFileService pdfFileService;
 	@Override
 	public boolean nameRepeat(String name,Long uId) {
 		String repeat = baseMapper.nameRepeat(name,uId);
@@ -71,11 +77,21 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public boolean removeByDocIdAndUserId(Long DocId, Long UserId) {
+		//Mapper层添加了docId判断
 		Integer delete=baseMapper.removeByDouble(DocId,UserId);
-		if (delete==1)
-			return true;
-		return false;
+		if (delete<1)
+			return false;
+		if(DocId==null)
+		{
+			boolean remove=pdfFileService.deleteFileByUser(UserId);
+			if (remove)
+				return true;
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return false;
+		}
+		return true;
 	}
 
 }

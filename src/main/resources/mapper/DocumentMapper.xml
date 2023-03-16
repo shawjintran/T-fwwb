@@ -19,6 +19,11 @@
         doc_size,create_time,update_time,
         is_delete
     </sql>
+    <delete id="removeByDouble">
+        delete from document where user_id =#{userId}
+                               <if test = "_parameter.containsKey('docId') and docId!=null and docId!=''"></if>
+                               and doc_id =#{docId}
+    </delete>
     <select id = "nameRepeat" resultType="string" >
         select  doc_name from document where doc_name = #{name} and user_id=#{uId};
     </select>

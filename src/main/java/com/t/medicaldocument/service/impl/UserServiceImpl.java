@@ -3,9 +3,15 @@ package com.t.medicaldocument.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.t.medicaldocument.entity.User;
+import com.t.medicaldocument.entity.Vo.UserVo;
 import com.t.medicaldocument.mapper.UserMapper;
+import com.t.medicaldocument.service.DocumentService;
+import com.t.medicaldocument.service.PdfFileService;
 import com.t.medicaldocument.service.UserService;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
 * @author sky
@@ -16,9 +22,36 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     implements UserService {
 
+
+	@Autowired
+	DocumentService documentService;
+
 	@Override
-	public boolean deleteUser(Long id) {
-		// TODO: 2023/3/15 删除用户
+	@Transactional
+	public boolean deleteUser(Long userId) {
+		int i = baseMapper.deleteById(userId);
+		boolean b = documentService.removeByDocIdAndUserId(null, userId);
+		if (i==1&&b)
+			return true;
+		return false;
+	}
+
+	@Override
+	public boolean generatePwd(Long userId, String oldPwd, String newPwd) {
+		if (userId==null||oldPwd==null||newPwd==null)
+			return false;
+		boolean done=baseMapper.generatePwd(userId,oldPwd,newPwd);
+		return done;
+	}
+
+	@Override
+	public boolean updateInfo(UserVo vo) {
+		User user = new User();
+		vo.setUserPoints(null);
+		BeanUtils.copyProperties(vo,user);
+		int update = baseMapper.updateById(user);
+		if (update==1)
+			return true;
 		return false;
 	}
 }

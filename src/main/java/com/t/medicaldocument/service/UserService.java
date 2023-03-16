@@ -2,6 +2,7 @@ package com.t.medicaldocument.service;
 
 import com.t.medicaldocument.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.t.medicaldocument.entity.Vo.UserVo;
 
 /**
 * @author sky
@@ -10,4 +11,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface UserService extends IService<User> {
 	boolean deleteUser(Long id);
+
+	boolean generatePwd(Long userId, String oldPwd, String newPwd);
+
+	boolean updateInfo(UserVo vo);
 }

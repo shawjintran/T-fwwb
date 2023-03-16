@@ -30,4 +30,6 @@ public interface PdfFileService extends IService<PdfFile> {
 	boolean fileUpdate(PdfFileVo2 pdf);
 	boolean placeFile(List<Long> ids, Long docId, Long userId);
 	void downloadPdfFile(HttpServletResponse response, String filename) throws IOException;
+
+	boolean deleteFileByUser(Long userId);
 }

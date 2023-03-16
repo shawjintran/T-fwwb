@@ -44,6 +44,7 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	DocumentService documentService;
 	@Autowired
 	PdfDescriptionService descriptionService;
+
 	public HashMap<String, Object> uploadPdfFile(MultipartFile file, PdfFile pdf) throws IOException {
 		String filename = UUID.randomUUID()
 				.toString()
@@ -87,6 +88,20 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		}
 
 	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean deleteFileByUser(Long userId) {
+		List<Long> pdfIds = baseMapper.fileSelectByUser(userId);
+		boolean deleteDesc = descriptionService.deleteByPdfIds(pdfIds);
+		boolean deletePdf=baseMapper.fileDeleteByIds(pdfIds);
+		if (deleteDesc&&deletePdf)
+			return true;
+		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+		return false;
+	}
+
+
 	@Override
 	public Integer dividePDF(String filename) throws IOException{
 		return FileUtils.dividePDF(filename);

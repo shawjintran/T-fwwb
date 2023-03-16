@@ -3,16 +3,24 @@ package com.t.medicaldocument;
 
 
 import com.alibaba.fastjson2.JSONObject;
+import com.t.medicaldocument.entity.User;
+import com.t.medicaldocument.service.PdfFileService;
+import com.t.medicaldocument.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.annotations.Mapper;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 @SpringBootTest
@@ -20,6 +28,14 @@ import java.util.HashMap;
 @Slf4j
 class MedicalDocumentApplicationTests {
 
+	@Autowired
+	UserService userService;
+
+	@Autowired
+	PlatformTransactionManager platformTransaction;
+	@Autowired
+	// 事务定义:事务的一些基础信息，如超时时间、隔离级别、传播属性等
+	TransactionDefinition transactionDefinition;
 	@Test
 	void contextLoads() {
 		String end=System.getProperty("user.dir")+"fileName";
@@ -74,5 +90,25 @@ class MedicalDocumentApplicationTests {
 		FileOutputStream outputStream = new FileOutputStream(file1);
 		FileInputStream inputStream = new FileInputStream(file);
 		IOUtils.copy(inputStream, outputStream);
+	}
+	@Test
+	void Arr(){
+		int[] a= new int[2];
+		System.out.println(Arrays.toString(a));
+	}
+	@Test
+	void Tran(){
+		TransactionStatus transaction = platformTransaction.
+				getTransaction(transactionDefinition);
+		for (int i = 0; i < 5; i++) {
+
+		}
+		System.out.println("yes");
+		platformTransaction.rollback(transaction);
+	}
+	@Test
+	void User(){
+		System.out.println(userService.updateById(new User().setUserId(1L).setUserPoints(3)));
+
 	}
 }

@@ -3,6 +3,8 @@ package com.t.medicaldocument.mapper;
 import com.t.medicaldocument.entity.PdfFile;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.t.medicaldocument.entity.Vo.PdfFileVo;
+import org.apache.ibatis.annotations.Select;
+
 import java.util.List;
 
 /**
@@ -20,6 +22,11 @@ public interface PdfFileMapper extends BaseMapper<PdfFile> {
 	Integer fileCount(Long docId,Long userId);
 
 	List<Long> judgeIfRational(List<Long> ids);
+
+	@Select("select pdf_id from pdf_file where user_id=#{userId}")
+	List<Long> fileSelectByUser(Long userId);
+
+	boolean fileDeleteByIds(List<Long> pdfIds);
 }
 
 

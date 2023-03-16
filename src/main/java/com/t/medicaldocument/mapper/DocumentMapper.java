@@ -29,7 +29,7 @@ public interface DocumentMapper extends BaseMapper<Document> {
 	Integer AddSize(Long docId, Integer size, Long userId);
 	@Update("update document set doc_size = doc_size-${size} ,update_time =now() where doc_id=#{docId} and user_id=#{userId}")
 	Integer SubSize(Long docId, Integer size, Long userId);
-	@Delete("delete from document where user_id =#{userId} and doc_id =#{docId}")
+
 	Integer removeByDouble(Long docId, Long userId);
 }
 

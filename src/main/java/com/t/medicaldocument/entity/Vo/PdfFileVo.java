@@ -5,10 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PdfFileVo {
+public class PdfFileVo implements Serializable {
 	/**
 	 * pdf文件id
 	 */

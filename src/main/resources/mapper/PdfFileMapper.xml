@@ -29,6 +29,12 @@
         #{item}
     </foreach>
     </update>
+    <delete id="fileDeleteByIds">
+        delete from pdf_file where pdf_id in
+        <foreach collection = "pdfIds" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </delete>
     <select id = "fileSearchPageById" resultType="com.t.medicaldocument.entity.Vo.PdfFileVo">
         select pdf_id, doc_id,pdf_title, pdf_author,pdf_status from pdf_file
         where  user_id=#{userId}

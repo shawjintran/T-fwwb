@@ -15,6 +15,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -80,7 +82,8 @@ public class FileController {
 	}
 
 	// @GetMapping("/analyze/structure")
-	public R fileAnalyzeStructure(String filename, Integer count) throws Exception {
+	public R fileAnalyzeStructure(String filename, Integer count)
+			throws Exception {
 		String picUrl=System.getProperty("user.dir")+File.separator+"pic"+File.separator+filename+File.separator;
 		HttpHeaders headers = new HttpHeaders();
 
@@ -123,6 +126,7 @@ public class FileController {
 								   @ApiParam(required = true)String filename,
 								   @ApiParam(required = true)Integer count)
 			throws IOException, InterruptedException, ExecutionException {
+// TODO: 2023/3/16 是否应添加合理性判断
 		task.predictByPython(pdfId, filename, count);
 		return R.ok().setMes("系统将对文献进行分析");
 	}
@@ -141,10 +145,11 @@ public class FileController {
 			log.error(e.getMessage());
 			return;
 		}
-		return;
+		return ;
 	}
 	@PostMapping("update")
 	@ApiOperation("（已定）文献信息的修改(可以实现文献的文件夹的变动)")
+	@CacheEvict(cacheNames = "PdfFile",key = "'*'+_+#pdf.getUserId()+'_'+'*'")
 	public R fileUpdate( PdfFileVo2 pdf){
 		boolean update=pdfFileService.fileUpdate(pdf);
 		if (update)
@@ -153,12 +158,13 @@ public class FileController {
 	}
 	@DeleteMapping("delete/{userId}/{docId}")
 	@ApiOperation("（已定）同个文件夹中文献的删除")
+	@CacheEvict(cacheNames = "PdfFile",key = "'*'+_+#userId+'_'+'*'")
 	public R fileDelete( @ApiParam(required = true)
 								@RequestBody List<Long> ids,
 						@ApiParam(value="当前同个文件夹的docId")
 							@PathVariable Long docId,
 						 @ApiParam(required = true)
-							 @PathVariable Long userId){
+						@PathVariable Long userId){
 		boolean fileDelete=pdfFileService.fileDelete(ids,docId,userId);
 		if (fileDelete)
 			return R.ok().setMes("删除成功");
@@ -166,6 +172,7 @@ public class FileController {
 	}
 	@GetMapping("search/{page}/{size}")
 	@ApiOperation("（已定）根据文件夹id和用户id 分页 查询文件夹中的文献")
+	@Cacheable(cacheNames = "PdfFile",key = "#root.methodName+'_'+#vo.getUserId()+'_'+#page+'_'+#size")
 	public R fileSearchByDoc(@ApiParam(required = true)
 								 @PathVariable Integer page,
 							 @ApiParam(required = true)

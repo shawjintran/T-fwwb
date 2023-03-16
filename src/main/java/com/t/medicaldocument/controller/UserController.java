@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 
 @RestController
@@ -78,11 +79,12 @@ public class UserController {
 		return null;
 	}
 	@PostMapping("login")
-	@ApiOperation("登录用户")
+	@ApiOperation("（已定）登录用户")
 	public R login(@ApiParam(required = true)
 							   String phone,
 				   @ApiParam(required = true)
-						   String pwd){
+						   String pwd,
+				   HttpSession session){
 		if(ObjectUtils.isEmpty(phone)||ObjectUtils.isEmpty(pwd))
 			return R.fail().setMes("手机号或密码为空");
 		QueryWrapper<User> wrapper = new QueryWrapper<>();
@@ -90,39 +92,44 @@ public class UserController {
 		wrapper.eq("user_pwd",pwd);
 		User one = userService.getOne(wrapper);
 		if(ObjectUtils.isEmpty(one))
-			return R.fail().setMes("");
-		one.setUserPwd("");
-		return R.ok(one);
+			return R.fail().setMes("用户未注册");
+		UserVo userVo = new UserVo();
+		BeanUtils.copyProperties(one,userVo);
+		session.setAttribute("user",one.getUserId());
+		return R.ok(userVo);
 	}
 	@GetMapping("logout")
 	@ApiOperation("登出账户")
-	public R logout(){
-
+	public R logout(HttpSession session){
+		session.removeAttribute("user");
 		return null;
 	}
 	@PostMapping("update")
 	@ApiOperation("（已定）更新账户信息")
 	public R update(UserVo vo){
-		User user = new User();
-		BeanUtils.copyProperties(vo,user);
-		boolean update = userService.updateById(user);
+		boolean update =userService.updateInfo(vo);
 		if(update)
 			return R.ok().setMes("修改成功");
 		return R.fail().setMes("未知原因:修改失败");
 	}
 	@PostMapping("generate")
+	@ApiOperation("（已定）更新用户密码")
 	public R generatePwd(@RequestBody Long userId,
-						 @RequestBody String pwd){
-		//todo: 用户更改密码
-		return null;
+						 @RequestBody String oldPwd,
+						 @RequestBody String newPwd){
+		if(oldPwd.equals(newPwd))
+			return R.fail().setMes("新旧密码一致");
+		boolean done=userService.generatePwd(userId,oldPwd,newPwd);
+		if (done)
+			return R.ok().setMes("修改密码成功");
+		return R.fail().setMes("旧密码输入有误");
 	}
 	@DeleteMapping("delete/{id}")
 	@ApiOperation("（已定）注销账户")
 	public R delete(@ApiParam(required = true)
 						@PathVariable Long id){
 		boolean delete=userService.deleteUser(id);
-		boolean remove = userService.removeById(id);
-		if(remove)
+		if(delete)
 			return R.ok().setMes("删除成功");
 		return R.fail().setMes("未知原因:删除失败");
 	}

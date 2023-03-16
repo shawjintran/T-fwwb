@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserVo {
-	// TODO: 2023/3/15 登录成功，返回用户信息
 	@ApiParam(required = true)
 	private Long userId;
 	/**
