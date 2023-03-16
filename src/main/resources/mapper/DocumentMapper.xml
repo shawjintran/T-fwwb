@@ -19,7 +19,7 @@
         doc_size,create_time,update_time,
         is_delete
     </sql>
-    <select id = "nameRepeat" resultType="string" parameterType="string">
+    <select id = "nameRepeat" resultType="string" >
         select  doc_name from document where doc_name = #{name} and user_id=#{uId};
     </select>
     <select id="searchDocById" resultType="java.util.HashMap">

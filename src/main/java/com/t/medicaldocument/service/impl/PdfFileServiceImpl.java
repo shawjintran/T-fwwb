@@ -3,6 +3,7 @@ package com.t.medicaldocument.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.t.medicaldocument.entity.PdfFile;
 import com.t.medicaldocument.entity.Vo.PdfFileVo;
 import com.t.medicaldocument.entity.Vo.PdfFileVo2;
@@ -52,6 +53,7 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		pdf.setDocId(0L);
 		//文件未开始预测,状态为0;
 		pdf.setPdfStatus(0);
+		pdf.setPdfTitle(file.getOriginalFilename());
 		FileUtils.savePDF(file,filename+".pdf");
 		HashMap<String,Object> map=new HashMap<>(3);
 		map.put("filename",filename);
@@ -124,7 +126,7 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	@Transactional(rollbackFor = Exception.class)
 	public boolean moveFile(List<Long> ids,Long userId,Long oldDocId,Long newDocId){
 		//todo: 整合函数逻辑
-		return null;
+		return true;
 	}
 
 	@Override
@@ -156,13 +158,14 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean fileUpdate(PdfFileVo2 pdf) {
-		if (pdf.getPdfId()==null||pdf.getPdfTitle()==null||pdf.getPdfAuthor()==null||pdf.getDocId()==null)
+		if (pdf.getPdfId()==null||pdf.getPdfTitle()==null||pdf.getDocId()==null)
 			return false;
 		UpdateWrapper<PdfFile> wrapper = new UpdateWrapper<>();
 		wrapper.eq("pdf_id",pdf.getPdfId())
 				.eq("user_id",pdf.getUserId())
-				.set("pdf_title",pdf.getPdfTitle())
-				.set("pdf_author",pdf.getPdfAuthor());
+				.set("pdf_title",pdf.getPdfTitle());
+		if (pdf.getPdfAuthor()!=null)
+				wrapper.set("pdf_author",pdf.getPdfAuthor());
 		int doc_id=0;
 		if (pdf.getNewDocId()==null)
 			doc_id=baseMapper.update(null,wrapper);

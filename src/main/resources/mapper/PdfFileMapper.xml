@@ -31,12 +31,12 @@
     </update>
     <select id = "fileSearchPageById" resultType="com.t.medicaldocument.entity.Vo.PdfFileVo">
         select pdf_id, doc_id,pdf_title, pdf_author,pdf_status from pdf_file
-        limit #{offset},#{limit}
         where  user_id=#{userId}
           <if test = "_parameter.containsKey('docId') and docId!=null and docId!=''">
               and doc_id=#{docId}
           </if>
            and is_delete = 0
+        limit #{offset},#{limit}
     </select>
     <select id = "judgeIfRational" resultType="long" parameterType="list">
         SELECT doc_id FROM medical.pdf_file  WHERE pdf_id IN

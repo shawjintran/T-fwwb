@@ -1,7 +1,12 @@
 package com.t.medicaldocument.entity.Vo;
 
-import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class PdfDescVo {
 	/**
 	 *

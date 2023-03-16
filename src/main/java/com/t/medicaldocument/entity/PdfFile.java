@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
+
+import io.swagger.annotations.ApiParam;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -23,6 +25,7 @@ public class PdfFile implements Serializable {
     /**
      * 用户id
      */
+    @ApiParam(required = true)
     private Long userId;
     /**
      * pdf文件夹id
@@ -37,6 +40,7 @@ public class PdfFile implements Serializable {
     /**
      * pdf文件标题
      */
+    @ApiParam(value = "前端获取pdf文件名，对此值进行赋值",required = true)
     private String pdfTitle;
 
     /**

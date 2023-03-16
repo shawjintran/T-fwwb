@@ -12,6 +12,7 @@ import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
@@ -31,8 +32,14 @@ public class UserController {
 	DocumentService documentService;
 
 	@PostMapping("signup")
-	@ApiOperation("注册用户")
-	public R signup(String phone, String pwd, Integer code){
+	@ApiOperation("（已定）注册用户")
+	public R signup(
+			@ApiParam(required = true)
+					String phone,
+			@ApiParam(required = true)
+					String pwd,
+			@ApiParam(required = true)
+					Integer code){
 		if(ObjectUtils.isEmpty(phone)||ObjectUtils.isEmpty(pwd)||ObjectUtils.isEmpty(code))
 		{
 			return R.fail().setMes("手机号,密码或验证码为空");
@@ -65,13 +72,17 @@ public class UserController {
 	}
 	@GetMapping("SMS")
 	@ApiOperation("发送验证码")
-	public R sendSMS(String phone){
+	public R sendSMS(@ApiParam(required = true)
+								 String phone){
 		//通过电话号通过相关服务,发送验证码
 		return null;
 	}
 	@PostMapping("login")
 	@ApiOperation("登录用户")
-	public R login(String phone,String pwd){
+	public R login(@ApiParam(required = true)
+							   String phone,
+				   @ApiParam(required = true)
+						   String pwd){
 		if(ObjectUtils.isEmpty(phone)||ObjectUtils.isEmpty(pwd))
 			return R.fail().setMes("手机号或密码为空");
 		QueryWrapper<User> wrapper = new QueryWrapper<>();
@@ -81,7 +92,7 @@ public class UserController {
 		if(ObjectUtils.isEmpty(one))
 			return R.fail().setMes("");
 		one.setUserPwd("");
-		return R.ok().setData(one);
+		return R.ok(one);
 	}
 	@GetMapping("logout")
 	@ApiOperation("登出账户")
@@ -90,7 +101,7 @@ public class UserController {
 		return null;
 	}
 	@PostMapping("update")
-	@ApiOperation("更新账户信息")
+	@ApiOperation("（已定）更新账户信息")
 	public R update(UserVo vo){
 		User user = new User();
 		BeanUtils.copyProperties(vo,user);
@@ -106,12 +117,13 @@ public class UserController {
 		return null;
 	}
 	@DeleteMapping("delete/{id}")
-	@ApiOperation("注销账户")
-	public R delete(@PathVariable Long id){
+	@ApiOperation("（已定）注销账户")
+	public R delete(@ApiParam(required = true)
+						@PathVariable Long id){
 		boolean delete=userService.deleteUser(id);
 		boolean remove = userService.removeById(id);
 		if(remove)
 			return R.ok().setMes("删除成功");
-		return R.fail("未知原因:删除失败");
+		return R.fail().setMes("未知原因:删除失败");
 	}
 }

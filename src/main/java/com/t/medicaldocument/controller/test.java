@@ -27,7 +27,6 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/paddleocr")
-@Api
 public class test {
 
 	@PostMapping("/upload")

@@ -14,5 +14,5 @@ import java.util.List;
 */
 public interface PdfDescriptionService extends IService<PdfDescription> {
 	boolean deleteByPdfIds(List<Long> ids);
-	List<PdfDescVo>  descSearchByPdfId(Long pdfId);
+	List<PdfDescVo> descSearchByPdfId(Long pdfId);
 }
