@@ -15,8 +15,10 @@ import java.util.Map;
 public interface DocumentService extends IService<Document> {
 	boolean nameRepeat(String name,Long uId);
 	boolean addDoc(DocumentVo doc);
-	List<Map<String,Object>> searchDocById(Long uId);
+	List<Map<String,Object>> searchDocByUser(Long uId);
 	boolean updateDoc(DocumentVo doc);
 	boolean updateSize(Integer mode,Long docId,Integer size,Long userId);
 	boolean removeByDocIdAndUserId(Long DocId,Long UserId);
+
+	DocumentVo docEcho(Long docId, Long userId);
 }

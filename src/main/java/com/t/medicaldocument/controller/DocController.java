@@ -20,12 +20,12 @@ import java.util.Map;
 public class DocController {
 	@Autowired
 	DocumentService documentService;
-	@GetMapping("search/{uId}")
+	@GetMapping("search/{userId}")
 	@ApiOperation("（已定）根据用户Id查询文件夹")
-	public R searchDocById(@ApiParam(required = true) @PathVariable Long uId){
-		if (uId==null)
+	public R searchDocById(@ApiParam(required = true) @PathVariable Long userId){
+		if (userId==null)
 			return R.fail().setMes("请先登录");
-		List<Map<String, Object>> map = documentService.searchDocById(uId);
+		List<Map<String, Object>> map = documentService.searchDocByUser(userId);
 		//预期是装入 docid,docname,docsize,
 		Map<String,Object> data= new HashMap<>();
 		data.put("data",map);
@@ -36,33 +36,45 @@ public class DocController {
 	@ApiOperation("（已定）添加文件夹")
 	public R addDoc( DocumentVo doc){
 		if(doc.getUserId()==null)
-			return R.fail("先登录");
+			return R.fail().setMes("先登录");
 		if (doc.getDocName()==null)
-			return R.fail("请输入文件夹名字");
+			return R.fail().setMes("请输入文件夹名字");
 		if (documentService.nameRepeat(doc.getDocName(),doc.getUserId()))
-			return R.fail("文件夹名重复");
-
+			return R.fail().setMes("文件夹名重复");
 		boolean b = documentService.addDoc(doc);
 		if (b)
 			return R.ok().setMes("创建成功");
 		return R.fail().setMes("未知错误,请等待");
 	}
 	@DeleteMapping("delete/{userId}/{docId}")
-	@ApiOperation("（已定）删除文件夹(不涉及账号删除)")
+	@ApiOperation("（已定）删除文件夹(非默认)")
 	public R deleteDoc(@ApiParam (required = true)
 						   @PathVariable Long userId,
 					   @ApiParam(required = true)
 					   @PathVariable Long docId){
 		if (docId==0L)
-			return R.fail("默认文件夹不可删除");
+			return R.fail().setMes("默认文件夹不可删除");
 		boolean b = documentService.removeByDocIdAndUserId(docId,userId);
 		if (b)
 			return R.ok().setMes("删除成功");
 		return R.fail().setMes("删除失败");
 	}
-	@PutMapping("update/name")
+	@GetMapping("echo/{userId}/{docId}")
+	@ApiOperation("文件夹信息回显")
+	public R docEcho(@PathVariable Long docId, @PathVariable Long userId){
+		if (docId==null||userId==null)
+			return R.fail().setMes("错误");
+		DocumentVo vo =documentService.docEcho(docId,userId);
+		if(vo==null)
+			return R.fail().setMes("错误");
+		return R.ok(vo);
+	}
+	@PutMapping("update")
 	@ApiOperation("更改文件夹的名字")
-	public R updateDoc( DocumentVo doc ){
+	public R updateDoc(DocumentVo doc){
+		boolean b = documentService.nameRepeat(doc.getDocName(), doc.getUserId());
+		if (b)
+			return R.fail().setMes("文件夹名重复");
 		boolean updateDoc = documentService.updateDoc(doc);
 		if (updateDoc)
 			return R.ok().setMes("更改成功");

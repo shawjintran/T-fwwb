@@ -1,6 +1,7 @@
 package com.t.medicaldocument.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -45,7 +46,8 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	@Autowired
 	PdfDescriptionService descriptionService;
 
-	public HashMap<String, Object> uploadPdfFile(MultipartFile file, PdfFile pdf) throws IOException {
+	public String uploadPdfFile(MultipartFile file, PdfFile pdf)
+			 {
 		String filename = UUID.randomUUID()
 				.toString()
 				.replace("-","").substring(0,8);
@@ -54,11 +56,14 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		pdf.setDocId(0L);
 		//文件未开始预测,状态为0;
 		pdf.setPdfStatus(0);
-		pdf.setPdfTitle(file.getOriginalFilename());
-		FileUtils.savePDF(file,filename+".pdf");
-		HashMap<String,Object> map=new HashMap<>(3);
-		map.put("filename",filename);
-		return map;
+		pdf.setPdfTitle(file.getName());
+		 try {
+			 FileUtils.savePDF(file,filename+".pdf");
+		 } catch (IOException e) {
+		 	log.debug("上传文件出现异常");
+			return null;
+		 }
+		return filename;
 	}
 	public void downloadPdfFile(HttpServletResponse response,String filename)
 			 {
@@ -101,6 +106,16 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		return false;
 	}
 
+	@Override
+	public PdfFileVo fileEcho(Long userId, Long pdfId) {
+		PdfFileVo vo=baseMapper.fileSearchOne(userId,pdfId);
+		return vo;
+	}
+
+	@Override
+	public PdfFileVo fileExist(Long userId, Long pdfId) {
+		return baseMapper.fileExist(userId,pdfId);
+	}
 
 	@Override
 	public Integer dividePDF(String filename) throws IOException{
@@ -115,15 +130,6 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		if (longs.size()!=1)
 			return false;
 		//移入到用户默认文件夹
-		List<PdfFile> pdfFiles = baseMapper.selectBatchIds(ids);
-		//Todo: 需要优化select语句
-		List<PdfFile> collect = pdfFiles.stream().filter((file) -> {
-			if (file.getDocId() != oldDocId)
-				return true;
-			return false;
-		}).collect(Collectors.toList());
-		if (collect.size()>0)
-			return false;
 		Integer integer = baseMapper.modifyDocId(ids, 0L,userId);
 		if (integer<1)
 			return false;
@@ -139,9 +145,27 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public boolean moveFile(List<Long> ids,Long userId,Long oldDocId,Long newDocId){
-		//todo: 整合函数逻辑
-		return true;
+	public boolean fileMove(List<Long> ids,Long userId,Long newDocId){
+		//限制只能同时，从同一个文件夹进行移动
+		List<Long> longs = baseMapper.judgeIfRational(ids);
+		if (longs.size()!=1)
+			return false;
+		if (longs.get(0)==newDocId)
+			return false;
+		//移入到新的文件夹
+		Integer integer = baseMapper.modifyDocId(ids, newDocId,userId);
+		if (integer!=ids.size()){
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return false;
+		}
+		//更改文件夹的大小,先减少原文件夹大小,再增加新文件夹大小
+		boolean b1 = documentService.updateSize(2, longs.get(0), integer, userId);
+		boolean b2 = documentService.updateSize(1, newDocId, integer,	 userId);
+		if(b1&&b2)
+			return true;
+		//出现错误,事务回滚
+		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+		return false;
 	}
 
 	@Override

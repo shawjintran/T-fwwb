@@ -25,14 +25,6 @@ public class DescController {
 		List<PdfDescVo> pdfDescVos = descriptionService.descSearchByPdfId(pdfId);
 		return R.ok(pdfDescVos);
 	}
-	@PostMapping("predict")
-	@ApiOperation("针对状态异常的Pdf文件进行重新预测")
-	public R descPredict(@ApiParam(required = true)
-									 Integer status,
-						 @ApiParam(required = true)
-								 Long pdfId){
-		//todo 未厘清函数逻辑
-		return null;
-	}
+
 
 }

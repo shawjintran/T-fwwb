@@ -19,8 +19,8 @@ import java.util.List;
 * @createDate 2023-02-02 20:23:28
 */
 public interface PdfFileService extends IService<PdfFile> {
-	HashMap<String, Object> uploadPdfFile(MultipartFile file, PdfFile pdf) throws IOException;
-	 boolean moveFile(List<Long> ids,Long userId,Long oldDocId,Long newDocId);
+	String uploadPdfFile(MultipartFile file, PdfFile pdf) throws IOException;
+	 boolean fileMove(List<Long> ids,Long userId,Long newDocId);
 	Integer dividePDF(String filename) throws IOException;
 	boolean removeFile(List<Long> ids, Long docId, Long userId);
 	List<PdfFileVo> fileSearchPageById( Integer page, Integer size, Integer total,PdfFileVo3 vo);
@@ -32,4 +32,9 @@ public interface PdfFileService extends IService<PdfFile> {
 	void downloadPdfFile(HttpServletResponse response, String filename) throws IOException;
 
 	boolean deleteFileByUser(Long userId);
+
+	PdfFileVo fileEcho(Long userId, Long pdfId);
+	PdfFileVo fileExist(Long userId, Long pdfId);
+
+
 }

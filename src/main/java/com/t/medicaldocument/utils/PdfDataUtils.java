@@ -2,6 +2,7 @@ package com.t.medicaldocument.utils;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import jdk.nashorn.internal.scripts.JS;
 
 import java.io.File;
 import java.io.IOException;
@@ -183,6 +184,7 @@ public class PdfDataUtils {
 		//todo: 需要ES对象
 		for (String s : map.keySet()) {
 		//	todo：使用反射进行映射字段名
+
 		}
 
 	}

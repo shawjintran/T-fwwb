@@ -1,5 +1,6 @@
 package com.t.medicaldocument.entity.Vo;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ApiModel(description = "做页面参数传递")
 public class PdfFileVo2 {
 	/**
 	 * pdf文件id

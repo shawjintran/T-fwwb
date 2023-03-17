@@ -44,7 +44,8 @@ public class AsyncTask {
 	TransactionDefinition transactionDefinition;
 
 	@Async
-	public void predictByPython(Long pdfId,String filename, Integer count) throws IOException, InterruptedException, ExecutionException {
+	public void predictByPython(Long pdfId,String filename, Integer count) throws
+			InterruptedException, ExecutionException {
 		TransactionStatus transaction = platformTransaction.
 				getTransaction(transactionDefinition);
 		PdfFileService bean = BeanContext.getBean(PdfFileService.class);

@@ -1,6 +1,7 @@
 package com.t.medicaldocument.utils;
 
 
+import lombok.Data;
 import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageTree;
@@ -18,10 +19,12 @@ import java.util.Objects;
 /**
  * 对文件进行相关操作处理
  */
+@Data
 public class FileUtils {
 
-	static String pdf_location= System.getProperty("user.dir")+File.separator+"pdf"+File.separator;
+	public static String pdf_location= System.getProperty("user.dir")+File.separator+"pdf"+File.separator;
 	static String pic_location= System.getProperty("user.dir")+File.separator+"pic"+File.separator;
+	static String res_location= System.getProperty("user.dir")+File.separator+"res"+File.separator;
 	static public void savePDF(MultipartFile file,String filename)
 			throws IOException {
 		String end = pdf_location+
@@ -31,9 +34,16 @@ public class FileUtils {
 		//将文件保存
 		file.transferTo(destFile);
 	}
-	static public void removePDF(){
-	//	Todo：文件删除
-
+	static public void deletePDF(String filename){
+		File pdf = new File(pdf_location + filename + ".pdf");
+		File pic = new File(pic_location + filename);
+		File res = new File(res_location + filename);
+		if (pdf.exists())
+			pdf.delete();
+		if (pic.exists())
+			pdf.delete();
+		if (res.exists())
+			res.delete();
 	}
 	static public Boolean downloadPDF(OutputStream out, String filename)
 			throws IOException {

@@ -3,10 +3,12 @@ package com.t.medicaldocument.controller;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.t.medicaldocument.common.Job.AsyncTask;
+import com.t.medicaldocument.config.MException;
 import com.t.medicaldocument.entity.PdfFile;
 import com.t.medicaldocument.entity.Vo.PdfFileVo;
 import com.t.medicaldocument.entity.Vo.PdfFileVo2;
 import com.t.medicaldocument.entity.Vo.PdfFileVo3;
+import com.t.medicaldocument.service.DocumentService;
 import com.t.medicaldocument.service.PdfFileService;
 import com.t.medicaldocument.utils.FileUtils;
 import com.t.medicaldocument.utils.R;
@@ -16,10 +18,13 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -48,39 +53,44 @@ public class FileController {
 	AsyncTask task;
 	@Autowired
 	PdfFileService pdfFileService;
-
+	@Autowired
+	DocumentService documentService;
 	@PostMapping("upload/")
-	@ApiOperation("（已定）文献的上传,并转换为图片")
-	public R fileUploadAndDivide(	@RequestParam(value = "file",required = true)
+	@ApiOperation("（已定2.0）文献的上传,并转换为图片")
+	@Transactional(rollbackFor = Exception.class)
+	@CacheEvict(cacheNames = "PdfFile+'_'+#pdf.getUserId()",
+			condition = "#result.getCode()==200",
+			allEntries = true)
+	public R fileUploadAndDivide(@RequestParam(value = "file",required = true)
 									 @RequestPart
-										 MultipartFile file,
-								 PdfFile pdf) throws IOException {
+											 MultipartFile file,
+								 PdfFile pdf) throws IOException, MException {
 		//接收上传文件
-		//Receiving uploaded files
 		if(pdf.getUserId()==null)
 			return R.fail().setMes("请先登录");
 		if (file.isEmpty())
 			return R.fail().setMes("上传文件为空");
-		if(pdf.getPdfTitle()==null)
-			return R.fail().setMes("出现错误");
-		HashMap<String, Object> map = pdfFileService.uploadPdfFile(file, pdf);
-		if(map==null)
-			return R.fail().setMes("文件上传出现错误");
-
-		Integer count = pdfFileService.dividePDF((String) map.get("filename"));
+		String filename = pdfFileService.uploadPdfFile(file, pdf);
+		if(filename==null)
+			return R.fail().setMes("上传文件失败");
+		//不成功就删除
+		Integer count = pdfFileService.dividePDF(filename);
 		if (count==null)
-			return R.fail().setMes("未知错误");
-		//count 为 页数
+			throw new MException().put("filename",filename);
+		//count 为页数
 		pdf.setPdfPagecount(count);
-		boolean save = pdfFileService.save(pdf);
-		map.put("count",count);
-		map.put("id",pdf.getPdfId());
-		if (save)
-			return R.ok(map);
-		//Todo:不成功 需要将本地文件进行删除
-		return R.fail().setMes("未知错误");
-	}
 
+		boolean save = pdfFileService.save(pdf);
+		boolean updateSize = documentService.updateSize(1, 0L, 1, pdf.getUserId());
+		if (!save||!updateSize)
+			throw new MException().put("filename",filename);
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("title",pdf.getPdfTitle());
+		map.put("pdfId",pdf.getPdfId());
+		map.put("status",pdf.getPdfStatus());
+		map.put("CT",pdf.getCreateTime());
+		return R.ok(map);
+	}
 	// @GetMapping("/analyze/structure")
 	public R fileAnalyzeStructure(String filename, Integer count)
 			throws Exception {
@@ -121,13 +131,19 @@ public class FileController {
 		return R.ok(list);
 	}
 	@GetMapping("analyze/structure")
-	@ApiOperation("（已定）基于python对文献图片进行分析")
+	@ApiOperation("（已定2.0）基于python对文献图片进行分析")
+	@CacheEvict(cacheNames = "PdfFile+'_'+#pdf.getUserId()",
+			condition = "#result.getCode()==200",
+			allEntries = true)
 	public R fileAnalyzeStructure2(@ApiParam(value="pdf文件的id", required = true) Long pdfId,
-								   @ApiParam(required = true)String filename,
-								   @ApiParam(required = true)Integer count)
-			throws IOException, InterruptedException, ExecutionException {
-// TODO: 2023/3/16 是否应添加合理性判断
-		task.predictByPython(pdfId, filename, count);
+								   @ApiParam(required = true) Long userId)
+			throws InterruptedException, ExecutionException {
+		PdfFileVo vo = pdfFileService.fileExist(userId, pdfId);
+		if (vo==null)
+			return R.fail().setMes("没有对应文件,请删除当前文献信息,请重新上传文件");
+		if (vo.getPdfStatus()!=2)
+			return R.fail().setMes("文件已经预测");
+		task.predictByPython(pdfId, vo.getPdfFileName(), vo.getPdfPagecount());
 		return R.ok().setMes("系统将对文献进行分析");
 	}
 	@GetMapping(value = "download/{pdfId}", produces = "application/pdf")
@@ -143,13 +159,43 @@ public class FileController {
 			pdfFileService.downloadPdfFile(response,pdfFileName);
 		}catch (Exception e){
 			log.error(e.getMessage());
-			return;
 		}
-		return ;
+	}
+	@GetMapping("view/{userId}/{pdfId}")
+	@ApiOperation("文献pdf的展示")
+	@Cacheable(cacheNames = "PdfFile+'_'+#userId",
+			key = "#root.methodName+'_'+#pdfId")
+	public R fileView(@ApiParam(required = true)
+						  @PathVariable Long pdfId,
+					  @ApiParam(required = true)
+						  @PathVariable Long userId){
+		PdfFileVo vo = pdfFileService.fileExist(userId, pdfId);
+		if (vo==null)
+			return R.fail().setMes("没有对应文件,请删除当前文献信息,重新上传文件");
+		return R.ok("/file/"+vo.getPdfFileName()+".pdf");
+	}
+	@GetMapping("echo/{userId}/{pdfId}")
+	@ApiOperation("文献信息的回显")
+	@Cacheable(cacheNames = "PdfFile+'_'+#userId",
+			key = "#root.methodName+'_'+#pdfId")
+	public R fileEcho(
+			@ApiParam(required = true)
+			@PathVariable Long pdfId,
+			@ApiParam(required = true)
+			@PathVariable Long userId)
+	{
+		if (pdfId==null||userId==null)
+			return R.fail().setMes("错误");
+		PdfFileVo vo=pdfFileService.fileEcho(userId,pdfId);
+		if (vo==null)
+			return R.fail().setMes("错误");
+		return R.ok(vo);
 	}
 	@PostMapping("update")
 	@ApiOperation("（已定）文献信息的修改(可以实现文献的文件夹的变动)")
-	@CacheEvict(cacheNames = "PdfFile",key = "'*'+_+#pdf.getUserId()+'_'+'*'")
+	@CacheEvict(cacheNames = "PdfFile+'_'+#pdf.getUserId()",
+			condition = "#result.getCode()==200",
+			allEntries = true)
 	public R fileUpdate( PdfFileVo2 pdf){
 		boolean update=pdfFileService.fileUpdate(pdf);
 		if (update)
@@ -158,7 +204,9 @@ public class FileController {
 	}
 	@DeleteMapping("delete/{userId}/{docId}")
 	@ApiOperation("（已定）同个文件夹中文献的删除")
-	@CacheEvict(cacheNames = "PdfFile",key = "'*'+_+#userId+'_'+'*'")
+	@CacheEvict(cacheNames = "PdfFile+'_'+#userId",
+			condition = "#result.getCode()==200",
+			allEntries = true)
 	public R fileDelete( @ApiParam(required = true)
 								@RequestBody List<Long> ids,
 						@ApiParam(value="当前同个文件夹的docId")
@@ -172,16 +220,17 @@ public class FileController {
 	}
 	@GetMapping("search/{page}/{size}")
 	@ApiOperation("（已定）根据文件夹id和用户id 分页 查询文件夹中的文献")
-	@Cacheable(cacheNames = "PdfFile",key = "#root.methodName+'_'+#vo.getUserId()+'_'+#page+'_'+#size")
+	@Cacheable(cacheNames = "PdfFile+'_'+#vo.getUserId()",
+			key = "#root.methodName+'_'+#page+'_'+#size")
 	public R fileSearchByDoc(@ApiParam(required = true)
 								 @PathVariable Integer page,
 							 @ApiParam(required = true)
 							 @PathVariable Integer size,
 							 @ApiParam(required = true)PdfFileVo3 vo){
 		if(vo==null)
-			return R.fail();
+			return R.fail().setMes("错误");
 		if (vo.getUserId()==null)
-			return R.fail();
+			return R.fail().setMes("请登录");
 		Integer total = pdfFileService.fileCount(vo.getDocId(), vo.getUserId());
 		HashMap<String, Object> map = new HashMap<>(2);
 		map.put("all",total);
@@ -192,39 +241,42 @@ public class FileController {
 		map.put("data",list);
 		return R.ok(map);
 	}
-	@PutMapping("place/{userId}/{newDocId}")
-	@ApiOperation("(归档)文献们从默认文件夹归入到同一个文档(非默认0)")
+	@PutMapping("place/{userId}/{oldDocId}/{newDocId}")
+	@ApiOperation("(归档)将多个文献从同一个文件夹归入到另一个文档")
+	@CacheEvict(cacheNames = "PdfFile+'_'+#userId",
+			condition = "#result.getCode()==200",
+			allEntries = true)
 	public R filePlace( @ApiParam(required = true)@RequestBody List<Long> ids,
 						@ApiParam(required = true)@PathVariable Long userId,
 						@ApiParam(required = true)@PathVariable Long newDocId){
-		if(newDocId==0)
-			log.error("系统接口暴露,逻辑失效");
+		if(newDocId==null)
+			return R.fail().setMes("错误");
 		if (ids==null)
 			return R.fail().setMes("请选择文献");
 		if (ids.isEmpty())
 			return R.fail().setMes("请选择文献");
-		//重写方法
-		boolean b = pdfFileService.placeFile(ids, newDocId, userId);
-		if (b)
+		boolean moveFile = pdfFileService.fileMove(ids, userId, newDocId);
+		if (moveFile)
 			return R.ok().setMes("归档成功");
 		return R.fail().setMes("归档失败");
 	}
-	@DeleteMapping("remove/{userId}/{oldDocId}")
-	@ApiOperation("移除同个文件夹中的文献(到默认文件夹中)")
-	public R fileRemove( @ApiParam(required = true)@RequestBody List<Long> ids,
-						 @ApiParam(required = true)@PathVariable Long oldDocId,
-						 @ApiParam(required = true)@PathVariable Long userId){
-		if(oldDocId==0)
-			log.error("系统接口暴露,逻辑失效");
-		if (ids==null)
-			return R.fail().setMes("请选择文献");
-		if (ids.isEmpty())
-			return R.fail().setMes("请选择文献");
-		boolean b = pdfFileService.removeFile(ids, oldDocId, userId);
-		if (b)
-			return R.ok().setMes("移除文献成功");
-		return R.fail().setMes("移除文献失败");
-	}
+	// @DeleteMapping("remove/{userId}/{oldDocId}")
+	// @ApiOperation("移除同个文件夹中的文献(到默认文件夹中)")
+	// public R fileRemove( @ApiParam(required = true)@RequestBody List<Long> ids,
+	// 					 @ApiParam(required = true)@PathVariable Long oldDocId,
+	// 					 @ApiParam(required = true)@PathVariable Long userId){
+	// 	if(oldDocId==0)
+	// 		log.error("系统接口暴露,逻辑失效");
+	// 	if (ids==null)
+	// 		return R.fail().setMes("请选择文献");
+	// 	if (ids.isEmpty())
+	// 		return R.fail().setMes("请选择文献");
+	// 	boolean b = pdfFileService.removeFile(ids, oldDocId, userId);
+	// 	if (b)
+	// 		return R.ok().setMes("移除文献成功");
+	// 	return R.fail().setMes("移除文献失败");
+	// }
+
 	// @PutMapping("removeTo/{docId}/{mode}")
 	// @ApiOperation("修改文献文件的信息")
 	// public R removeFile(@PathVariable Long id,@PathVariable Long docId,@PathVariable Integer mode){

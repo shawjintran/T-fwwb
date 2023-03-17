@@ -15,7 +15,7 @@ public class R<T> implements Serializable {
 		return new R().setCode(200);
 	}
 	public static <T> R<T> ok(T data){
-		return R.ok().setData(data);
+		return R.ok().setData(data).setMes("成功");
 	}
 	public static R fail(){
 		return new R().setCode(201);

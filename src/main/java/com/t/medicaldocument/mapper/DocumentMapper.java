@@ -2,6 +2,7 @@ package com.t.medicaldocument.mapper;
 
 import com.t.medicaldocument.entity.Document;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.t.medicaldocument.entity.Vo.DocumentVo;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Select;
@@ -31,6 +32,8 @@ public interface DocumentMapper extends BaseMapper<Document> {
 	Integer SubSize(Long docId, Integer size, Long userId);
 
 	Integer removeByDouble(Long docId, Long userId);
+	@Select("select doc_name from document where doc_id=#{docId} and user_id=#{userId}")
+	DocumentVo searchDoc(Long docId, Long userId);
 }
 
 

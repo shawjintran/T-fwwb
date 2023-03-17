@@ -19,6 +19,10 @@ public interface PdfFileMapper extends BaseMapper<PdfFile> {
 
 	List<PdfFileVo> fileSearchPageById(Integer offset,Integer limit,Long docId, Long userId);
 
+	List<PdfFileVo> fileSearchPageOrderByCT(Integer offset,Integer limit,Long docId, Long userId);
+	List<PdfFileVo> fileSearchPageOrderByUT(Integer offset,Integer limit,Long docId, Long userId);
+	List<PdfFileVo> fileSearchPageOrderByTiT(Integer offset, Integer limit, Long docId, Long userId);
+
 	Integer fileCount(Long docId,Long userId);
 
 	List<Long> judgeIfRational(List<Long> ids);
@@ -27,6 +31,14 @@ public interface PdfFileMapper extends BaseMapper<PdfFile> {
 	List<Long> fileSelectByUser(Long userId);
 
 	boolean fileDeleteByIds(List<Long> pdfIds);
+
+	@Select(" select pdf_id, doc_id,pdf_title, pdf_status,create_time,update_time from pdf_file " +
+			"where user_id=#{userId} and pdf_id=#{pdfId}")
+	PdfFileVo fileSearchOne(Long userId, Long pdfId);
+
+	@Select(" select pdf_status,pdf_pagecount,pdf_file_name from pdf_file " +
+			"where user_id=#{userId} and pdf_id=#{pdfId}")
+	PdfFileVo fileExist(Long userId, Long pdfId);
 }
 
 

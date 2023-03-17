@@ -51,7 +51,7 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 	}
 
 	@Override
-	public List<Map<String, Object>> searchDocById(Long uId) {
+	public List<Map<String, Object>> searchDocByUser(Long uId) {
 		List<Map<String, Object>> maps = baseMapper.searchDocById(uId);
 		return maps;
 	}
@@ -92,6 +92,16 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public DocumentVo docEcho(Long docId, Long userId) {
+		DocumentVo vo=baseMapper.searchDoc(docId,userId);
+		if (vo==null||vo.getDocName()==null)
+			return null;
+		vo.setDocId(docId);
+		vo.setUserId(userId);
+		return vo;
 	}
 
 }

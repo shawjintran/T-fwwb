@@ -104,6 +104,16 @@ public class UserController {
 		session.removeAttribute("user");
 		return null;
 	}
+	@GetMapping("echo/{userId}")
+	@ApiOperation("用户信息的回显")
+	public R userEcho(@PathVariable Long userId){
+		User byId = userService.getById(userId);
+		if (byId==null)
+			return R.fail().setMes("错误");
+		UserVo vo = new UserVo();
+		BeanUtils.copyProperties(byId,vo);
+		return R.ok(vo);
+	}
 	@PostMapping("update")
 	@ApiOperation("（已定）更新账户信息")
 	public R update(UserVo vo){
