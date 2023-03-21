@@ -88,7 +88,7 @@ public class FileController {
 		map.put("title",pdf.getPdfTitle());
 		map.put("pdfId",pdf.getPdfId());
 		map.put("status",pdf.getPdfStatus());
-		map.put("CT",pdf.getCreateTime());
+		map.put("createTime",pdf.getCreateTime());
 		return R.ok(map);
 	}
 	// @GetMapping("/analyze/structure")
@@ -137,7 +137,7 @@ public class FileController {
 			allEntries = true)
 	public R fileAnalyzeStructure2(@ApiParam(value="pdf文件的id", required = true) Long pdfId,
 								   @ApiParam(required = true) Long userId)
-			throws InterruptedException, ExecutionException {
+			throws Exception {
 		PdfFileVo vo = pdfFileService.fileExist(userId, pdfId);
 		if (vo==null)
 			return R.fail().setMes("没有对应文件,请删除当前文献信息,请重新上传文件");

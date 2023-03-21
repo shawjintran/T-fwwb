@@ -40,9 +40,9 @@ public class DescCallable implements Callable<HashMap> {
 		boolean save= bean.save(desc);
 		log.info(file_name+"_"+page+" save success");
 		if (save){
-			Long pdfDescId = desc.getPdfDescId();
+			Long pdfId = desc.getPdfId();
 			HashMap<String, Object> pdfDesc = new HashMap<>(1);
-			pdfDesc.put("descId",pdfDescId);
+			pdfDesc.put("pdfId",pdfId);
 			pdfDesc.put("page",page);
 			pdfDesc.put("desc",map);
 			return pdfDesc;

@@ -45,7 +45,7 @@ public class AsyncTask {
 
 	@Async
 	public void predictByPython(Long pdfId,String filename, Integer count) throws
-			InterruptedException, ExecutionException {
+			InterruptedException, ExecutionException, NoSuchFieldException, IllegalAccessException {
 		TransactionStatus transaction = platformTransaction.
 				getTransaction(transactionDefinition);
 		PdfFileService bean = BeanContext.getBean(PdfFileService.class);
@@ -56,7 +56,7 @@ public class AsyncTask {
 			futures.add(executor.submit(new DescCallable(pdfId, filename, i)));
 		}
 		ArrayList<HashMap<String,Object>> pdfEs=new ArrayList<>();
-		//将要存储进Es的先收集起
+
 		for (Future<HashMap> future : futures) {
 			if (future.get()!=null)
 			{
@@ -70,7 +70,10 @@ public class AsyncTask {
 		}
 		synchronized (this){
 			bean.statusUpdate(pdfId,1);
-			// todo：修改逻辑，结合ES
+			// todo：修改逻辑，结合ES 存入
+			ArrayList<Object> objects = PdfDataUtils.parseList(pdfEs);
+			//将要存储进Es的对象先收集起
+			//通过es批量存储
 		}
 
 

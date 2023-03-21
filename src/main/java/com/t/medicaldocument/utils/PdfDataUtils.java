@@ -1,11 +1,14 @@
 package com.t.medicaldocument.utils;
 
+
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import jdk.nashorn.internal.scripts.JS;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -137,7 +140,7 @@ public class PdfDataUtils {
 			JSONObject json = new JSONObject((JSONObject) o);
 			text.append((json.get("text")));
 			// (json).get("confidence");
-			//	Todo:整合之后,对每一句进行数据结构存储(考虑)
+			//	整合之后,对每一句进行数据结构存储(考虑)
 		}
 		return text;
 	}
@@ -173,19 +176,28 @@ public class PdfDataUtils {
 		}
 	}
 
-	static public void parseList(ArrayList<HashMap<String,Object>> list){
-
+	static public ArrayList<Object> parseList(ArrayList<HashMap<String,Object>> list) throws NoSuchFieldException, IllegalAccessException {
+		ArrayList<Object> esObjs = new ArrayList<>();
 		for (HashMap<String, Object> map : list) {
 			HashMap<String,ArrayList> pdf = (HashMap<String,ArrayList>)map.get("desc");
-			parseMapToEsObject(pdf,new Object());
+			//传入ES对象
+			Object esObj = new Object();
+			parseMapToEsObject(pdf, esObj);
+			//设置 pdfId 和 page 页数
+			//
+			//
+			esObjs.add(esObj);
 		}
+		return esObjs;
 	}
-	static void parseMapToEsObject(HashMap<String,ArrayList> map,Object EsObject){
-		//todo: 需要ES对象
+	static void parseMapToEsObject(HashMap<String,ArrayList> map,Object esObject) throws NoSuchFieldException, IllegalAccessException {
+		//通过Java 反射
+		Class<?> cls = esObject.getClass();
 		for (String s : map.keySet()) {
-		//	todo：使用反射进行映射字段名
-
+			Field field = cls.getDeclaredField(s);
+			field.setAccessible(true);
+			field.set(esObject, JSON.toJSONString(map.get(s)));
+			//使用反射进行映射字段名
 		}
-
 	}
 }
