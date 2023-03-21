@@ -4,6 +4,7 @@ package com.t.medicaldocument.utils;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.t.medicaldocument.entity.Bo.EsDocumentBo;
 import jdk.nashorn.internal.scripts.JS;
 
 import java.io.File;
@@ -176,12 +177,12 @@ public class PdfDataUtils {
 		}
 	}
 
-	static public ArrayList<Object> parseList(ArrayList<HashMap<String,Object>> list) throws NoSuchFieldException, IllegalAccessException {
-		ArrayList<Object> esObjs = new ArrayList<>();
+	static public ArrayList<EsDocumentBo> parseList(ArrayList<HashMap<String,Object>> list) throws NoSuchFieldException, IllegalAccessException {
+		ArrayList<EsDocumentBo> esObjs = new ArrayList<>();
 		for (HashMap<String, Object> map : list) {
 			HashMap<String,ArrayList> pdf = (HashMap<String,ArrayList>)map.get("desc");
 			//传入ES对象
-			Object esObj = new Object();
+			EsDocumentBo esObj = new EsDocumentBo();
 			parseMapToEsObject(pdf, esObj);
 			//设置 pdfId 和 page 页数
 			//
@@ -190,6 +191,14 @@ public class PdfDataUtils {
 		}
 		return esObjs;
 	}
+
+	/**
+	 *
+	 * @param map
+	 * @param esObject
+	 * @throws NoSuchFieldException
+	 * @throws IllegalAccessException
+	 */
 	static void parseMapToEsObject(HashMap<String,ArrayList> map,Object esObject) throws NoSuchFieldException, IllegalAccessException {
 		//通过Java 反射
 		Class<?> cls = esObject.getClass();

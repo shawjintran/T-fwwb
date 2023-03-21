@@ -1,31 +1,25 @@
 package com.t.medicaldocument.common.Job;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.t.medicaldocument.common.BeanContext;
 import com.t.medicaldocument.config.AsyncConfig;
-import com.t.medicaldocument.entity.PdfDescription;
+import com.t.medicaldocument.entity.Bo.EsDocumentBo;
 import com.t.medicaldocument.service.PdfDescriptionService;
 import com.t.medicaldocument.service.PdfFileService;
-import com.t.medicaldocument.utils.Cmd;
+import com.t.medicaldocument.service.impl.SearchServiceImpl;
 import com.t.medicaldocument.utils.PdfDataUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 
 @Component
@@ -42,6 +36,10 @@ public class AsyncTask {
 	@Autowired
 	// 事务定义:事务的一些基础信息，如超时时间、隔离级别、传播属性等
 	TransactionDefinition transactionDefinition;
+
+	//es实现类
+	@Autowired
+	SearchServiceImpl searchService;
 
 	@Async
 	public void predictByPython(Long pdfId,String filename, Integer count) throws
@@ -70,10 +68,20 @@ public class AsyncTask {
 		}
 		synchronized (this){
 			bean.statusUpdate(pdfId,1);
+
+
 			// todo：修改逻辑，结合ES 存入
-			ArrayList<Object> objects = PdfDataUtils.parseList(pdfEs);
+			ArrayList<EsDocumentBo> objects = PdfDataUtils.parseList(pdfEs);
 			//将要存储进Es的对象先收集起
+
+
+			//储存到es,返回bool
+			boolean b=searchService.save2ES(objects);
+
+			log.info("是否存入:"+b);
+
 			//通过es批量存储
+
 		}
 
 
