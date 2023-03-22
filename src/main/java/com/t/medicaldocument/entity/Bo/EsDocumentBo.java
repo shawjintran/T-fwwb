@@ -101,5 +101,8 @@ public class EsDocumentBo {
     private String equation;
 
 
-
+    public void setAll() {
+        this.all =this.text+this.title+this.figure+this.figure_caption+this.table+this.table_caption+this.header+this.footer+this.reference+this.equation;
+        System.out.println("all:"+this.all);
+    }
 }

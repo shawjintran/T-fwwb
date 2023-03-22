@@ -183,11 +183,11 @@ public class PdfDataUtils {
 			//传入ES对象
 			EsDocumentBo esObj = new EsDocumentBo();
 			parseMapToEsObject(pdf, esObj);
-			// TODO: 2023/3/22 将整个pdf融合成一整个字段信息储存
 			//设置 pdfId 和 page 页数
 			esObj.setPdfId((Long) map.get("pdfId"));
 			esObj.setPdfPage((Integer) map.get("page"));
 			esObj.setCreatetime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
+			esObj.setAll();//setAll方法
 			esObjs.add(esObj);
 		}
 		return esObjs;
