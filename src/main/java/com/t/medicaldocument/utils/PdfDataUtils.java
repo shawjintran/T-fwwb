@@ -12,10 +12,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class PdfDataUtils {
 	/**
@@ -184,9 +183,11 @@ public class PdfDataUtils {
 			//传入ES对象
 			EsDocumentBo esObj = new EsDocumentBo();
 			parseMapToEsObject(pdf, esObj);
+			// TODO: 2023/3/22 将整个pdf融合成一整个字段信息储存
 			//设置 pdfId 和 page 页数
-			//
-			//
+			esObj.setPdfId((Long) map.get("pdfId"));
+			esObj.setPdfPage((Integer) map.get("page"));
+			esObj.setCreatetime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
 			esObjs.add(esObj);
 		}
 		return esObjs;

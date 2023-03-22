@@ -64,28 +64,24 @@ public class AsyncTask {
 			platformTransaction.rollback(transaction);
 			//推测出现异常,设置为2
 			bean.statusUpdate(pdfId,2);
+			log.info("出现异常");
 			return;
 		}
-		synchronized (this){
-			bean.statusUpdate(pdfId,1);
-
-
-			// todo：修改逻辑，结合ES 存入
+			boolean update = bean.statusUpdate(pdfId, 1);
+			//结合ES 存入
 			ArrayList<EsDocumentBo> objects = PdfDataUtils.parseList(pdfEs);
 			//将要存储进Es的对象先收集起
-
-
-			//储存到es,返回bool
-			boolean b=searchService.save2ES(objects);
-
-			log.info("是否存入:"+b);
-
+			//储存到es,返回boolean
+			boolean save=searchService.save2ES(objects);
+			log.info("是否存入:"+save);
 			//通过es批量存储
-
+		if (update&&save)
+			platformTransaction.commit(transaction);
+		else {
+			platformTransaction.rollback(transaction);
+			//推理出现异常
+			bean.statusUpdate(pdfId, 2);
+			log.info("出现异常");
 		}
-
-
-		platformTransaction.commit(transaction);
-
 	}
 }

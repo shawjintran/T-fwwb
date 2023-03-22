@@ -141,7 +141,7 @@ public class FileController {
 		PdfFileVo vo = pdfFileService.fileExist(userId, pdfId);
 		if (vo==null)
 			return R.fail().setMes("没有对应文件,请删除当前文献信息,请重新上传文件");
-		if (vo.getPdfStatus()!=2)
+		if (vo.getPdfStatus()==1)
 			return R.fail().setMes("文件已经预测");
 		task.predictByPython(pdfId, vo.getPdfFileName(), vo.getPdfPagecount());
 		return R.ok().setMes("系统将对文献进行分析");

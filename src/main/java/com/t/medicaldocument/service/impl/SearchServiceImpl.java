@@ -5,6 +5,7 @@ import com.t.medicaldocument.entity.Bo.EsDocumentBo;
 import com.t.medicaldocument.entity.PdfDescription;
 import com.t.medicaldocument.entity.Vo.SearchShow;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -129,7 +130,7 @@ public class SearchServiceImpl {
 //
 //                   searchShow.setPdfId(documentBo.getPdfId());
 //
-//                   searchShow.setTitle("");//TODO 获取标题
+//                   searchShow.setTitle("");//
 //                   // searchShow.setImgUrl("");// 设置图片
 //                   searchShow.setPageString("命中页数有:");
 //                   //searchShow.setScore(0f);
@@ -151,6 +152,7 @@ public class SearchServiceImpl {
 
     //实现搜索功能
     public Object searchPage(String searchString, int pageNo, int pageSize) throws IOException {
+        // TODO: 2023/3/22 优化检索出的信息，以及解析JSON格式字符串
         //如果分页太小也从第一个开始分页
         if(pageNo<=0){
             pageNo=0;
@@ -169,7 +171,7 @@ public class SearchServiceImpl {
         sourceBuilder.from(pageNo);
         sourceBuilder.size(pageSize);
         //匹配
-        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("all", searchString);
+        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("text", searchString);
         sourceBuilder.query(queryBuilder)
                 .timeout(TimeValue.timeValueSeconds(10));
 
@@ -262,9 +264,16 @@ public class SearchServiceImpl {
 
         BulkResponse bulk = null;
         try {
-            bulk = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);//开始批量查询的请求
+            bulk = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);//开始批量存储的请求
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+        if (bulk.hasFailures())
+        {
+            for (BulkItemResponse item : bulk.getItems()) {
+                if (item.isFailed())
+                    log.error(item.getFailureMessage());
+            }
         }
         return  !bulk.hasFailures();//返回成功与否
 

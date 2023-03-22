@@ -19,8 +19,11 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 
 @SpringBootTest
@@ -108,7 +111,8 @@ class MedicalDocumentApplicationTests {
 	}
 	@Test
 	void User(){
-		System.out.println(userService.updateById(new User().setUserId(1L).setUserPoints(3)));
+		// System.out.println(userService.updateById(new User().setUserId(1L).setUserPoints(3)));
+		System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
 
 	}
 }

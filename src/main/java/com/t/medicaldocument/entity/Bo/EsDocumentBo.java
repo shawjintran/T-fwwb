@@ -1,6 +1,5 @@
 package com.t.medicaldocument.entity.Bo;
 
-import com.t.medicaldocument.entity.PdfDescription;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,20 +12,16 @@ import java.time.LocalDateTime;
 //从es来的
 public class EsDocumentBo {
 
-    /**
-     * es和mysql用的id
-     */
-    private Long pdfdescid;
 
     /**
      * 该段对应的pdf的id
      */
-    private Long pdfid;
+    private Long pdfId;
 
     /**
      * 该段的页码
      */
-    private Integer pdfpage;
+    private Integer pdfPage;
 
     /**
      * pdf文件page页的文本json结构
