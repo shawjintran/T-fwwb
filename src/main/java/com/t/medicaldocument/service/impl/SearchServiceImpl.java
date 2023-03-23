@@ -2,8 +2,10 @@ package com.t.medicaldocument.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.t.medicaldocument.entity.Bo.EsDocumentBo;
+import com.t.medicaldocument.entity.Mate;
 import com.t.medicaldocument.entity.PdfDescription;
 import com.t.medicaldocument.entity.Vo.SearchShow;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -13,21 +15,23 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -149,7 +153,7 @@ public class SearchServiceImpl {
 
 
 
-
+    //TODO es的检索结果
     //实现搜索功能
     public Object searchPage(String searchString, int pageNo, int pageSize) throws IOException {
         // TODO: 2023/3/22 优化检索出的信息，以及解析JSON格式字符串
@@ -190,17 +194,176 @@ public class SearchServiceImpl {
 
 
 
+//TODO pdf的检索结果
+    /**
+     * 资料整理
+     * 获取文档类
+     * @param pdfId
+     * @param searchString
+     * @return
+     */
+    public Object getdoc(long pdfId,String searchString) throws IOException {
+
+        //构建搜索条件
+        SearchSourceBuilder sourceBuilder=new SearchSourceBuilder();
+        //使用QueryBuilders工具实现
+        QueryBuilder queryBuilder = QueryBuilders.boolQuery()
+                .must(QueryBuilders.termQuery("pdfId", pdfId))
+                //.must(QueryBuilders.matchQuery("all", searchString))
+                .should(QueryBuilders.matchQuery("text", searchString))
+                .should(QueryBuilders.matchQuery("title", searchString))
+                .should(QueryBuilders.matchQuery("figure", searchString))
+                .should(QueryBuilders.matchQuery("figure_caption", searchString))
+                .should(QueryBuilders.matchQuery("table", searchString))
+                .should(QueryBuilders.matchQuery("table_caption", searchString))
+                .should(QueryBuilders.matchQuery("header", searchString))
+                .should(QueryBuilders.matchQuery("footer", searchString))
+                .should(QueryBuilders.matchQuery("reference", searchString))
+                .should(QueryBuilders.matchQuery("equation", searchString));
+
+        sourceBuilder.query(queryBuilder);
+
+        //高亮
+
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder
+                //.field("all")
+                .field("text")
+                .field("title")
+                .field("figure")
+                .field("figure_caption")
+                .field("table")
+                .field("table_caption")
+                .field("header")
+                .field("footer")
+                .field("reference")
+                .field("equation")
+                .preTags("<em>")
+                .postTags("</em>")
+                .fragmentSize(50).numOfFragments(1);
+
+        sourceBuilder.highlighter(highlightBuilder);//自定义设置高亮
+        //创建请求
+        SearchRequest searchRequest = new SearchRequest("pdf");
+        searchRequest.source(sourceBuilder);
+        //获得响应
+        SearchResponse searchResponse=restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
+
+        //////////////////
+
+        // 获取搜索结果
+        SearchHits hits = searchResponse.getHits();
 
 
+        // 处理每个结果并输出高亮结果
+        //System.out.println(get50WordListBySearchHits(hits, "figure"));
+        //////////////////
+
+        return get50WordListBySearchHits(hits, "figure");
+        //return JSON.toJSONString(searchResponse.getHits().getHits());//打印命中集合
+    }
 
 
+    /**
+     *
+     * 通过命中结果获取
+     * @param hits
+     * @param field
+     * @return
+     */
+    public ArrayList<HashMap> get50WordListBySearchHits(SearchHits hits,String field){
+        ArrayList<HashMap> result=new ArrayList<>();//list
+
+//
+//
+//        for (SearchHit hit : hits) {
+//            // 获取高亮结果
+//            Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+//            HighlightField highlightField = highlightFields.get(field);
+//
+//            // 处理高亮结果
+//            if (highlightField != null) {
+//                Text[] fragments = highlightField.fragments();
+//                String fragmentString = "";
+//                for (Text text : fragments) {
+//                    fragmentString += text;
+//                }
+//                set.add((Integer) hit.getSourceAsMap().get("pdfPage"));
+//                strings.add(fragmentString);
+//            }
+//        }
+
+        for (SearchHit hit : hits) {//遍历每页
+            HashMap<Integer,Object> map=new HashMap<>();//map<page,StringList>
+            ArrayList<Mate> mateList = new ArrayList<>();//mateList
+            //HashMap<String,String> Mate=new HashMap<>();//map<field,String>
+
+            log.info("解析hit"+hit.getSourceAsMap());
+            //获取每页高亮结果
+            Map<String,HighlightField> highlightFieldMap=hit.getHighlightFields();
+            //
 
 
+            HighlightField highlightFieldText = highlightFieldMap.get("text");
+            String stringByHighlightField = getStringByHighlightField(highlightFieldText);
+            if(!stringByHighlightField.equals(""))
+            mateList.add(new Mate("来源于正文", stringByHighlightField));
+
+            HighlightField highlightFieldTitle = highlightFieldMap.get("title");
+            String stringByHighlightField1 = getStringByHighlightField(highlightFieldTitle);
+            if(!stringByHighlightField1.equals(""))
+            mateList.add(new Mate("来源于标题",stringByHighlightField1));
+
+            HighlightField highlightFieldFigure = highlightFieldMap.get("figure");
+            String stringByHighlightField2 = getStringByHighlightField(highlightFieldTitle);
+            if(!stringByHighlightField2.equals(""))
+            mateList.add(new Mate("来源于图片", getStringByHighlightField(highlightFieldFigure)));
 
 
+//            HighlightField highlightFieldFigureCaption = highlightFieldMap.get("figure_caption");
+//            mateList.add(new HashMap<String,String>().put("来源于图片标题",getStringByHighlightField(highlightFieldFigureCaption)));
+//
+//            HighlightField highlightFieldTable = highlightFieldMap.get("table");
+//            mateList.add(new HashMap<String,String>().put("来源于表格",getStringByHighlightField(highlightFieldTable)));
+//
+//            HighlightField highlightFieldTableCaption = highlightFieldMap.get("table_caption");
+//            mateList.add(new HashMap<String,String>().put("来源于表格标题",getStringByHighlightField(highlightFieldTableCaption)));
+//
+//            HighlightField highlightFieldHeader = highlightFieldMap.get("header");
+//            mateList.add(new HashMap<String,String>().put("来源于页眉",getStringByHighlightField(highlightFieldHeader)));
+//
+//
+//            HighlightField highlightFieldFooter = highlightFieldMap.get("footer");
+//            mateList.add(new HashMap<String,String>().put("来源于页脚",getStringByHighlightField(highlightFieldFooter)));
+//
+//            HighlightField highlightFieldReference = highlightFieldMap.get("reference");
+//            mateList.add(new HashMap<String,String>().put("来源于引用",getStringByHighlightField(highlightFieldReference)));
+//
+//            HighlightField highlightFieldEquation = highlightFieldMap.get("equation");
+//            mateList.add(new HashMap<String,String>().put("来源于公式",getStringByHighlightField(highlightFieldEquation)));
+
+            map.put((Integer) hit.getSourceAsMap().get("pdfPage"),mateList);
+            log.info("这是map:"+map.toString());
+            result.add(map);
+        }
 
 
+        return result;
+    }
 
+    public String getStringByHighlightField(HighlightField highlightField){
+        String fragmentString = "";
+            // 处理高亮结果
+        if (highlightField != null) {
+            Text[] fragments = highlightField.fragments();
+            for (Text text : fragments) {
+                fragmentString += text;
+            }
+            //set.add((Integer) hit.getSourceAsMap().get("pdfPage"));
+           // strings.add(fragmentString);
+        }
+        return fragmentString;
+    }
 
 
 
@@ -223,7 +386,7 @@ public class SearchServiceImpl {
         sourceBuilder.size(pageSize);
 
         //匹配
-        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("pdftextstructure", keyword);
+        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("text", keyword);
         sourceBuilder.query(termQueryBuilder)
                 .timeout(TimeValue.timeValueSeconds(10));
 
@@ -249,6 +412,11 @@ public class SearchServiceImpl {
     }
 
 
+    /**
+     * 保存到es
+     * @param objects
+     * @return
+     */
     public boolean save2ES(ArrayList<EsDocumentBo> objects) {
 
 

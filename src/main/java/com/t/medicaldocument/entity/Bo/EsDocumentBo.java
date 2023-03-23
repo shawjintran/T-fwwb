@@ -32,7 +32,7 @@ public class EsDocumentBo {
     /**
      *图片yrl??
      */
-    private String pdfpicurl;
+    private String pdfPicurl;
 
 
     /**
@@ -78,7 +78,7 @@ public class EsDocumentBo {
 
 
     /**
-     * 页头
+     * 页眉
      */
     private String header;
 

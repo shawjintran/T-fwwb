@@ -40,8 +40,4 @@ public class SearchShow {
      * pdf的命中分数
      */
     private Float score;
-
-
-
-
 }
