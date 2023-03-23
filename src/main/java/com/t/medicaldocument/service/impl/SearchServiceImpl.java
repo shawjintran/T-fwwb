@@ -315,9 +315,9 @@ public class SearchServiceImpl {
             mateList.add(new Mate("来源于标题",stringByHighlightField1));
 
             HighlightField highlightFieldFigure = highlightFieldMap.get("figure");
-            String stringByHighlightField2 = getStringByHighlightField(highlightFieldTitle);
+            String stringByHighlightField2 = getStringByHighlightField(highlightFieldFigure);
             if(!stringByHighlightField2.equals(""))
-            mateList.add(new Mate("来源于图片", getStringByHighlightField(highlightFieldFigure)));
+            mateList.add(new Mate("来源于图片", stringByHighlightField2));
 
 
 //            HighlightField highlightFieldFigureCaption = highlightFieldMap.get("figure_caption");
