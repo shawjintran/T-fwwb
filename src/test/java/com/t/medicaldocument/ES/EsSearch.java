@@ -23,7 +23,7 @@ public class EsSearch {
     @Test
     public void serachPage(){
         try {
-            System.out.println("结果:"+ JSON.toJSONString(searchService.searchPage("内容", 0, 10)));
+            System.out.println("结果:"+ JSON.toJSONString(searchService.searchPage("内容", 0, 10,1l)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

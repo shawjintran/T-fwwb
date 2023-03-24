@@ -22,9 +22,9 @@ public class SearchController {
 	private SearchServiceImpl searchService;
 
 
-	@GetMapping("/{searchString}/{pageNo}/{pageSize}")
-	public Object search(@PathVariable String searchString, @PathVariable int pageNo, @PathVariable int pageSize) throws IOException {
-		Object o= searchService.searchPage(searchString, pageNo, pageSize);
+	@GetMapping("/{searchString}/{pageNo}/{pageSize}/{userId}")
+	public Object search(@PathVariable String searchString, @PathVariable int pageNo, @PathVariable int pageSize,@PathVariable Long userId) throws IOException {
+		Object o= searchService.searchPage(searchString, pageNo, pageSize,userId);
 		///TODO 需要实现文献合并,map里是页数据条,需要转成文献数据条
 		System.out.println(o);
 		return JSON.toJSONString(o);
