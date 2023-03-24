@@ -2,6 +2,8 @@ package com.t.medicaldocument.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.code.kaptcha.Constants;
+import com.google.code.kaptcha.Producer;
 import com.t.medicaldocument.entity.Document;
 import com.t.medicaldocument.entity.User;
 import com.t.medicaldocument.entity.Vo.DocumentVo;
@@ -13,22 +15,31 @@ import io.swagger.annotations.Api;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.HashMap;
 
 @RestController
 @RequestMapping("/user/")
 @Api(tags = "用户的登录登出")
+@Slf4j
 public class UserController {
 
 	@Autowired
 	UserService userService;
-
+	@Autowired
+	Producer producer;
 	@Autowired
 	DocumentService documentService;
 
@@ -72,7 +83,7 @@ public class UserController {
 
 	}
 	@GetMapping("SMS")
-	@ApiOperation("发送验证码")
+	@ApiOperation("(遗弃)发送验证码")
 	public R sendSMS(@ApiParam(required = true)
 								 String phone){
 		//通过电话号通过相关服务,发送验证码
@@ -124,7 +135,7 @@ public class UserController {
 	}
 	@PostMapping("generate")
 	@ApiOperation("（已定）更新用户密码")
-	public R generatePwd(@RequestBody Long userId,
+	public R modifyPwd(@RequestBody Long userId,
 						 @RequestBody String oldPwd,
 						 @RequestBody String newPwd){
 		if(oldPwd.equals(newPwd))
@@ -142,5 +153,27 @@ public class UserController {
 		if(delete)
 			return R.ok().setMes("删除成功");
 		return R.fail().setMes("未知原因:删除失败");
+	}
+
+	@GetMapping(value = "pic", produces = "image/jpeg")
+	@ApiOperation("生成验证码图片（前端可通过session中KAPTCHA_SESSION_KEY先进行页面验证）")
+	public void generatePic(HttpServletResponse response, HttpServletRequest request) throws IOException {
+		response.setHeader("Cache-Control", "no-store,no-cache");
+		response.setContentType("image/jpeg");
+		//生成文字验证码
+		// String text=producer.createText();
+		String text="1234";
+		//生成图片验证码
+		BufferedImage image=producer.createImage(text);
+		//保存验证码到session
+		request.getSession().setAttribute(Constants.KAPTCHA_SESSION_KEY, text);
+		ServletOutputStream out= null;
+		out = response.getOutputStream();
+		ImageIO.write(image, "jpg", out);
+		try {
+				out.close();
+		} catch (IOException var2) {
+			log.error("生成验证码出错");
+		}
 	}
 }
