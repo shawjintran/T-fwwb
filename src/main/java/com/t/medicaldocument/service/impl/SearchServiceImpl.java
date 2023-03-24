@@ -2,8 +2,10 @@ package com.t.medicaldocument.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.t.medicaldocument.entity.Bo.EsDocumentBo;
+import com.t.medicaldocument.entity.EsSearch1;
 import com.t.medicaldocument.entity.Mate;
 import com.t.medicaldocument.entity.PdfDescription;
+import com.t.medicaldocument.entity.Vo.EsSearchVo;
 import com.t.medicaldocument.entity.Vo.SearchShow;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,10 @@ public class SearchServiceImpl {
     @Autowired
     private RestHighLevelClient restHighLevelClient;
     //解析数据放在es索引
+
+    @Autowired
+    private PdfFileServiceImpl pdfFileService;
+
     public Boolean parseContent(List<PdfDescription> pdfDescriptions) throws IOException {
 
 
@@ -155,8 +161,84 @@ public class SearchServiceImpl {
 
     //TODO es的检索结果
     //实现搜索功能
-    public Object searchPage(String searchString, int pageNo, int pageSize) throws IOException {
+    public Object searchPage(String searchString, int pageNo, int pageSize, Long userId) throws IOException {
         // TODO: 2023/3/22 优化检索出的信息，以及解析JSON格式字符串
+        //如果分页太小也从第一个开始分页
+        if(pageNo<=0){
+            pageNo=0;
+        }
+
+        log.info("搜索内容为"+searchString+"开始页:"+pageNo+"结束页:"+pageSize);
+
+
+        //条件搜索
+        SearchRequest searchRequest = new SearchRequest("pdfpage");
+        //构造器
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        //匹配
+        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("all", searchString);
+        sourceBuilder.query(queryBuilder)
+                .timeout(TimeValue.timeValueSeconds(30));
+
+
+        //执行搜索
+        searchRequest.source(sourceBuilder);
+        SearchResponse searchResponse=restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
+        log.info("获得结果数:"+searchResponse.getHits().getHits().length);
+        //解析结果
+
+        //存入list
+        ArrayList<EsSearch1> list =new ArrayList<>();
+
+
+        //遍历收集成map集合
+        for (SearchHit hit : searchResponse.getHits()) {
+            EsSearch1 esSearch1=new EsSearch1(
+                    (Long)hit.getSourceAsMap().get("pdfId"),
+                    (Integer) hit.getSourceAsMap().get("pdfPage"),
+                    (String)hit.getSourceAsMap().get("createtime"),
+                    hit.getScore()
+                    );
+        }
+
+        //前端显示的对象列表
+        List<EsSearchVo> esSearchVoList=new ArrayList<>();
+        //分类处理map<pdf的id,分数>
+
+        Map<Long,List<EsSearch1>> pdfIdListMap=list.stream().collect(Collectors.groupingBy(EsSearch1::getPdfId));//按照pdfId进行分类
+        for(Map.Entry<Long,List<EsSearch1>> entry : pdfIdListMap.entrySet()) {//for遍历
+            List<EsSearch1> esSearch1s = entry.getValue();
+            //前端显示对象
+            EsSearchVo esSearchVo=new EsSearchVo();
+            for (int i = 0; i < esSearch1s.size(); i++) {
+                EsSearch1 esSearch1 = esSearch1s.get(i);
+                if(i==0){
+                    //循环初始化
+                    esSearchVo.setPdfId(esSearch1.getPdfId());
+                    esSearchVo.setTitle(pdfFileService.fileEcho(userId, esSearch1.getPdfId()).getPdfTitle());//TODO
+                    esSearchVo.setPdfPages("命中页数为: ");
+                    esSearchVo.setCreatetime(esSearch1.getCreatetime());
+                }
+                esSearchVo.setPdfPages(esSearchVo.getPdfPages()+" "+esSearch1.getPdfPage());
+            }
+            esSearchVoList.add(esSearchVo);
+
+        }
+
+
+
+
+
+        //TODO 2023/3/24 如果按照时间排序
+
+
+        return esSearchVoList;
+    }
+/*
+
+
+    //实现搜索功能
+    public Object searchPage(String searchString, int pageNo, int pageSize) throws IOException {
         //如果分页太小也从第一个开始分页
         if(pageNo<=0){
             pageNo=0;
@@ -189,7 +271,7 @@ public class SearchServiceImpl {
 
 
         return searchResponse.getHits().getHits();
-    }
+    }*/
 
 
 

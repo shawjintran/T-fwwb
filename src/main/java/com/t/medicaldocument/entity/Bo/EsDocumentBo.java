@@ -31,7 +31,7 @@ public class EsDocumentBo {
     private String all;
 
     /**
-     *图片yrl??
+     *图片url??
      */
     private String pdfpicurl;
 
