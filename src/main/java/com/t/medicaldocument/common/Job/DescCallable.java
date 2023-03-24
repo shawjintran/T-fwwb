@@ -41,7 +41,7 @@ public class DescCallable implements Callable<HashMap> {
 		log.info(file_name+"_"+page+" save success");
 		if (save){
 			Long pdfId = desc.getPdfId();
-			HashMap<String, Object> pdfDesc = new HashMap<>(1);
+			HashMap<String, Object> pdfDesc = new HashMap<>(3);
 			pdfDesc.put("pdfId",pdfId);
 			pdfDesc.put("page",page);
 			pdfDesc.put("desc",map);

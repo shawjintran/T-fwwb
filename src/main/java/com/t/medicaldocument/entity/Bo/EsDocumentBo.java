@@ -1,10 +1,11 @@
 package com.t.medicaldocument.entity.Bo;
 
+import com.t.medicaldocument.entity.EsNestedChild;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -32,7 +33,7 @@ public class EsDocumentBo {
     /**
      *图片yrl??
      */
-    private String pdfPicurl;
+    private String pdfpicurl;
 
 
     /**
@@ -41,67 +42,8 @@ public class EsDocumentBo {
     private String createtime;
 
 
-    /**
-     * 正文
-     */
-    private String text;
+    private List<EsNestedChild> esfathernested = new ArrayList<>();
 
 
-    /**
-     * 标题
-     */
 
-    private String title;
-
-    /**
-     *图片
-     */
-    private String figure;
-
-
-    /**
-     *图片的标题
-     */
-
-    private String figure_caption;
-
-    /**
-     * 图表
-     */
-    private String table;
-
-    /**
-     * 图表的标题
-     */
-
-    private String table_caption;
-
-
-    /**
-     * 页眉
-     */
-    private String header;
-
-
-    /**
-     * 页脚
-     */
-
-    private String footer;
-
-    /**
-     * 引用,参考
-     */
-
-    private String reference;
-
-    /**
-     * 公式
-     */
-    private String equation;
-
-
-    public void setAll() {
-        this.all =this.text+","+this.title+","+this.figure+","+this.figure_caption+","+this.table+","+this.table_caption+","+this.header+","+this.footer+","+this.reference+","+this.equation;
-    }
 }

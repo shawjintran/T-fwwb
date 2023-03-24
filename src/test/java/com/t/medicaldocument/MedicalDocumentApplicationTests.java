@@ -3,6 +3,7 @@ package com.t.medicaldocument;
 
 
 import com.alibaba.fastjson2.JSONObject;
+import com.t.medicaldocument.entity.EsNestedChild;
 import com.t.medicaldocument.entity.User;
 import com.t.medicaldocument.service.PdfFileService;
 import com.t.medicaldocument.service.UserService;
@@ -113,6 +114,21 @@ class MedicalDocumentApplicationTests {
 	void User(){
 		// System.out.println(userService.updateById(new User().setUserId(1L).setUserPoints(3)));
 		System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
+
+	}
+	@Test
+	void op() throws CloneNotSupportedException {
+		ArrayList<EsNestedChild> esNestedChildren = new ArrayList<>();
+		long start = System.currentTimeMillis();
+		EsNestedChild child = new EsNestedChild();
+
+		for (int i = 0; i < Math.pow(10,10); i++) {
+
+		}
+		long finish = System.currentTimeMillis();
+		long timeElapsed = finish - start;
+		System.out.println(timeElapsed);
+
 
 	}
 }

@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.t.medicaldocument.entity.Bo.EsDocumentBo;
+import com.t.medicaldocument.entity.EsNestedChild;
 import jdk.nashorn.internal.scripts.JS;
 
 import java.io.File;
@@ -176,25 +177,26 @@ public class PdfDataUtils {
 		}
 	}
 
-	static public ArrayList<EsDocumentBo> parseList(ArrayList<HashMap<String,Object>> list) throws NoSuchFieldException, IllegalAccessException {
+	static public ArrayList<EsDocumentBo> parseList(ArrayList<HashMap<String,Object>> list)
+	{
 		ArrayList<EsDocumentBo> esObjs = new ArrayList<>();
 		for (HashMap<String, Object> map : list) {
-			HashMap<String,ArrayList> pdf = (HashMap<String,ArrayList>)map.get("desc");
+			HashMap<String,ArrayList<String>> pdf =
+					(HashMap<String,ArrayList<String>>) map.get("desc");
 			//传入ES对象
 			EsDocumentBo esObj = new EsDocumentBo();
-			parseMapToEsObject(pdf, esObj);
+			parseMapIntoEsNested(pdf, esObj);
 			//设置 pdfId 和 page 页数
 			esObj.setPdfId((Long) map.get("pdfId"));
 			esObj.setPdfPage((Integer) map.get("page"));
 			esObj.setCreatetime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
-			esObj.setAll();//setAll方法
 			esObjs.add(esObj);
 		}
 		return esObjs;
 	}
 
 	/**
-	 *
+	 * 初版解析字符串存储
 	 * @param map
 	 * @param esObject
 	 * @throws NoSuchFieldException
@@ -209,5 +211,32 @@ public class PdfDataUtils {
 			field.set(esObject, JSON.toJSONString(map.get(s)));
 			//使用反射进行映射字段名
 		}
+	}
+
+	/**
+	 * 第二版解析字符串，存入类型为Nested类型
+	 * @param map
+	 * @param esObject
+	 */
+	static void parseMapIntoEsNested(HashMap<String,ArrayList<String>> map,EsDocumentBo esObject)
+	{
+		ArrayList<EsNestedChild> children = new ArrayList<>();
+		ArrayList<ArrayList<String>> lists=new ArrayList<>();
+		for (String s : map.keySet()) {
+			ArrayList<String> arrayList = map.get(s);
+			for (String o : arrayList) {
+				if (!o.equals("")&&o.equals(" "))
+				{
+					EsNestedChild child = new EsNestedChild();
+					child.setEstype(s);
+					child.setEsvalue(o);
+					children.add(child);
+				}
+			}
+			lists.add(arrayList);
+		}
+		esObject.setAll(lists.toString());
+		if (children.size()!=0)
+			esObject.setEsfathernested(children);
 	}
 }
