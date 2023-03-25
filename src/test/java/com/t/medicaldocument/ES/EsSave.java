@@ -26,8 +26,6 @@ public class EsSave {
     //数据导入
     @Test
     void testBulkRequest(){
-
-
         ArrayList<EsDocumentBo> esDocumentBos=new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             EsDocumentBo esDocumentBo = new EsDocumentBo();
@@ -38,8 +36,8 @@ public class EsSave {
 
             esDocumentBo.setCreatetime("2023-02-15");
             ArrayList<EsNestedChild> esfathernested=new ArrayList<>();
-            esfathernested.add(new EsNestedChild("这是类型苹果","这是内容苹果"));
-            esfathernested.add(new EsNestedChild("这是类型香蕉","这是内容香蕉"));
+            esfathernested.add(new EsNestedChild("这是类型苹果","lks双位数"));
+            esfathernested.add(new EsNestedChild("这是类型香蕉","受打击很快就"));
 
             esDocumentBo.setEsfathernested(esfathernested);
             esDocumentBo.setAll();

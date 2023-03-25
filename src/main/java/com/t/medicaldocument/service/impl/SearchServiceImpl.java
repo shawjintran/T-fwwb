@@ -230,7 +230,7 @@ public class SearchServiceImpl {
         //遍历收集成map集合
         for (SearchHit hit : searchResponse.getHits()) {
             EsSearch1 esSearch1=new EsSearch1(
-                    Integer.toUnsignedLong((Integer)hit.getSourceAsMap().get("pdfId")),
+                    (Long) hit.getSourceAsMap().get("pdfId"),
                     (Integer) hit.getSourceAsMap().get("pdfPage"),
                     (String)hit.getSourceAsMap().get("createtime"),
                     hit.getScore()

@@ -12,7 +12,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @MapperScan("com.t.medicaldocument.mapper")
 @EnableSwagger2
 @EnableAsync
-@EnableCaching
+// @EnableCaching
 public class MedicalDocumentApplication {
 
 	public static void main(String[] args) {

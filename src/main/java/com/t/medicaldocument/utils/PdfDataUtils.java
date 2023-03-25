@@ -225,7 +225,7 @@ public class PdfDataUtils {
 		for (String s : map.keySet()) {
 			ArrayList<String> arrayList = map.get(s);
 			for (String o : arrayList) {
-				if (!o.equals("")&&o.equals(" "))
+				if (!o.equals("")&&!o.equals(" "))
 				{
 					EsNestedChild child = new EsNestedChild();
 					child.setEstype(s);

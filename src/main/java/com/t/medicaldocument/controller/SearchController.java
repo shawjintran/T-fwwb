@@ -33,7 +33,11 @@ public class SearchController {
 	 * @throws IOException
 	 */
 	@GetMapping("/{searchString}/{pageNo}/{pageSize}/{userId}/{searchType}")
-	public Object search(@PathVariable String searchString, @PathVariable int pageNo, @PathVariable int pageSize,@PathVariable Long userId,@PathVariable Integer searchType) throws IOException {
+	public Object search(@PathVariable String searchString,
+						 @PathVariable int pageNo,
+						 @PathVariable int pageSize,
+						 @PathVariable Long userId,
+						 @PathVariable Integer searchType) throws IOException {
 		Object o = null;
 		if(searchType==1)//按照时间搜索
 			o= searchService.searchPageByScore(searchString, pageNo, pageSize,userId);
