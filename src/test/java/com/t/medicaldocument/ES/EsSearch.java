@@ -1,6 +1,7 @@
 package com.t.medicaldocument.ES;
 
 
+import com.alibaba.fastjson.JSON;
 import com.t.medicaldocument.service.impl.SearchServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -20,9 +21,28 @@ public class EsSearch {
 
 
     @Test
+    public void serachPageByScore(){
+        try {
+            System.out.println("结果:"+ JSON.toJSONString(searchService.searchPageByScore("内容", 0,10,0l)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void serachPageByTime(){
+        try {
+            System.out.println("结果:"+ JSON.toJSONString(searchService.searchPageByTime("内容", 0,10,0l)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Test
     public void getDocTest(){
         try {
-            System.out.println(searchService.getdoc(120l, "图片"));
+            System.out.println(JSON.toJSONString(searchService.getdoc(120l, "内容")));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

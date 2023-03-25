@@ -31,7 +31,7 @@ public class EsDocumentBo {
     private String all;
 
     /**
-     *图片yrl??
+     *图片url??
      */
     private String pdfpicurl;
 
@@ -45,5 +45,11 @@ public class EsDocumentBo {
     private List<EsNestedChild> esfathernested = new ArrayList<>();
 
 
+
+    public void setAll(){
+        for (EsNestedChild esNestedChild : this.esfathernested) {
+            this.all+=esNestedChild.getEsvalue();
+        }
+    }
 
 }
