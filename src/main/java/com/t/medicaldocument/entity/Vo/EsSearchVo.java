@@ -20,6 +20,11 @@ public class EsSearchVo {
      * 命中页数的字符串
      */
     private String pdfPages;
+
+    /**
+     * 分数
+     */
+    private Float score;
     /**
      * 创建时间
      */

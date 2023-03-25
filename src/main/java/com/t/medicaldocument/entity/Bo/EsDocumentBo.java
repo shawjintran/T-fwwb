@@ -46,4 +46,10 @@ public class EsDocumentBo {
 
 
 
+    public void setAll(){
+        for (EsNestedChild esNestedChild : this.esfathernested) {
+            this.all+=esNestedChild.getEsvalue();
+        }
+    }
+
 }
