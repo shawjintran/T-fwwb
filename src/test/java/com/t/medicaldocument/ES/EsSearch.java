@@ -42,7 +42,7 @@ public class EsSearch {
     @Test
     public void getDocTest(){
         try {
-            System.out.println(JSON.toJSONString(searchService.getdoc(120l, "苹果")));
+            System.out.println(JSON.toJSONString(searchService.getdoc(120l, "内容")));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -16,6 +16,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.InnerHitBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
@@ -27,6 +28,8 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -320,19 +323,16 @@ public class SearchServiceImpl {
     public Object getdoc(Long pdfId,String searchString) throws IOException {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
-//
-//        //高亮设置
-//        HighlightBuilder highlightBuilder = new HighlightBuilder();
-//        highlightBuilder.field("esfathernested.esvalue")
-//                .preTags("<em>")
-//                .postTags("</em>")
-//                .fragmentSize(50);//前后50字
-//
-//        searchSourceBuilder.highlighter(highlightBuilder);
-//
 
-        InnerHitBuilder innerHitBuilder = new InnerHitBuilder();
-        innerHitBuilder.setName("my_inner_hits");
+        //高亮设置
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.field("esfathernested.esvalue")
+                .preTags("<em>")
+                .postTags("</em>")
+                .fragmentSize(50);//前后50字
+
+        searchSourceBuilder.highlighter(highlightBuilder);
+
 
 
 
@@ -341,7 +341,7 @@ public class SearchServiceImpl {
         QueryBuilder queryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.termQuery("pdfId", pdfId))
                 .should(QueryBuilders.nestedQuery("esfathernested",QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("esfathernested.esvalue",searchString)), ScoreMode.Avg)
-                        .innerHit(new InnerHitBuilder().setName("inner_hits")));//内部高亮
+                        .innerHit(new InnerHitBuilder().setName("inner_hits").setHighlightBuilder(highlightBuilder)));//内部高亮
 
         searchSourceBuilder.query(queryBuilder);
 
@@ -368,35 +368,31 @@ public class SearchServiceImpl {
 
             Map<String, SearchHits> innerHits = hit.getInnerHits();
 
-            for(Map.Entry<String,SearchHits> entry : innerHits.entrySet()){//遍历命中子文档
-                SearchHit[] hits1 = entry.getValue().getHits();
-                for (SearchHit documentFields : hits1) {//取得最小单位
-                    Map<String, Object> sourceAsMap = documentFields.getSourceAsMap();
-                    System.out.println("innerhit_sourceAsMap"+JSON.toJSONString(sourceAsMap));
-                    EsNestedChild esNestedChild = switchKey(sourceAsMap);
-                    esNestedChildren.add(esNestedChild);//添加最小单位
-                }
+            SearchHits inner_hits = innerHits.get("inner_hits");
+            for (SearchHit inner_hit : inner_hits) {//子文档遍历
+                Map<String, Object> sourceAsMap = inner_hit.getSourceAsMap();
+                EsNestedChild esNestedChild = switchKey(sourceAsMap);
+                ////////
+                Map<String, HighlightField> highlightFields = inner_hit.getHighlightFields();
+                HighlightField highlightField = highlightFields.get("esfathernested.esvalue");
+                Text[] fragments = highlightField.fragments();
+                String valueString = Texts2String(fragments);
+                ////////
+                esNestedChild.setEsvalue(valueString);
+
+                esNestedChildren.add(esNestedChild);
             }
 
             listMap.put((Integer) hit.getSourceAsMap().get("pdfPage"),esNestedChildren);
-
-//
-//            System.out.println("sourceMap:"+sourceMap.toString());
-//            Map<String, HighlightField> highlightMap = hit.getHighlightFields();
-//            if (highlightMap.containsKey("esfathernested.esvalue")) {
-//                HighlightField highlight = highlightMap.get("esfathernested.esvalue");
-//                sourceMap.put("esfathernested.esvalue", highlight.fragments()[0].string());
-//            }
-//            log.info("sourceMap:"+sourceMap);
-//            // TODO: 处理返回的esfathernested对象
-//            List<EsNestedChild> esfathernested = (List<EsNestedChild>) sourceMap.get("esfathernested");
-//            listMap.put((Integer) sourceMap.get("pdfPage"),esfathernested);
-
         }
 
-
-
         return listMap;
+    }
+
+
+    private String Texts2String(Text[] fragments){
+        String fragmentString = fragments[0].string();//只返回一个片段
+        return fragmentString;
     }
 
     private EsNestedChild switchKey(Map<String, Object> sourceAsMap) {
@@ -450,7 +446,7 @@ public class SearchServiceImpl {
                     break;
                 }
             }
-            esNestedChild.setEsvalue((String) sourceAsMap.get("esvalue"));
+            //esNestedChild.setEsvalue((String) sourceAsMap.get("esvalue"));
         return esNestedChild ;
     }
 
