@@ -364,6 +364,7 @@ public class SearchServiceImpl {
 
         //构造返回结果
         for (SearchHit hit : hits) {//遍历父文档
+
             List<EsNestedChild> esNestedChildren=new ArrayList<>();
 
             Map<String, SearchHits> innerHits = hit.getInnerHits();
@@ -371,83 +372,89 @@ public class SearchServiceImpl {
             SearchHits inner_hits = innerHits.get("inner_hits");
             for (SearchHit inner_hit : inner_hits) {//子文档遍历
                 Map<String, Object> sourceAsMap = inner_hit.getSourceAsMap();
-                EsNestedChild esNestedChild = switchKey(sourceAsMap);
+                String estype = switchKey(sourceAsMap);
                 ////////
                 Map<String, HighlightField> highlightFields = inner_hit.getHighlightFields();
                 HighlightField highlightField = highlightFields.get("esfathernested.esvalue");
                 Text[] fragments = highlightField.fragments();
-                String valueString = Texts2String(fragments);
+                String[] valueStrings = Texts2Strings(fragments);
                 ////////
-                esNestedChild.setEsvalue(valueString);
+                for (int i = 0; i < valueStrings.length; i++) {
+                    esNestedChildren.add(new EsNestedChild(estype,valueStrings[i]));
+                }
 
-                esNestedChildren.add(esNestedChild);
             }
 
+            if(esNestedChildren.size()!=0)
             listMap.put((Integer) hit.getSourceAsMap().get("pdfPage"),esNestedChildren);
         }
+
 
         return listMap;
     }
 
 
-    private String Texts2String(Text[] fragments){
-        String fragmentString = fragments[0].string();//只返回一个片段
-        return fragmentString;
+    private String[] Texts2Strings(Text[] fragments){
+
+        String[] fragmentStrings=new String[fragments.length];
+        for (int i = 0; i < fragments.length; i++) {
+            fragmentStrings[i]=fragments[i].string();//只返回一个片段
+        }
+        return fragmentStrings;
     }
 
-    private EsNestedChild switchKey(Map<String, Object> sourceAsMap) {
+    private String switchKey(Map<String, Object> sourceAsMap) {
 
-        EsNestedChild esNestedChild = new EsNestedChild();
-
+        String estype;
         String stringkey = (String) sourceAsMap.get("estype");
         switch (stringkey) {
                 case "text" : {
-                    esNestedChild.setEstype("来源于正文");
+                    estype="来源于正文";
                     break;
                 }
                 case "title" : {
-                    esNestedChild.setEstype("来源于标题");
+                    estype="来源于标题";
                     break;
                 }
                 case "figure" : {
-                    esNestedChild.setEstype("来源于图片");
+                    estype="来源于图片";
                     break;
                 }
                 case "figure_caption" : {
-                    esNestedChild.setEstype("来源于图片标题");
+                    estype="来源于图片标题";
                     break;
                 }
                 case "table" : {
-                    esNestedChild.setEstype("来源于表格");
+                    estype="来源于表格";
                      break;
                 }
                 case "table_caption" : {
-                    esNestedChild.setEstype("来源于表格标题");
+                    estype="来源于表格标题";
                     break;
                 }
                 case "header" : {
-                    esNestedChild.setEstype("来源于页眉");
+                    estype="来源于页眉";
                     break;
                 }
                 case "footer" : {
-                    esNestedChild.setEstype("来源于页脚");
+                    estype="来源于页脚";
                     break;
                 }
                 case "reference" : {
-                    esNestedChild.setEstype("来源于引用");
+                    estype="来源于引用";
                     break;
                 }
                 case "equation" : {
-                    esNestedChild.setEstype("来源于公式");
+                    estype="来源于公式";
                     break;
                 }
                 default:{
-                    esNestedChild.setEstype("来源于其他");
+                    estype="来源于其他";
                     break;
                 }
             }
             //esNestedChild.setEsvalue((String) sourceAsMap.get("esvalue"));
-        return esNestedChild ;
+        return estype ;
     }
 
 

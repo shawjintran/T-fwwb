@@ -1,8 +1,10 @@
 package com.t.medicaldocument.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.t.medicaldocument.entity.Vo.EsSearchVo;
 import com.t.medicaldocument.entity.Vo.SearchShow;
 import com.t.medicaldocument.service.impl.SearchServiceImpl;
+import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,14 +40,14 @@ public class SearchController {
 						 @PathVariable int pageSize,
 						 @PathVariable Long userId,
 						 @PathVariable Integer searchType) throws IOException {
-		Object o = null;
+		List<EsSearchVo> list = null;
 		if(searchType==1)//按照时间搜索
-			o= searchService.searchPageByScore(searchString, pageNo, pageSize,userId);
+			list= searchService.searchPageByScore(searchString, pageNo, pageSize,userId);
 		if(searchType==2)//按照相关度搜索
-			o=searchService.searchPageByTime(searchString, pageNo, pageSize,userId);
+			list=searchService.searchPageByTime(searchString, pageNo, pageSize,userId);
 		///TODO 需要实现文献合并,map里是页数据条,需要转成文献数据条
-		System.out.println(o);
-		return JSON.toJSONString(o);
+		System.out.println(list);
+		return R.ok(list);
 	}
 
 
@@ -58,7 +60,7 @@ public class SearchController {
 		} catch (IOException e) {
 			throw new RuntimeException();
 		}
-		return JSON.toJSONString(getdoc);
+		return R.ok(getdoc);
 	}
 
 
