@@ -10,7 +10,4 @@ import lombok.NoArgsConstructor;
 public class EsNestedChild implements Cloneable{
 	private String estype;
 	private String esvalue;
-
-
-
 }

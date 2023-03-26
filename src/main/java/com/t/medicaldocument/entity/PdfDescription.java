@@ -22,7 +22,7 @@ public class PdfDescription implements Serializable {
     /**
      *
      */
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long pdfDescId;
 
     /**

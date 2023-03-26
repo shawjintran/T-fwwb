@@ -16,6 +16,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,44 +45,41 @@ public class AsyncTask {
 
 	@Async
 	@Transactional
-	public void predictByPython(Long pdfId,String filename, Integer count) throws
-			InterruptedException, ExecutionException{
-		// TODO: 2023/3/25 事务出现问题
+	public void predictByPython(Long pdfId,Long userId,String filename, Integer count) throws
+			InterruptedException, ExecutionException {
+		// TODO: 2023/3/25 事务问题 出现 难题
 		TransactionStatus transaction = platformTransaction.
 				getTransaction(transactionDefinition);
 		PdfFileService bean = BeanContext.getBean(PdfFileService.class);
 		List<Future<HashMap>> futures = new ArrayList<>();
 		AsyncConfig asyncConfig = BeanContext.getBean(AsyncConfig.class);
-		ThreadPoolTaskExecutor executor = (ThreadPoolTaskExecutor)asyncConfig.getAsyncExecutor();
+		ThreadPoolTaskExecutor executor = (ThreadPoolTaskExecutor) asyncConfig.getAsyncExecutor();
 		for (Integer i = 0; i < count; i++) {
 			futures.add(executor.submit(new DescCallable(pdfId, filename, i)));
 		}
-		ArrayList<HashMap<String,Object>> pdfEs=new ArrayList<>();
+		ArrayList<HashMap<String, Object>> pdfEs = new ArrayList<>();
 
 		for (Future<HashMap> future : futures) {
-			if (future.get()!=null)
-			{
+			if (future.get() != null) {
 				pdfEs.add(future.get());
 				continue;
 			}
-			platformTransaction.rollback(transaction);
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			//推测出现异常,设置为2
-			bean.statusUpdate(pdfId,2);
+			bean.statusUpdate(pdfId, 2);
 			log.info("出现异常");
 			return;
 		}
-			boolean update = bean.statusUpdate(pdfId, 1);
-			//结合ES 存入
-			ArrayList<EsDocumentBo> objects = PdfDataUtils.parseList(pdfEs);
-			//将要存储进Es的对象先收集起
-			//储存到es,返回boolean
-			boolean save=searchService.save2ES(objects);
-			log.info("是否存入:"+save);
-			//通过es批量存储
-		if (update&&save)
-			platformTransaction.commit(transaction);
-		else {
-			platformTransaction.rollback(transaction);
+		boolean update = bean.statusUpdate(pdfId, 1);
+		//结合ES 存入
+		ArrayList<EsDocumentBo> objects = PdfDataUtils.parseList(pdfEs,userId);
+		//将要存储进Es的对象先收集起
+		//储存到es,返回boolean
+		boolean save = searchService.save2ES(objects);
+		log.info("是否存入:" + save);
+		//通过es批量存储
+		if (!update || !save){
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			//推理出现异常
 			bean.statusUpdate(pdfId, 2);
 			log.info("出现异常");

@@ -180,7 +180,7 @@ public class PdfDataUtils {
 		}
 	}
 
-	static public ArrayList<EsDocumentBo> parseList(ArrayList<HashMap<String,Object>> list)
+	static public ArrayList<EsDocumentBo> parseList(ArrayList<HashMap<String,Object>> list,Long userId)
 	{
 		ArrayList<EsDocumentBo> esObjs = new ArrayList<>();
 		for (HashMap<String, Object> map : list) {
@@ -192,6 +192,7 @@ public class PdfDataUtils {
 			//设置 pdfId 和 page 页数
 			esObj.setPdfId((Long) map.get("pdfId"));
 			esObj.setPdfPage((Integer) map.get("page"));
+			esObj.setUserId(userId);
 			esObj.setCreatetime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
 			esObjs.add(esObj);
 		}

@@ -20,7 +20,7 @@ public class PdfFile implements Serializable {
     /**
      * pdf文件id
      */
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long pdfId;
     /**
      * 用户id

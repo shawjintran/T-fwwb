@@ -146,7 +146,7 @@ public class FileController {
 			return R.fail().setMes("没有对应文件,请删除当前文献信息,请重新上传文件");
 		if (vo.getPdfStatus()==1)
 			return R.fail().setMes("文件已经预测");
-		task.predictByPython(pdfId, vo.getPdfFileName(), vo.getPdfPagecount());
+		task.predictByPython(pdfId,userId, vo.getPdfFileName(), vo.getPdfPagecount());
 		return R.ok().setMes("系统将对文献进行分析");
 	}
 	@GetMapping(value = "download/{pdfId}", produces = "application/pdf")
