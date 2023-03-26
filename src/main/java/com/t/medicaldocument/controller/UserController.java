@@ -34,6 +34,7 @@ import java.util.HashMap;
 @RequestMapping("/user/")
 @Api(tags = "用户的登录登出")
 @Slf4j
+@CrossOrigin
 public class UserController {
 
 	@Autowired
@@ -100,10 +101,11 @@ public class UserController {
 			return R.fail().setMes("手机号或密码为空");
 		QueryWrapper<User> wrapper = new QueryWrapper<>();
 		wrapper.eq("user_phone",phone);
-		wrapper.eq("user_pwd",pwd);
 		User one = userService.getOne(wrapper);
 		if(ObjectUtils.isEmpty(one))
 			return R.fail().setMes("用户未注册");
+		if (pwd!=one.getUserPwd())
+			return R.fail().setMes("密码错误");
 		UserVo userVo = new UserVo();
 		BeanUtils.copyProperties(one,userVo);
 		session.setAttribute("user",one.getUserId());
@@ -112,8 +114,9 @@ public class UserController {
 	@GetMapping("logout")
 	@ApiOperation("登出账户")
 	public R logout(HttpSession session){
-		session.removeAttribute("user");
-		return null;
+		if (session.getAttribute("user")!=null)
+			session.removeAttribute("user");
+		return R.ok().setMes("成功");
 	}
 	@GetMapping("echo/{userId}")
 	@ApiOperation("用户信息的回显")
@@ -135,9 +138,9 @@ public class UserController {
 	}
 	@PostMapping("generate")
 	@ApiOperation("（已定）更新用户密码")
-	public R modifyPwd(@RequestBody Long userId,
-						 @RequestBody String oldPwd,
-						 @RequestBody String newPwd){
+	public R modifyPwd( Long userId,
+						  String oldPwd,
+						 String newPwd){
 		if(oldPwd.equals(newPwd))
 			return R.fail().setMes("新旧密码一致");
 		boolean done=userService.generatePwd(userId,oldPwd,newPwd);
@@ -156,7 +159,7 @@ public class UserController {
 	}
 
 	@GetMapping(value = "pic", produces = "image/jpeg")
-	@ApiOperation("生成验证码图片（前端可通过session中KAPTCHA_SESSION_KEY先进行页面验证）")
+	@ApiOperation("生成验证码图片（前端可通过session中KAPTCHA_SESSION_KEY键取值先进行页面验证）")
 	public void generatePic(HttpServletResponse response, HttpServletRequest request) throws IOException {
 		response.setHeader("Cache-Control", "no-store,no-cache");
 		response.setContentType("image/jpeg");

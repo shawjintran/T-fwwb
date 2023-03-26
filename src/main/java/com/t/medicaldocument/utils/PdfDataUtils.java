@@ -153,7 +153,10 @@ public class PdfDataUtils {
 		if (res==null)
 			return null;
 		StringBuilder table=new StringBuilder();
-		table.append(res.get("html"));
+		String html = (String)res.get("html");
+		html=html.replaceAll("<[^>]*>", ","); // 去掉所有HTML标签
+		html = html.replaceAll("^,|,$", "");// 去掉开头或结尾的逗号
+		table.append(html);
 		return table;
 	}
 

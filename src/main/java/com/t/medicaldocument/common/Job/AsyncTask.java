@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,8 +43,10 @@ public class AsyncTask {
 	SearchServiceImpl searchService;
 
 	@Async
+	@Transactional
 	public void predictByPython(Long pdfId,String filename, Integer count) throws
-			InterruptedException, ExecutionException, NoSuchFieldException, IllegalAccessException {
+			InterruptedException, ExecutionException{
+		// TODO: 2023/3/25 事务出现问题
 		TransactionStatus transaction = platformTransaction.
 				getTransaction(transactionDefinition);
 		PdfFileService bean = BeanContext.getBean(PdfFileService.class);

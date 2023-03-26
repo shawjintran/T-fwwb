@@ -12,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 /**
 * @author sky
@@ -33,6 +34,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 		boolean b = documentService.removeByDocIdAndUserId(null, userId);
 		if (i==1&&b)
 			return true;
+		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		return false;
 	}
 

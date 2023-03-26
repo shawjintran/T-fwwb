@@ -7,10 +7,7 @@ import com.t.medicaldocument.service.impl.SearchServiceImpl;
 import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,6 +15,7 @@ import java.util.List;
 @Api(tags = "与检索信息的相关请求，检索文献等")
 @RestController
 @RequestMapping("/search/")
+@CrossOrigin
 public class SearchController {
 
 	@Autowired
@@ -35,7 +33,7 @@ public class SearchController {
 	 * @throws IOException
 	 */
 	@GetMapping("/{searchString}/{pageNo}/{pageSize}/{userId}/{searchType}")
-	public Object search(@PathVariable String searchString,
+	public R search(@PathVariable String searchString,
 						 @PathVariable int pageNo,
 						 @PathVariable int pageSize,
 						 @PathVariable Long userId,
@@ -45,7 +43,6 @@ public class SearchController {
 			list= searchService.searchPageByScore(searchString, pageNo, pageSize,userId);
 		if(searchType==2)//按照相关度搜索
 			list=searchService.searchPageByTime(searchString, pageNo, pageSize,userId);
-		///TODO 需要实现文献合并,map里是页数据条,需要转成文献数据条
 		System.out.println(list);
 		return R.ok(list);
 	}
@@ -53,7 +50,7 @@ public class SearchController {
 
 
 	@GetMapping("/{pdfId}/{searchString}")
-	public Object getDoc(@PathVariable Long pdfId,@PathVariable String searchString){
+	public R getDoc(@PathVariable Long pdfId,@PathVariable String searchString){
 		Object getdoc = null;
 		try {
 			getdoc = searchService.getdoc(pdfId, searchString);

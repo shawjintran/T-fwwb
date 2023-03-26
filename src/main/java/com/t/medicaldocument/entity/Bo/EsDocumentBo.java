@@ -35,7 +35,10 @@ public class EsDocumentBo {
      */
     private String pdfpicurl;
 
-
+    /**
+     * 用户ID
+     */
+    private Long userId;
     /**
      * 创建时间
      */

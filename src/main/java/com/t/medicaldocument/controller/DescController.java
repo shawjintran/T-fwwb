@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/desc/")
 @Api(tags = "与pdf文件预测后得到的描述有关")
+@CrossOrigin
 public class DescController {
 	@Autowired
 	PdfDescriptionService descriptionService;

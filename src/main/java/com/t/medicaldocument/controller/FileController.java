@@ -38,6 +38,7 @@ import java.util.concurrent.ExecutionException;
 @Api(tags = "与文件的相关请求，包括上传文件，查看文献详情,修改删除文献.")
 @RestController
 @RequestMapping("/file/")
+@CrossOrigin
 @Slf4j
 /**
  * 1.上传Pdf文件,并保存
@@ -63,7 +64,7 @@ public class FileController {
 			allEntries = true)
 	public R fileUploadAndDivide(@RequestParam(value = "file",required = true)
 									 @RequestPart
-											 MultipartFile file,
+									 MultipartFile file,
 								 PdfFile pdf) throws IOException, MException {
 		//接收上传文件
 		if(pdf.getUserId()==null)
@@ -83,7 +84,7 @@ public class FileController {
 		boolean save = pdfFileService.save(pdf);
 		boolean updateSize = documentService.updateSize(1, 0L, 1, pdf.getUserId());
 		if (!save||!updateSize)
-			throw new MException().put("filename",filename);
+			throw new MException().put("filename", filename);
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("title",pdf.getPdfTitle());
 		map.put("pdfId",pdf.getPdfId());
@@ -135,8 +136,10 @@ public class FileController {
 	@CacheEvict(cacheNames = "PdfFile+'_'+#pdf.getUserId()",
 			condition = "#result.getCode()==200",
 			allEntries = true)
-	public R fileAnalyzeStructure2(@ApiParam(value="pdf文件的id", required = true) Long pdfId,
-								   @ApiParam(required = true) Long userId)
+	public R fileAnalyzeStructure2(@ApiParam(value="pdf文件的id", required = true)
+											   Long pdfId,
+								   @ApiParam(required = true)
+										   Long userId)
 			throws Exception {
 		PdfFileVo vo = pdfFileService.fileExist(userId, pdfId);
 		if (vo==null)
@@ -241,14 +244,14 @@ public class FileController {
 		map.put("data",list);
 		return R.ok(map);
 	}
-	@PutMapping("place/{userId}/{oldDocId}/{newDocId}")
+	@PutMapping("place/{userId}/{newDocId}")
 	@ApiOperation("(归档)将多个文献从同一个文件夹归入到另一个文档")
 	@CacheEvict(cacheNames = "PdfFile+'_'+#userId",
 			condition = "#result.getCode()==200",
 			allEntries = true)
-	public R filePlace( @ApiParam(required = true)@RequestBody List<Long> ids,
-						@ApiParam(required = true)@PathVariable Long userId,
-						@ApiParam(required = true)@PathVariable Long newDocId){
+	public R filePlace(@ApiParam(required = true) @RequestBody List<Long> ids,
+					   @ApiParam(required = true) @PathVariable Long userId,
+					   @ApiParam(required = true) @PathVariable Long newDocId){
 		if(newDocId==null)
 			return R.fail().setMes("错误");
 		if (ids==null)

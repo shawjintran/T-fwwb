@@ -17,6 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/doc/")
 @Api(tags = "用户文件夹的相关操作")
+@CrossOrigin
 public class DocController {
 	@Autowired
 	DocumentService documentService;

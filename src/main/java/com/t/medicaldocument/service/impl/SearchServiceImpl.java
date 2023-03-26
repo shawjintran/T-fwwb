@@ -201,10 +201,8 @@ public class SearchServiceImpl {
     }
 
 
-    //TODO es的检索结果
     //实现搜索功能
     public List<EsSearchVo> searchPage(String searchString,  Long userId) throws IOException {
-        // TODO: 2023/3/22 优化检索出的信息，以及解析JSON格式字符串
         //如果分页太小也从第一个开始分页
 
 
@@ -256,7 +254,6 @@ public class SearchServiceImpl {
                         esSearchVo.setTitle(pdfFileService.fileEcho(userId, esSearch1.getPdfId()).getPdfTitle());
                     else //测试状态
                         esSearchVo.setTitle("测试显示");
-                    esSearchVo.setPdfPages("命中页数为:");
                     esSearchVo.setScore(0f);
                     esSearchVo.setCreatetime(esSearch1.getCreatetime());
                 }
@@ -266,14 +263,6 @@ public class SearchServiceImpl {
             esSearchVoList.add(esSearchVo);
 
         }
-
-
-
-
-
-        //TODO 2023/3/24 如果按照时间排序
-
-
         return esSearchVoList;
     }
 /*
@@ -314,12 +303,6 @@ public class SearchServiceImpl {
 
         return searchResponse.getHits().getHits();
     }*/
-
-
-
-
-//TODO pdf的检索结果
-
     public Object getdoc(Long pdfId,String searchString) throws IOException {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
@@ -332,12 +315,6 @@ public class SearchServiceImpl {
                 .fragmentSize(50);//前后50字
 
         searchSourceBuilder.highlighter(highlightBuilder);
-
-
-
-
-
-
         QueryBuilder queryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.termQuery("pdfId", pdfId))
                 .should(QueryBuilders.nestedQuery("esfathernested",QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("esfathernested.esvalue",searchString)), ScoreMode.Avg)
@@ -613,8 +590,7 @@ public class SearchServiceImpl {
      * @return
      */
     public boolean save2ES(ArrayList<EsDocumentBo> objects) {
-
-
+        // TODO: 2023/3/25 存储userId
         BulkRequest bulkRequest = new BulkRequest();
         bulkRequest.timeout(TimeValue.timeValueSeconds(50));//留给他50秒的响应
         log.info("正在存入");
