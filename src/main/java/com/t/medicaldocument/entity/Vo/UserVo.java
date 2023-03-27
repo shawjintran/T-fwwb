@@ -24,4 +24,5 @@ public class UserVo {
 	 */
 	private Integer userPoints;
 
+	private Long userCapacity;
 }

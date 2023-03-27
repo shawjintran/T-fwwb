@@ -15,4 +15,6 @@ public interface UserService extends IService<User> {
 	boolean generatePwd(Long userId, String oldPwd, String newPwd);
 
 	boolean updateInfo(UserVo vo);
+
+	boolean updatePoint(Integer mode, Integer point,Long userId);
 }

@@ -152,6 +152,9 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 			return false;
 		if (longs.get(0)==newDocId)
 			return false;
+		boolean fullCapacity = documentService.isFullCapacity(userId, newDocId,ids.size());
+		if (fullCapacity)
+			return false;
 		//移入到新的文件夹
 		Integer integer = baseMapper.modifyDocId(ids, newDocId,userId);
 		if (integer!=ids.size()){

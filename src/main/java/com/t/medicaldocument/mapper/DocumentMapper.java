@@ -30,7 +30,8 @@ public interface DocumentMapper extends BaseMapper<Document> {
 	Integer AddSize(Long docId, Integer size, Long userId);
 	@Update("update document set doc_size = doc_size-${size} ,update_time =now() where doc_id=#{docId} and user_id=#{userId}")
 	Integer SubSize(Long docId, Integer size, Long userId);
-
+	@Update("update document set doc_capacity=doc_capacity+5, update_time=now() where doc_id=#{docId} and user_id=#{userId}")
+	Integer addDocCapacity(Long docId,Long userI);
 	Integer removeByDouble(Long docId, Long userId);
 	@Select("select doc_name from document where doc_id=#{docId} and user_id=#{userId}")
 	DocumentVo searchDoc(Long docId, Long userId);

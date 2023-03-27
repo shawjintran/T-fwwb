@@ -1,13 +1,18 @@
 package com.t.medicaldocument.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.t.medicaldocument.common.BeanContext;
 import com.t.medicaldocument.entity.Document;
+import com.t.medicaldocument.entity.User;
 import com.t.medicaldocument.entity.Vo.DocumentVo;
 import com.t.medicaldocument.service.DocumentService;
 import com.t.medicaldocument.mapper.DocumentMapper;
 import com.t.medicaldocument.service.PdfFileService;
+import com.t.medicaldocument.service.UserService;
 import com.t.medicaldocument.utils.R;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +34,8 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 
 	@Autowired
 	PdfFileService pdfFileService;
+	@Autowired
+	UserService userService;
 	@Override
 	public boolean nameRepeat(String name,Long uId) {
 		String repeat = baseMapper.nameRepeat(name,uId);
@@ -42,7 +49,11 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 		Document document = new Document();
 		document.setDocName(doc.getDocName());
 		document.setUserId(doc.getUserId());
-		if(document.getUserId()!=null)
+
+		User byId = userService.getById(doc.getUserId());
+		document.setDocCapacity(byId.getCapacity());
+
+		if(document.getDocId()!=null)
 			document.setDocId(doc.getDocId());
 		int insert = baseMapper.insert(document);
 		if (insert==1)
@@ -102,6 +113,29 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 		vo.setDocId(docId);
 		vo.setUserId(userId);
 		return vo;
+	}
+
+	@Override
+	public boolean isFullCapacity(Long docId, Long userId,Integer size) {
+		QueryWrapper<Document> wrapper = new QueryWrapper<>();
+		wrapper.eq("doc_id",docId).eq("user_id",userId);
+		Document one = baseMapper.selectOne(wrapper);
+		if (one==null)
+			return true;
+		if (one.getDocCapacity()<one.getDocSize()+size)
+			return true;
+		return false;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean expandCapacity(Long docId, Long userId) {
+		Integer integer = baseMapper.addDocCapacity(docId, userId);
+		boolean b = userService.updatePoint(1, 3, userId);
+		if (integer==1&&b)
+			return true;
+		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+		return false;
 	}
 
 }

@@ -261,7 +261,7 @@ public class FileController {
 		boolean moveFile = pdfFileService.fileMove(ids, userId, newDocId);
 		if (moveFile)
 			return R.ok().setMes("归档成功");
-		return R.fail().setMes("归档失败");
+		return R.fail().setMes("归档失败,请检查目标文件夹容量大小");
 	}
 	// @DeleteMapping("remove/{userId}/{oldDocId}")
 	// @ApiOperation("移除同个文件夹中的文献(到默认文件夹中)")

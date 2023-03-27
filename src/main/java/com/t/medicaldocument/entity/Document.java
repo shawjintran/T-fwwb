@@ -34,6 +34,11 @@ public class Document implements Serializable {
     /**
      *
      */
+
+    private Integer docCapacity;
+    /**
+     *
+     */
     private Long docSize;
 
     @TableField(fill = FieldFill.INSERT)

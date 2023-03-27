@@ -56,6 +56,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 			return true;
 		return false;
 	}
+
+	@Override
+	public boolean updatePoint(Integer mode, Integer point, Long userId) {
+		Integer integer=0;
+		if (mode==1)
+		{
+			 integer = baseMapper.subPoint(point, userId);
+
+		}
+		else if (mode==2)
+		{
+			integer = baseMapper.addPoint(point, userId);
+		}
+		if (integer==1)
+			return true;
+		return false;
+	}
 }
 
 

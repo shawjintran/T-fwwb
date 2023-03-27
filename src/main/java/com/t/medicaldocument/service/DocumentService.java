@@ -21,4 +21,6 @@ public interface DocumentService extends IService<Document> {
 	boolean removeByDocIdAndUserId(Long DocId,Long UserId);
 
 	DocumentVo docEcho(Long docId, Long userId);
+	boolean isFullCapacity(Long docId,Long userId,Integer size);
+	boolean expandCapacity(Long docId,Long userId);
 }
