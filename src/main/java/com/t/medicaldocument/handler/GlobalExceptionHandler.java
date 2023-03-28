@@ -14,13 +14,20 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MException.class)
 	public R custom(MException m){
 		Integer code = m.getCode();
-		if(code==302)
-		{
-		//	文件上传错误
-			HashMap<String, Object> desc = m.getDesc();
-			String filename = (String) desc.get("filename");
-			FileUtils.deletePDF(filename);
-			return R.fail().setMes("文件上传出现错误,请重新上传");
+		switch (code){
+			case 302:{
+				//	文件上传错误
+				HashMap<String, Object> desc = m.getDesc();
+				String filename = (String) desc.get("filename");
+				FileUtils.deletePDF(filename);
+				return R.fail().setMes("文件上传出现错误,请重新上传");
+			}
+			case 301:{
+				//订单业务错误
+				HashMap<String, Object> desc = m.getDesc();
+				String descString = (String) desc.get("desc");
+				return R.fail().setMes(descString);
+			}
 		}
 		return R.fail().setMes("wrong");
 	}
@@ -28,7 +35,7 @@ public class GlobalExceptionHandler {
 	public R error(Exception e){
 		System.out.println("global exception");
 		e.printStackTrace();
-		return R.fail(e.getMessage());
+		return R.fail();
 	}
 
 }

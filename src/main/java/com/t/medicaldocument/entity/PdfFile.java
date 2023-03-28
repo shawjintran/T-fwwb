@@ -40,7 +40,7 @@ public class PdfFile implements Serializable {
     /**
      * pdf文件标题
      */
-    @ApiParam(value = "前端获取pdf文件名，对此值进行赋值",required = true)
+
     private String pdfTitle;
 
     /**

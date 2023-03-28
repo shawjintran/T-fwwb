@@ -51,7 +51,7 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 		document.setUserId(doc.getUserId());
 
 		User byId = userService.getById(doc.getUserId());
-		document.setDocCapacity(byId.getCapacity());
+		document.setDocCapacity(byId.getUserCapacity());
 
 		if(document.getDocId()!=null)
 			document.setDocId(doc.getDocId());

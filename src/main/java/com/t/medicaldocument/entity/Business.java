@@ -1,15 +1,15 @@
 package com.t.medicaldocument.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import io.swagger.annotations.ApiParam;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
@@ -21,7 +21,8 @@ public class Business implements Serializable {
     /**
      * 业务编号ID
      */
-    @TableId
+    @TableId(type = IdType.AUTO)
+    @ApiParam(value = "添加时不需要，修改时需要")
     private Long bizId;
 
     /**
@@ -44,12 +45,16 @@ public class Business implements Serializable {
     /**
      * 业务创建时间
      */
-    private Date createTime;
+    @TableField(fill = FieldFill.INSERT)
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createTime;
 
     /**
      * 业务更新时间
      */
-    private Date updateTime;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updateTime;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
+
+import io.swagger.annotations.ApiParam;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,11 +30,13 @@ public class User implements Serializable {
     /**
      * 用户电话
      */
+    @ApiParam(required = true)
     private String userPhone;
 
     /**
      * 用户密码
      */
+    @ApiParam(required = true)
     private String userPwd;
 
     /**
@@ -45,7 +49,8 @@ public class User implements Serializable {
      */
     private Integer userPoints;
 
-    private Integer capacity;
+
+    private Integer userCapacity;
 
     /**
      *

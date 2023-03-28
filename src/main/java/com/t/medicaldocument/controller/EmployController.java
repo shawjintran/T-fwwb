@@ -14,9 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/api/employ/")
+@RestController
+@RequestMapping("/api/employ/")
 public class EmployController {
 	@Autowired
 	EmployeeService employeeService;
@@ -49,6 +51,8 @@ public class EmployController {
 			return R.fail().setMes("用户不存在");
 		if (!one.getEmployeePwd().equals(oldPwd))
 			return R.fail().setMes("旧密码错误");
+		if (one.getEmployeePwd().equals(newPwd))
+			return R.fail().setMes("新旧密码一致");
 		one.setEmployeePwd(newPwd);
 		boolean update = employeeService.updateById(one);
 		if (!update)
@@ -58,7 +62,7 @@ public class EmployController {
 	@PostMapping
 	@Transactional(rollbackFor = Exception.class)
 	public R addUser(User user){
-		user.setCapacity(Integer.MAX_VALUE);
+		user.setUserCapacity(Integer.MAX_VALUE);
 		boolean save = userService.save(user);
 		boolean doc = documentService.addDoc(new DocumentVo(0L, user.getUserId(), "默认"));
 		if (save&&doc)

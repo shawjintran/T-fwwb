@@ -6,15 +6,13 @@ import com.t.medicaldocument.entity.Business;
 import com.t.medicaldocument.service.BusinessService;
 import com.t.medicaldocument.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 
-@RestController("/biz/")
+@RestController
+@RequestMapping("/biz/")
 public class BizController {
 	@Autowired
 	BusinessService businessService;
@@ -29,7 +27,7 @@ public class BizController {
 	};
 	@GetMapping("list/{page}/{size}")
 	public R listBiz(@PathVariable int page, @PathVariable int size){
-		Page<Business> businessPage = businessService.page(new Page<Business>(page, size), new QueryWrapper<Business>().eq("business_status", 1));
+		Page<Business> businessPage = businessService.page(new Page<Business>(page, size), new QueryWrapper<Business>().eq("biz_status", 1));
 		long total = businessPage.getTotal();
 		List<Business> records = businessPage.getRecords();
 		HashMap<String, Object> map = new HashMap<>();

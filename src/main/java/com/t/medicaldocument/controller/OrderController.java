@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.zxing.WriterException;
+import com.t.medicaldocument.config.MException;
 import com.t.medicaldocument.entity.Business;
 import com.t.medicaldocument.entity.Order;
 import com.t.medicaldocument.service.BusinessService;
 import com.t.medicaldocument.service.OrderService;
 import com.t.medicaldocument.utils.QrCodeUtil;
 import com.t.medicaldocument.utils.R;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,7 +23,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Objects;
 
-@RestController("/order/")
+@RestController
+@RequestMapping("/order/")
 public class OrderController {
 	@Autowired
 	BusinessService businessService;
@@ -53,18 +56,18 @@ public class OrderController {
 		return R.ok(map);
 	};
 	@PostMapping(value = "add")
-	// @Transactional(rollbackFor = Exception.class)
+	@ApiOperation(value = "",produces = "image/png")
 	public void addOrder(@ApiParam(required = true)
 									 Long bizId,
 						 @ApiParam(required = true)
 								 Long userId,
-						 HttpServletResponse response) throws IOException, WriterException {
-		// TODO: 2023/3/27 添加业务错误类型捕捉
+						 HttpServletResponse response) throws IOException, WriterException, MException {
+		// 添加业务错误类型捕捉
 		if (bizId==null||userId==null)
-			return;
+			throw new MException().put("desc","用户未登录").setCode(301);
 		Business byId = businessService.getById(bizId);
 		if (byId==null)
-			return;
+			throw new MException().put("desc","业务不存在").setCode(301);
 		Order order = new Order().setUserId(userId)
 				.setOrderPoint(byId.getBizPoint())
 				.setOrderPrice(byId.getBizPrice())
@@ -76,7 +79,9 @@ public class OrderController {
 					350, 350);
 			response.setContentType(MediaType.IMAGE_PNG_VALUE);
 			response.getOutputStream().write(Objects.requireNonNull(bytes));
+			return;
 		}
+		throw new MException().put("desc","订单生成失败").setCode(301);
 	};
 	//  2023/3/27 扫码后，更新订单状态，同时添加用户的积分
 	// 2023/3/27 列出用户的订单

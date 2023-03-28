@@ -10,6 +10,7 @@
             <result property="userPwd" column="user_pwd" jdbcType="VARCHAR"/>
             <result property="userUrl" column="user_url" jdbcType="VARCHAR"/>
             <result property="userPoints" column="user_points" jdbcType="INTEGER"/>
+            <result property="userCapacity" column="user_capacity" jdbcType="INTEGER"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
             <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
@@ -17,7 +18,7 @@
 
     <sql id="Base_Column_List">
         user_id,user_phone,user_pwd,
-        user_url,user_points,create_time,
+        user_url,user_points,user_capacity,create_time,
         update_time,is_delete
     </sql>
 </mapper>
