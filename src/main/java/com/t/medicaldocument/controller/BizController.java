@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.t.medicaldocument.entity.Business;
 import com.t.medicaldocument.service.BusinessService;
 import com.t.medicaldocument.utils.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +15,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/biz/")
+@Api(tags = "业务相关操作")
 public class BizController {
 	@Autowired
 	BusinessService businessService;
 	@PostMapping("add")
+	@ApiOperation("(已定)添加业务信息。只能由employee操作")
 	public R addBiz(Business biz){
 		if (biz.getBizPoint()==null||biz.getBizPrice()==null)
 			return R.fail().setMes("请输入价格或者积分数");
@@ -26,6 +30,7 @@ public class BizController {
 		return R.ok();
 	};
 	@GetMapping("list/{page}/{size}")
+	@ApiOperation("(已定)分页列出所有的业务")
 	public R listBiz(@PathVariable int page, @PathVariable int size){
 		Page<Business> businessPage = businessService.page(new Page<Business>(page, size), new QueryWrapper<Business>().eq("biz_status", 1));
 		long total = businessPage.getTotal();
@@ -33,9 +38,10 @@ public class BizController {
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("total",total);
 		map.put("data",records);
-		return R.ok(records);
+		return R.ok(map);
 	};
 	@PostMapping("update")
+	@ApiOperation("(已定)更新业务信息")
 	public R updateBiz(Business biz){
 		if (biz.getBizId()==null||biz.getBizPoint()==null||biz.getBizPrice()==null)
 			return R.fail().setMes("输入有误");
@@ -45,6 +51,7 @@ public class BizController {
 		return R.ok().setMes("更新成功");
 	};
 	@GetMapping("echo/{bizId}")
+	@ApiOperation("(已定)业务信息的回显")
 	public R echoBiz(@PathVariable Long bizId){
 		if (bizId==null)
 			return R.fail().setMes("业务ID为空");

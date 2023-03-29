@@ -53,7 +53,7 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 		User byId = userService.getById(doc.getUserId());
 		document.setDocCapacity(byId.getUserCapacity());
 
-		if(document.getDocId()!=null)
+		if(doc.getDocId()!=null)
 			document.setDocId(doc.getDocId());
 		int insert = baseMapper.insert(document);
 		if (insert==1)

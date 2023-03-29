@@ -56,7 +56,8 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		pdf.setDocId(0L);
 		//文件未开始预测,状态为0;
 		pdf.setPdfStatus(0);
-		pdf.setPdfTitle(file.getName());
+	 	String[] split = file.getOriginalFilename().split(".pdf");
+		pdf.setPdfTitle(split[0]);
 		 try {
 			 FileUtils.savePDF(file,filename+".pdf");
 		 } catch (IOException e) {
@@ -189,6 +190,8 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	public boolean fileDelete(List<Long> ids, Long docId, Long useId) {
 		int deleteFile = baseMapper.deleteBatchIds(ids);
 		boolean deleteDesc=descriptionService.deleteByPdfIds(ids);
+		if (deleteFile==0&&deleteDesc)
+			return true;
 		boolean deleteDoc=documentService.updateSize(2,docId,deleteFile,useId);
 		if(deleteDesc&&deleteDoc)
 			return true;

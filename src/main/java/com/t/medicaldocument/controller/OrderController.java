@@ -11,6 +11,7 @@ import com.t.medicaldocument.service.BusinessService;
 import com.t.medicaldocument.service.OrderService;
 import com.t.medicaldocument.utils.QrCodeUtil;
 import com.t.medicaldocument.utils.R;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +26,14 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/order/")
+@Api(tags = "用户订单的相关操作")
 public class OrderController {
 	@Autowired
 	BusinessService businessService;
 	@Autowired
 	OrderService orderService;
-	@PutMapping("update/{orderId}")
+	@GetMapping("update/{orderId}")
+	@ApiOperation("(已定)用户支付订单成功，更新订单状态")
 	public R updateStatus(@PathVariable Long orderId){
 		if (orderId==null)
 			return R.fail().setMes("订单ID不存在");
@@ -45,6 +48,7 @@ public class OrderController {
 		return R.ok().setMes("订单支付成功");};
 
 	@GetMapping("list/{page}/{size}/{userId}")
+	@ApiOperation("(已定)列出用户的所有订单")
 	public R listOrder(@PathVariable Long userId,
 					   @PathVariable Integer page,
 					   @PathVariable Integer size ){
@@ -56,7 +60,7 @@ public class OrderController {
 		return R.ok(map);
 	};
 	@PostMapping(value = "add")
-	@ApiOperation(value = "",produces = "image/png")
+	@ApiOperation(value = "(初版已定)用户添加订单",produces = "image/png")
 	public void addOrder(@ApiParam(required = true)
 									 Long bizId,
 						 @ApiParam(required = true)

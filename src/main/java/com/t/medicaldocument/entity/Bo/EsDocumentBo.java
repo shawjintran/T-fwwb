@@ -19,6 +19,8 @@ public class EsDocumentBo {
      */
     private Long pdfId;
 
+    private Long docId;
+
     /**
      * 该段的页码
      */

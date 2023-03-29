@@ -20,10 +20,14 @@ public class PdfDescriptionServiceImpl extends ServiceImpl<PdfDescriptionMapper,
 
 	@Override
 	public boolean deleteByPdfIds(List<Long> ids) {
-		Integer delete=baseMapper.deleteByPdfIds(ids);
-		if (delete>=1)
-			return true;
-		return false;
+		try {
+			baseMapper.deleteByPdfIds(ids);
+		}catch (Exception e)
+		{
+			log.error(e.getMessage());
+			return false;
+		}
+		return true;
 	}
 
 	@Override

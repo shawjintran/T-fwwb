@@ -13,7 +13,10 @@ import java.util.HashMap;
 public class GlobalExceptionHandler {
 	@ExceptionHandler(MException.class)
 	public R custom(MException m){
+
 		Integer code = m.getCode();
+		if (code==null)
+			return R.fail().setMes("异常错误");
 		switch (code){
 			case 302:{
 				//	文件上传错误

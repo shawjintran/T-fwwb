@@ -39,7 +39,7 @@ import java.util.concurrent.ExecutionException;
 @RestController
 @RequestMapping("/file/")
 @CrossOrigin
-@Slf4j
+// @Slf4j
 /**
  * 1.上传Pdf文件,并保存
  * 2.将Pdf文件,以每张图片形式输入到python服务端中
@@ -77,14 +77,14 @@ public class FileController {
 		//不成功就删除
 		Integer count = pdfFileService.dividePDF(filename);
 		if (count==null)
-			throw new MException().put("filename",filename);
+			throw new MException().put("filename",filename).setCode(301);
 		//count 为页数
 		pdf.setPdfPagecount(count);
 
 		boolean save = pdfFileService.save(pdf);
 		boolean updateSize = documentService.updateSize(1, 0L, 1, pdf.getUserId());
 		if (!save||!updateSize)
-			throw new MException().put("filename", filename);
+			throw new MException().put("filename", filename).setCode(301);
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("title",pdf.getPdfTitle());
 		map.put("pdfId",pdf.getPdfId());
@@ -161,7 +161,7 @@ public class FileController {
 		try{
 			pdfFileService.downloadPdfFile(response,pdfFileName);
 		}catch (Exception e){
-			log.error(e.getMessage());
+			// log.error(e.getMessage());
 		}
 	}
 	@GetMapping("view/{userId}/{pdfId}")

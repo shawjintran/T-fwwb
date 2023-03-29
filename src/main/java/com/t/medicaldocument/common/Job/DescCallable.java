@@ -35,7 +35,7 @@ public class DescCallable implements Callable<HashMap> {
 		desc.setPdfTextStructure(JSONObject.toJSONString(map));
 		desc.setPdfId(id);
 		desc.setPdfPage(page);
-		desc.setPdfPicUrl(pic_path);
+		desc.setPdfPicUrl(file_name + "\\" + page+".jpg");
 		PdfDescriptionService bean = BeanContext.getBean(PdfDescriptionService.class);
 		boolean save= bean.save(desc);
 		log.info(file_name+"_"+page+" save success");

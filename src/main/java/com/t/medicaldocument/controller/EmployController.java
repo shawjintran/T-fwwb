@@ -8,6 +8,8 @@ import com.t.medicaldocument.service.DocumentService;
 import com.t.medicaldocument.service.EmployeeService;
 import com.t.medicaldocument.service.UserService;
 import com.t.medicaldocument.utils.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/employ/")
+@Api(tags = "内部员工的相关操作")
 public class EmployController {
 	@Autowired
 	EmployeeService employeeService;
@@ -27,6 +30,7 @@ public class EmployController {
 	@Autowired
 	DocumentService documentService;
 	@PostMapping("login")
+	@ApiOperation("(已定)员工登录")
 	public R login(@ApiParam(required = true)
 							   String phone,
 				   @ApiParam(required = true)
@@ -36,13 +40,16 @@ public class EmployController {
 		QueryWrapper<Employee> wrapper = new QueryWrapper<>();
 		// employee_phone,
 		// 		employee_pwd,employee_status
-		wrapper.eq("employee_phone",phone).eq("employee_pwd",pwd).eq("employee_status",1);
+		wrapper.eq("employee_phone",phone)
+				.eq("employee_pwd",pwd)
+				.eq("employee_status",0);
 		Employee one = employeeService.getOne(wrapper);
 		if (one==null)
 			return R.fail().setMes("用户不存在");
 		return R.ok(one);
 	}
 	@PostMapping("generate")
+	@ApiOperation("(已定)员工更新密码")
 	public R generatePwd(Long empId,String oldPwd,String newPwd){
 		QueryWrapper<Employee> wrapper = new QueryWrapper<>();
 		wrapper.eq("employee_id",empId);
@@ -61,6 +68,7 @@ public class EmployController {
 	}
 	@PostMapping
 	@Transactional(rollbackFor = Exception.class)
+	@ApiOperation("(已定)添加超级用户")
 	public R addUser(User user){
 		user.setUserCapacity(Integer.MAX_VALUE);
 		boolean save = userService.save(user);
@@ -70,7 +78,7 @@ public class EmployController {
 		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		return R.fail().setMes("创建失败");
 	};
-	//员工只能后端成员手工添加，不设置api
+	//添加员工只能后端成员手工添加，不设置api
 	//2023/3/27 员工登录
 	//2023/3/27 员工更新密码
 	//2023/3/27 员工添加企业账号

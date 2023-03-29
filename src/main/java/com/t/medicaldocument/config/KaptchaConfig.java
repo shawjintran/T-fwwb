@@ -9,6 +9,10 @@ import java.util.Properties;
 
 @Configuration
 public class KaptchaConfig {
+	/**
+	 * Google kaptcha 验证码图片生成
+	 * @return
+	 */
 	@Bean
 	public DefaultKaptcha producer() {
 		Properties properties = new Properties();

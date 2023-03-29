@@ -193,6 +193,7 @@ public class PdfDataUtils {
 			esObj.setPdfId((Long) map.get("pdfId"));
 			esObj.setPdfPage((Integer) map.get("page"));
 			esObj.setUserId(userId);
+			esObj.setDocId(0L);
 			esObj.setCreatetime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
 			esObjs.add(esObj);
 		}

@@ -39,9 +39,9 @@ public class SearchController {
 						 @PathVariable Long userId,
 						 @PathVariable Integer searchType) throws IOException {
 		List<EsSearchVo> list = null;
-		if(searchType==1)//按照时间搜索
+		if(searchType==1)//按照相关度搜索
 			list= searchService.searchPageByScore(searchString, pageNo, pageSize,userId);
-		if(searchType==2)//按照相关度搜索
+		if(searchType==2)//按照创建时间搜索
 			list=searchService.searchPageByTime(searchString, pageNo, pageSize,userId);
 		System.out.println(list);
 		return R.ok(list);
