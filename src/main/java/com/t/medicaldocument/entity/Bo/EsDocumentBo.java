@@ -19,6 +19,16 @@ public class EsDocumentBo {
      */
     private Long pdfId;
 
+
+    /**
+     * 用户ID
+     */
+    private Long userId;
+
+    /**
+     *
+     *文件夹id,不是文档id
+     */
     private Long docId;
 
     /**
@@ -37,10 +47,6 @@ public class EsDocumentBo {
      */
     private String pdfpicurl;
 
-    /**
-     * 用户ID
-     */
-    private Long userId;
     /**
      * 创建时间
      */
