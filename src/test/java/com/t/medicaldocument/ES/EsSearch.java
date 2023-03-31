@@ -23,7 +23,10 @@ public class EsSearch {
     @Test
     public void serachPageByScore(){
         try {
-            System.out.println("结果:"+ JSON.toJSONString(searchService.searchPageByScore("内容", 0,10,0l)));
+            System.out.println("结果:"+
+                    JSON.toJSONString(
+                            searchService
+                                    .searchPageByScore("图片", 0,10,null,null)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -32,7 +35,10 @@ public class EsSearch {
     @Test
     public void serachPageByTime(){
         try {
-            System.out.println("结果:"+ JSON.toJSONString(searchService.searchPageByTime("内容", 0,10,0l)));
+            System.out.println("结果:"+
+                    JSON.toJSONString(
+                            searchService.
+                                    searchPageByTime("双位数", 0,10,120l,null)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

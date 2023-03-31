@@ -37,12 +37,13 @@ public class SearchController {
 						 @PathVariable int pageNo,
 						 @PathVariable int pageSize,
 						 @PathVariable Long userId,
+						 @PathVariable Long docId,
 						 @PathVariable Integer searchType) throws IOException {
 		List<EsSearchVo> list = null;
 		if(searchType==1)//按照相关度搜索
-			list= searchService.searchPageByScore(searchString, pageNo, pageSize,userId);
+			list= searchService.searchPageByScore(searchString, pageNo, pageSize,userId,docId);
 		if(searchType==2)//按照创建时间搜索
-			list=searchService.searchPageByTime(searchString, pageNo, pageSize,userId);
+			list=searchService.searchPageByTime(searchString, pageNo, pageSize,userId,docId);
 		System.out.println(list);
 		return R.ok(list);
 	}

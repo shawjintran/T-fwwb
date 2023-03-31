@@ -18,10 +18,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.core.TimeValue;
-import org.elasticsearch.index.query.InnerHitBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.join.query.HasChildQueryBuilder;
 import org.elasticsearch.join.query.JoinQueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -48,28 +45,28 @@ public class SearchServiceImpl {
     @Autowired
     private PdfFileServiceImpl pdfFileService;
 
-    public Boolean parseContent(List<PdfDescription> pdfDescriptions) throws IOException {
-
-
-        //查询数据放入es
-        //批量请求
-        BulkRequest bulkRequest = new BulkRequest();
-        bulkRequest.timeout(TimeValue.timeValueSeconds(60));
-        log.info("正在存入");
-
-
-        for (PdfDescription pdfDescription : pdfDescriptions) {
-            bulkRequest.add(new IndexRequest("ys")
-                    .source(JSON.toJSONString(pdfDescription),//存json
-                    XContentType.JSON));
-        }
-
-
-        BulkResponse bulk = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
-        return  !bulk.hasFailures();
-
-
-    }
+//    public Boolean parseContent(List<PdfDescription> pdfDescriptions) throws IOException {
+//
+//
+//        //查询数据放入es
+//        //批量请求
+//        BulkRequest bulkRequest = new BulkRequest();
+//        bulkRequest.timeout(TimeValue.timeValueSeconds(60));
+//        log.info("正在存入");
+//
+//
+//        for (PdfDescription pdfDescription : pdfDescriptions) {
+//            bulkRequest.add(new IndexRequest("ys")
+//                    .source(JSON.toJSONString(pdfDescription),//存json
+//                    XContentType.JSON));
+//        }
+//
+//
+//        BulkResponse bulk = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+//        return  !bulk.hasFailures();
+//
+//
+//    }
 
      // 这是之前写的按照pdfid分类,分类成对应文献
     //获取数据
@@ -168,10 +165,10 @@ public class SearchServiceImpl {
      * @return
      * @throws IOException
      */
-    public List<EsSearchVo> searchPageByScore(String searchString, int pageNo, int pageSize, Long userId) throws IOException {
+    public List<EsSearchVo> searchPageByScore(String searchString, int pageNo, int pageSize, Long userId,Long docId) throws IOException {
         if(pageNo<0)//检验分页合法性
             pageNo=0;
-        List<EsSearchVo> esSearchVoList = searchPage(searchString, userId);
+        List<EsSearchVo> esSearchVoList = searchPage(searchString, userId,docId);
         esSearchVoList=  esSearchVoList.stream()
                 .sorted(Comparator.comparing(EsSearchVo::getScore).reversed())//按分数排序
                 .skip((pageNo)*pageSize).limit(pageSize)//分页
@@ -189,10 +186,10 @@ public class SearchServiceImpl {
      * @return
      * @throws IOException
      */
-    public List<EsSearchVo> searchPageByTime(String searchString, int pageNo, int pageSize, Long userId) throws IOException {
+    public List<EsSearchVo> searchPageByTime(String searchString, int pageNo, int pageSize, Long userId,Long docId) throws IOException {
         if(pageNo<0)//检验分页合法性
             pageNo=0;
-        List<EsSearchVo> esSearchVoList = searchPage(searchString, userId);
+        List<EsSearchVo> esSearchVoList = searchPage(searchString, userId,docId);
         esSearchVoList= esSearchVoList.stream()
                 .sorted(Comparator.comparing(EsSearchVo::getCreatetime,String::compareTo).reversed())//按时间排序近到远
                 .skip((pageNo)*pageSize).limit(pageSize)
@@ -202,20 +199,29 @@ public class SearchServiceImpl {
 
 
     //实现搜索功能
-    public List<EsSearchVo> searchPage(String searchString,  Long userId) throws IOException {
+    public List<EsSearchVo> searchPage(String searchString,  Long userId,Long docId) throws IOException {
         //如果分页太小也从第一个开始分页
 
 
         //条件搜索
-        SearchRequest searchRequest = new SearchRequest("pdfpage");
+        SearchRequest searchRequest = new SearchRequest("pdfpage1");
         //构造器
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         //匹配
         MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("all", searchString);
-        sourceBuilder.query(queryBuilder)
-                .timeout(TimeValue.timeValueSeconds(30));
+        sourceBuilder.query(queryBuilder);
+        if(userId!=null){
+            TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("userId", userId);
+            sourceBuilder.query(termQueryBuilder);
+        }
+        if(docId!=null){
+            TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("docId", docId);
+            sourceBuilder.query(termQueryBuilder);
+        }
 
 
+
+        sourceBuilder.timeout(TimeValue.timeValueSeconds(30));
         //执行搜索
         searchRequest.source(sourceBuilder);
         SearchResponse searchResponse=restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
@@ -228,7 +234,8 @@ public class SearchServiceImpl {
         //遍历收集成map集合
         for (SearchHit hit : searchResponse.getHits()) {
             EsSearch1 esSearch1=new EsSearch1(
-                    (Long) hit.getSourceAsMap().get("pdfId"),
+                    (Long) hit.getSourceAsMap().get("pdfId"),//TODO 如果错了就用用下面的
+                    //Integer.toUnsignedLong((Integer) hit.getSourceAsMap().get("pdfId")),
                     (Integer) hit.getSourceAsMap().get("pdfPage"),
                     (String)hit.getSourceAsMap().get("createtime"),
                     hit.getScore()
@@ -250,7 +257,7 @@ public class SearchServiceImpl {
                 if(i==0){
                     //循环初始化
                     esSearchVo.setPdfId(esSearch1.getPdfId());
-                    if(userId!=0)//正常状态
+                    if(userId!=null)//正常状态
                         esSearchVo.setTitle(pdfFileService.fileEcho(userId, esSearch1.getPdfId()).getPdfTitle());
                     else //测试状态
                         esSearchVo.setTitle("测试显示");
@@ -325,7 +332,7 @@ public class SearchServiceImpl {
 
 
         //构造请求
-        SearchRequest searchRequest = new SearchRequest("pdfpage");
+        SearchRequest searchRequest = new SearchRequest("pdfpage1");
         searchRequest.source(searchSourceBuilder);
         //获得响应
         SearchResponse searchResponse=restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
@@ -596,7 +603,7 @@ public class SearchServiceImpl {
         log.info("正在存入");
         //循环添加到批量存储
         for (Object object: objects) {
-            bulkRequest.add(new IndexRequest("pdfpage")//文档名
+            bulkRequest.add(new IndexRequest("pdfpage1")//文档名
                     .source(com.alibaba.fastjson.JSON.toJSONString(object), //转json
                             XContentType.JSON));//固定的格式参数,不用管他
         }
