@@ -204,12 +204,13 @@ public class SearchServiceImpl {
 
 
         //条件搜索
-        SearchRequest searchRequest = new SearchRequest("pdfpage1");
+        SearchRequest searchRequest = new SearchRequest("pdfpage");
         //构造器
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         //匹配
         MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("all", searchString);
         sourceBuilder.query(queryBuilder);
+        //TODO 使用bool的合并查询,(must/and)
         if(userId!=null){
             TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("userId", userId);
             sourceBuilder.query(termQueryBuilder);
@@ -234,8 +235,8 @@ public class SearchServiceImpl {
         //遍历收集成map集合
         for (SearchHit hit : searchResponse.getHits()) {
             EsSearch1 esSearch1=new EsSearch1(
-                    (Long) hit.getSourceAsMap().get("pdfId"),//TODO 如果错了就用用下面的
-                    //Integer.toUnsignedLong((Integer) hit.getSourceAsMap().get("pdfId")),
+                    //(Long) hit.getSourceAsMap().get("pdfId"),//TODO 如果错了就用用下面的
+                    Integer.toUnsignedLong((Integer) hit.getSourceAsMap().get("pdfId")),
                     (Integer) hit.getSourceAsMap().get("pdfPage"),
                     (String)hit.getSourceAsMap().get("createtime"),
                     hit.getScore()
@@ -332,7 +333,7 @@ public class SearchServiceImpl {
 
 
         //构造请求
-        SearchRequest searchRequest = new SearchRequest("pdfpage1");
+        SearchRequest searchRequest = new SearchRequest("pdfpage");
         searchRequest.source(searchSourceBuilder);
         //获得响应
         SearchResponse searchResponse=restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
