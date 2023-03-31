@@ -83,7 +83,7 @@ public class UserController {
 		return R.ok().setMes("注册成功,请登录");
 
 	}
-	@GetMapping("SMS")
+//	@GetMapping("SMS")
 	@ApiOperation("(遗弃)发送验证码")
 	public R sendSMS(@ApiParam(required = true)
 								 String phone){

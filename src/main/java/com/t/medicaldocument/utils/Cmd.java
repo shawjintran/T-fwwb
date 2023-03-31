@@ -31,8 +31,10 @@ public class Cmd {
 	// String layout_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\dict\\layout_dict\\layout_publaynet_dict.txt";
 	String layout_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\dict\\layout_dict\\layout_cdla_dict.txt";
 	String table_dict="D:\\CodeOfPython\\PaddleOcr\\PaddleOCR\\ppocr\\utils\\dict\\table_structure_dict_ch.txt";
-	String image_dir="D:\\CodeOfJava\\Medical-Document\\pic\\";
-	String output="D:\\CodeOfJava\\Medical-Document\\res\\";
+//	String image_dir="D:\\CodeOfJava\\Medical-Document\\pic\\";
+	String image_dir=FileUtils.pic_location;
+//	String output="D:\\CodeOfJava\\Medical-Document\\res\\";
+	String output=FileUtils.res_location;
 	static Cmd cmd=new Cmd();
 	private Cmd(){
 		call.append("python ");

@@ -21,9 +21,9 @@ public class AsyncConfig implements AsyncConfigurer {
 		// 当核心线程都在跑任务，还有多余的任务会存到此处。
 		threadPool.setQueueCapacity(100);
 		//最大线程数，默认为Integer.MAX_VALUE，如果queueCapacity存满了，还有任务就会启动更多的线程，直到线程数达到maxPoolSize。如果还有任务，则根据拒绝策略进行处理。
-		threadPool.setMaxPoolSize(6);
+		threadPool.setMaxPoolSize(12);
 		threadPool.setWaitForTasksToCompleteOnShutdown(true);
-		threadPool.setAwaitTerminationSeconds(60 * 15);
+		threadPool.setAwaitTerminationSeconds(60*80);
 		threadPool.setThreadNamePrefix("MyAsync-");
 		threadPool.initialize();
 		return threadPool;

@@ -9,6 +9,7 @@ import com.t.medicaldocument.entity.Business;
 import com.t.medicaldocument.entity.Order;
 import com.t.medicaldocument.service.BusinessService;
 import com.t.medicaldocument.service.OrderService;
+import com.t.medicaldocument.utils.FileUtils;
 import com.t.medicaldocument.utils.QrCodeUtil;
 import com.t.medicaldocument.utils.R;
 import io.swagger.annotations.Api;
@@ -79,7 +80,7 @@ public class OrderController {
 		boolean save = orderService.save(order);
 		if (save)
 		{
-			byte[] bytes = QrCodeUtil.generateQrCodeByte("http://localhost:8081/order/update/" + order.getOrderId(),
+			byte[] bytes = QrCodeUtil.generateQrCodeByte(FileUtils.Server +"/order/update/" + order.getOrderId(),
 					350, 350);
 			response.setContentType(MediaType.IMAGE_PNG_VALUE);
 			response.getOutputStream().write(Objects.requireNonNull(bytes));

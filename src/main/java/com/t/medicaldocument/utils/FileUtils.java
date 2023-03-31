@@ -6,6 +6,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import sun.misc.BASE64Encoder;
 
@@ -19,12 +23,24 @@ import java.util.Objects;
 /**
  * 对文件进行相关操作处理
  */
-@Data
+
+@Configuration
 public class FileUtils {
 
-	public static String pdf_location= System.getProperty("user.dir")+File.separator+"pdf"+File.separator;
-	static String pic_location= System.getProperty("user.dir")+File.separator+"pic"+File.separator;
-	static String res_location= System.getProperty("user.dir")+File.separator+"res"+File.separator;
+//	public static String pdf_location= System.getProperty("user.dir")+File.separator+"pdf"+File.separator;
+
+	public static String pdf_location;
+//	static String pic_location= System.getProperty("user.dir")+File.separator+"pic"+File.separator;
+
+	public static String pic_location;
+//	static String res_location= System.getProperty("user.dir")+File.separator+"res"+File.separator;
+
+	public static String res_location;
+
+
+
+	public static String Server;
+
 	static public void savePDF(MultipartFile file,String filename)
 			throws IOException {
 		String end = pdf_location+
@@ -119,4 +135,21 @@ public class FileUtils {
 		return encoder.encode(Objects.requireNonNull(data));
 	}
 
+	// TODO: 2023/3/31 静态属性注入
+	@Value("${pdf.location}")
+	public  void setPdf_location(String pdf_location) {
+		FileUtils.pdf_location = pdf_location;
+	}
+	@Value("${pic.location}")
+	public  void setPic_location(String pic_location) {
+		FileUtils.pic_location = pic_location;
+	}
+	@Value("${res.location}")
+	public void setRes_location(String res_location) {
+		FileUtils.res_location = res_location;
+	}
+	@Value("${self.server}")
+	public void setServer(String server) {
+		Server = server;
+	}
 }
