@@ -26,7 +26,7 @@ public class OcrInterceptor implements HandlerInterceptor {
     response.setHeader("Cache-Control", "no-cache");
     response.setCharacterEncoding("utf-8");
     response.setContentType("application/json;charset=utf-8");
-    String jsonString = JSON.toJSONString(R.ok("").setMes("Sorry,Server not provide this service").toString());
+    String jsonString = JSON.toJSONString(R.ok("").setMes("Sorry,Server not provide this service"));
     writer.write(jsonString);
     writer.flush();
 // TODO: 2023/3/31  无法解决中文乱码

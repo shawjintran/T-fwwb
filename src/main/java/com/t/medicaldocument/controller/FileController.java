@@ -112,7 +112,7 @@ public class FileController {
 			InputStream imagePath = new FileInputStream(picUrl+filename+"_"+i+".jpg");
 			//添加请求参数images，并将Base64编码的图片传入
 			MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-			map.add("images", FileUtils.ImageToBase64(imagePath));
+//			map.add("images", FileUtils.ImageToBase64(imagePath));
 			//构建请求
 			//Build request
 			HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
