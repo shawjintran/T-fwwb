@@ -6,7 +6,6 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.t.medicaldocument.entity.Bo.EsDocumentBo;
 import com.t.medicaldocument.entity.EsNestedChild;
-import jdk.nashorn.internal.scripts.JS;
 
 import java.io.File;
 import java.io.IOException;

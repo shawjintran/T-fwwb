@@ -1,6 +1,7 @@
 package com.t.medicaldocument.controller;
 
-import io.swagger.annotations.Api;
+import java.util.Base64;
+import java.util.Base64.Encoder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -10,11 +11,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import sun.misc.BASE64Encoder;
-
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 
@@ -60,7 +58,7 @@ public class test {
 			InputStream imagePath = new FileInputStream(destFile);
 			//添加请求参数images，并将Base64编码的图片传入
 			//Add the request parameter Images and pass in the Base64 encoded image
-			map.add("images", ImageToBase64(imagePath));
+//			map.add("images", ImageToBase64(imagePath));
 			//构建请求
 			//Build request
 			HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
@@ -128,7 +126,7 @@ public class test {
 		}
 		return "OK";
 	}
-	private String ImageToBase64(InputStream imgPath) {
+	private byte[] ImageToBase64(InputStream imgPath) {
 		byte[] data = null;
 		// 读取图片字节数组
 		//Read the image byte array
@@ -143,7 +141,8 @@ public class test {
 		}
 		// 对字节数组Base64编码
 		//Base64 encoding of byte array
-		BASE64Encoder encoder = new BASE64Encoder();
+
+		Encoder encoder = Base64.getEncoder();
 		// 返回Base64编码过的字节数组字符串
 		//Returns a Base64 encoded byte array string
 		//System.out.println("图片转换Base64:" + encoder.encode(Objects.requireNonNull(data)));

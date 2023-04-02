@@ -39,10 +39,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	// TODO: 2023/3/31 Conditional注解失效
 	public void addInterceptors(InterceptorRegistry registry) {
 
-//		registry.addInterceptor(new OcrInterceptor())
-//				.addPathPatterns("/file/upload/**")
-//				.addPathPatterns("/file/analyze/structure/**")
-//				.addPathPatterns("/desc/**");
+		registry.addInterceptor(new OcrInterceptor())
+				.addPathPatterns("/file/upload/**")
+				.addPathPatterns("/file/analyze/structure/**")
+				.addPathPatterns("/desc/**");
 
 	}
 }

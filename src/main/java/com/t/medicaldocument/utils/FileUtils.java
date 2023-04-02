@@ -1,24 +1,22 @@
 package com.t.medicaldocument.utils;
 
 
-import lombok.Data;
+import java.util.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import sun.misc.BASE64Encoder;
+import java.util.Base64.Encoder;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 
 import java.util.Objects;
+
 
 /**
  * 对文件进行相关操作处理
@@ -113,7 +111,7 @@ public class FileUtils {
 	}
 
 
-	static public String ImageToBase64(InputStream imgPath) {
+	static public byte[] ImageToBase64(InputStream imgPath) {
 		byte[] data = null;
 		// 读取图片字节数组
 		//Read the image byte array
@@ -128,7 +126,7 @@ public class FileUtils {
 		}
 		// 对字节数组Base64编码
 		//Base64 encoding of byte array
-		BASE64Encoder encoder = new BASE64Encoder();
+		Encoder encoder = Base64.getEncoder();
 		// 返回Base64编码过的字节数组字符串
 		//Returns a Base64 encoded byte array string
 		//System.out.println("图片转换Base64:" + encoder.encode(Objects.requireNonNull(data)));
