@@ -97,8 +97,8 @@ class MedicalDocumentApplicationTests {
 	}
 	@Test
 	void Arr(){
-		int[] a= new int[2];
-		System.out.println(Arrays.toString(a));
+		System.out.println(System.currentTimeMillis());
+
 	}
 	@Test
 	void Tran(){

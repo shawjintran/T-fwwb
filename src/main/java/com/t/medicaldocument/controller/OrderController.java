@@ -28,6 +28,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/order/")
 @Api(tags = "用户订单的相关操作")
+@CrossOrigin
 public class OrderController {
 	@Autowired
 	BusinessService businessService;

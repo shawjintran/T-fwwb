@@ -55,6 +55,8 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 
 		if(doc.getDocId()!=null)
 			document.setDocId(doc.getDocId());
+		else
+			document.setDocId(System.currentTimeMillis());
 		int insert = baseMapper.insert(document);
 		if (insert==1)
 			return true;

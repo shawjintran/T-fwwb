@@ -16,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/biz/")
 @Api(tags = "业务相关操作")
+@CrossOrigin
 public class BizController {
 	@Autowired
 	BusinessService businessService;

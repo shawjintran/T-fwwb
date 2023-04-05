@@ -18,7 +18,7 @@ public class Document implements Serializable {
     /**
      *
      */
-    @TableId
+    @TableId(type = IdType.INPUT)
     private Long docId;
 
     /**
