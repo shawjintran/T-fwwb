@@ -18,6 +18,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.join.query.HasChildQueryBuilder;
@@ -205,24 +206,24 @@ public class SearchServiceImpl {
 
 
         //条件搜索
-        SearchRequest searchRequest = new SearchRequest("pdfpage");
+        SearchRequest searchRequest = new SearchRequest("");
         //构造器
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder boolQueryBuilder=QueryBuilders.boolQuery();
         //匹配
-        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("all", searchString);
+        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("all", searchString).fuzziness(Fuzziness.AUTO);
         sourceBuilder.query(queryBuilder);
         //TODO 使用bool的合并查询,(must/and)
+
         if(userId!=0){
-            TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("userId", userId);
-            sourceBuilder.query(termQueryBuilder);
+            boolQueryBuilder.must(new TermQueryBuilder("userId", userId));
         }
         if(docId!=0){
-            TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("docId", docId);
-            sourceBuilder.query(termQueryBuilder);
+            boolQueryBuilder.must(new TermQueryBuilder("docId", docId));
         }
 
-
-
+        sourceBuilder.query(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("all",searchString)).filter(boolQueryBuilder));
+        //设置最长超时
         sourceBuilder.timeout(TimeValue.timeValueSeconds(30));
         //执行搜索
         searchRequest.source(sourceBuilder);

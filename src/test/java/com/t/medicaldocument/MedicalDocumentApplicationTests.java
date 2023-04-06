@@ -42,8 +42,9 @@ class MedicalDocumentApplicationTests {
 	TransactionDefinition transactionDefinition;
 	@Test
 	void contextLoads() {
-		String end=System.getProperty("user.dir")+"fileName";
-		System.out.println(end);
+//		String end=System.getProperty("user.dir")+"fileName";
+//		System.out.println(end);
+		System.out.println(System.currentTimeMillis());
 	}
 	@Test
 	void test(){
