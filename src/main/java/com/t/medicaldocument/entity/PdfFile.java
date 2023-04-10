@@ -35,12 +35,13 @@ public class PdfFile implements Serializable {
     /**
      * pdf文件名
      */
+
     private String pdfFileName;
 
     /**
      * pdf文件标题
      */
-
+    @ApiParam(required = true)
     private String pdfTitle;
 
     /**

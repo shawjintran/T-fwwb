@@ -19,7 +19,7 @@ import java.util.List;
 * @createDate 2023-02-02 20:23:28
 */
 public interface PdfFileService extends IService<PdfFile> {
-	String uploadPdfFile(MultipartFile file, PdfFile pdf) throws IOException;
+	String uploadPdfFile(PdfFile pdf) throws IOException;
 	 boolean fileMove(List<Long> ids,Long userId,Long newDocId);
 	Integer dividePDF(String filename) throws IOException;
 	boolean removeFile(List<Long> ids, Long docId, Long userId);
@@ -37,4 +37,5 @@ public interface PdfFileService extends IService<PdfFile> {
 	PdfFileVo fileExist(Long userId, Long pdfId);
 
 
+	String upload(MultipartFile file);
 }

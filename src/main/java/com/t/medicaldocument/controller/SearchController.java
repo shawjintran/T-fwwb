@@ -32,7 +32,7 @@ public class SearchController {
 	 * @return
 	 * @throws IOException
 	 */
-	@GetMapping("/{searchString}/{pageNo}/{pageSize}/{userId}/{searchType}")
+	@GetMapping("/{searchString}/{pageNo}/{pageSize}/{userId}/{docId}/{searchType}")
 	public R search(@PathVariable String searchString,
 						 @PathVariable int pageNo,
 						 @PathVariable int pageSize,

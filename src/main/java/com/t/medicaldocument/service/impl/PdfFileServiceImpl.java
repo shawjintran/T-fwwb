@@ -46,7 +46,7 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	@Autowired
 	PdfDescriptionService descriptionService;
 
-	public String uploadPdfFile(MultipartFile file, PdfFile pdf)
+	public String uploadPdfFile(PdfFile pdf)
 			 {
 		String filename = UUID.randomUUID()
 				.toString()
@@ -56,15 +56,25 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		pdf.setDocId(0L);
 		//文件未开始预测,状态为0;
 		pdf.setPdfStatus(0);
-	 	String[] split = file.getOriginalFilename().split(".pdf");
-		pdf.setPdfTitle(split[0]);
+//	 	String[] split = file.getOriginalFilename().split(".pdf");
+		pdf.setPdfTitle(pdf.getPdfTitle());
 		 try {
-			 FileUtils.savePDF(file,filename+".pdf");
+			 FileUtils.transferPDF(pdf.getPdfTitle(),filename+".pdf");
 		 } catch (IOException e) {
 		 	log.debug("上传文件出现异常");
 			return null;
 		 }
 		return filename;
+	}
+	public String upload(MultipartFile file){
+		String[] split = file.getOriginalFilename().split(".pdf");
+		try {
+			FileUtils.tempSave(file,file.getOriginalFilename());
+		} catch (IOException e) {
+			log.debug("上传文件出现异常");
+			return null;
+		}
+		return split[0];
 	}
 	public void downloadPdfFile(HttpServletResponse response,String filename)
 			 {

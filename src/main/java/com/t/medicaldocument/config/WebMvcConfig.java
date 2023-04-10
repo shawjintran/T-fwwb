@@ -40,7 +40,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 
 		registry.addInterceptor(new OcrInterceptor())
-				.addPathPatterns("/file/upload/**")
+//				.addPathPatterns("/file/upload/**")
 				.addPathPatterns("/file/analyze/structure/**")
 				.addPathPatterns("/desc/**");
 

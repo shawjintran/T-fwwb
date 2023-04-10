@@ -65,7 +65,7 @@ class MedicalDocumentApplicationTests {
 	// 	BufferedReader bufferReader = null;
 	// 	try {
 	// 		//创建子进程，调用命令行启动Python程序并传参传递参数
-	// 		Process process = Runtime.getRuntime().exec(Cmd.create().toString("D:\\CodeOfJava\\Medical-Document\\pic\\2ee320bcb7eb41e28744b9c39348b5b0\\00.jpg"));
+	// 		Process process = Runtime.getRuntime().exec(CmdConfig.create().toString("D:\\CodeOfJava\\Medical-Document\\pic\\2ee320bcb7eb41e28744b9c39348b5b0\\00.jpg"));
 	// 		// 读取Python程序的输出
 	// 		bufferReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 	// 		String buffer = null;

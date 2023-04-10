@@ -56,12 +56,13 @@ public class FileController {
 	PdfFileService pdfFileService;
 	@Autowired
 	DocumentService documentService;
-	@PostMapping("upload/")
-	@ApiOperation("（已定2.0）文献的上传,并转换为图片")
-	@Transactional(rollbackFor = Exception.class)
-	@CacheEvict(cacheNames = "PdfFile+'_'+#pdf.getUserId()",
-			condition = "#result.getCode()==200",
-			allEntries = true)
+
+//	@PostMapping("upload/")
+//	@ApiOperation("（已定2.0）文献的上传,并转换为图片")
+//	@Transactional(rollbackFor = Exception.class)
+//	@CacheEvict(cacheNames = "PdfFile+'_'+#pdf.getUserId()",
+//			condition = "#result.getCode()==200",
+//			allEntries = true)
 	public R fileUploadAndDivide(@RequestParam(value = "file",required = true)
 									 @RequestPart
 									 MultipartFile file,
@@ -71,7 +72,8 @@ public class FileController {
 			return R.fail().setMes("请先登录");
 		if (file.isEmpty())
 			return R.fail().setMes("上传文件为空");
-		String filename = pdfFileService.uploadPdfFile(file, pdf);
+		String filename ="";
+//				= pdfFileService.uploadPdfFile(file, pdf);
 		if(filename==null)
 			return R.fail().setMes("上传文件失败");
 		//不成功就删除
@@ -92,6 +94,54 @@ public class FileController {
 		map.put("createTime",pdf.getCreateTime());
 		return R.ok(map);
 	}
+	@PostMapping("upload/")
+	@ApiOperation("（已定3.0）文献的上传,并转换为图片,需要UserId以及PdfTitle")
+	@Transactional(rollbackFor = Exception.class)
+	@CacheEvict(cacheNames = "PdfFile+'_'+#pdf.getUserId()",
+			condition = "#result.getCode()==200",
+			allEntries = true)
+	public R fileUploadToDivide(
+								 PdfFile pdf) throws IOException, MException {
+		//接收上传文件
+		if(pdf.getUserId()==null||pdf.getPdfTitle()==null)
+			return R.fail().setMes("请登录或上传文件");
+		//从temp中寻找文件
+		if (FileUtils.isExist(pdf.getPdfFileName()))
+			return R.fail().setMes("文件不存在");
+		String filename = pdfFileService.uploadPdfFile(pdf);
+		if(filename==null)
+			return R.fail().setMes("文件异常");
+		//不成功就删除
+		Integer count = pdfFileService.dividePDF(filename);
+		if (count==null)
+			throw new MException().put("filename",filename).setCode(301);
+		//count 为页数
+		pdf.setPdfPagecount(count);
+		boolean save = pdfFileService.save(pdf);
+		boolean updateSize = documentService.updateSize(1, 0L, 1, pdf.getUserId());
+		if (!save||!updateSize)
+			throw new MException().put("filename", filename).setCode(301);
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("title",pdf.getPdfTitle());
+		map.put("pdfId",pdf.getPdfId());
+		map.put("status",pdf.getPdfStatus());
+		map.put("createTime",pdf.getCreateTime());
+		return R.ok(map);
+	}
+	@PostMapping("temp")
+	@ApiOperation("上传文件，返回pdf文件名字")
+	public R fileUpload(@RequestParam(value = "file",required = true)
+			@RequestPart
+			MultipartFile file){
+		//接收上传文件
+		if (file.isEmpty())
+			return R.fail().setMes("上传文件为空");
+		String filename = pdfFileService.upload(file);
+		if(filename==null)
+			return R.fail().setMes("上传文件失败");
+		return R.ok(filename);
+	}
+
 	// @GetMapping("/analyze/structure")
 	public R fileAnalyzeStructure(String filename, Integer count)
 			throws Exception {

@@ -35,18 +35,37 @@ public class FileUtils {
 
 	public static String res_location;
 
+	public static String temp_location;
+
 
 
 	public static String Server;
 
-	static public void savePDF(MultipartFile file,String filename)
+	static public void transferPDF(String tempFile,String filename)
 			throws IOException {
 		String end = pdf_location+
 				filename;
 		File destFile = new File(end);
 		destFile.getParentFile().mkdirs();
+		if (isExist(tempFile)) {
+			File start=new File(temp_location+tempFile+".pdf");
+			org.apache.commons.io.FileUtils.copyFile(start,destFile);
+		}
+	}
+	static public void tempSave(MultipartFile file,String filename)
+			throws IOException {
+		String end = temp_location+
+				filename;
+		File destFile = new File(end);
+		destFile.getParentFile().mkdirs();
 		//将文件保存
 		file.transferTo(destFile);
+	}
+	static public boolean isExist(String filename){
+		String end = temp_location+
+				filename+".pdf";
+		File destFile = new File(end);
+		return destFile.exists();
 	}
 	static public void deletePDF(String filename){
 		File pdf = new File(pdf_location + filename + ".pdf");
@@ -136,16 +155,18 @@ public class FileUtils {
 	// TODO: 2023/3/31 静态属性注入
 	@Value("${pdf.location}")
 	public  void setPdf_location(String pdf_location) {
-		FileUtils.pdf_location = pdf_location;
+		this.pdf_location = pdf_location;
 	}
 	@Value("${pic.location}")
 	public  void setPic_location(String pic_location) {
-		FileUtils.pic_location = pic_location;
+		this.pic_location = pic_location;
 	}
 	@Value("${res.location}")
 	public void setRes_location(String res_location) {
-		FileUtils.res_location = res_location;
+		this.res_location = res_location;
 	}
+	@Value("${temp.location}")
+	public void setTemp_location(String temp_location) { this.temp_location = temp_location; }
 	@Value("${self.server}")
 	public void setServer(String server) {
 		Server = server;

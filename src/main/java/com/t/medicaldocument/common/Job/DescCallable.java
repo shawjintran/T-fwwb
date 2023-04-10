@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.t.medicaldocument.common.BeanContext;
 import com.t.medicaldocument.entity.PdfDescription;
 import com.t.medicaldocument.service.PdfDescriptionService;
-import com.t.medicaldocument.utils.Cmd;
+import com.t.medicaldocument.config.CmdConfig;
 import com.t.medicaldocument.utils.FileUtils;
 import com.t.medicaldocument.utils.PdfDataUtils;
 import java.io.BufferedReader;
@@ -13,7 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 @AllArgsConstructor
@@ -26,7 +25,7 @@ public class DescCallable implements Callable<HashMap> {
 	@Override
 	public HashMap call() throws Exception {
 		Process process = Runtime.getRuntime()
-				.exec(Cmd.create().toString(file_name,page));
+				.exec(CmdConfig.create().toString(file_name,page));
 		// TODO: 2023/3/31 Cmd进程 暂停
 		 /*
      启动读取buffer缓冲区子线程,避免buffer缓冲区被写满,导致线程等待问题
