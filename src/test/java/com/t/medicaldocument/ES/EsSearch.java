@@ -26,7 +26,7 @@ public class EsSearch {
             System.out.println("结果:"+
                     JSON.toJSONString(
                             searchService
-                                    .searchPageByScore("图片", 0,10,null,null)));
+                                    .searchPageByScore("肿瘤", 0,10,4l,0l)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -48,7 +48,7 @@ public class EsSearch {
     @Test
     public void getDocTest(){
         try {
-            System.out.println(JSON.toJSONString(searchService.getdoc(1636548881315807200l, "中华")));
+            System.out.println(JSON.toJSONString(searchService.getdoc(19l, "肿瘤")));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

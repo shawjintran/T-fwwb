@@ -5,6 +5,7 @@ import com.t.medicaldocument.entity.Bo.EsDocumentBo;
 import com.t.medicaldocument.entity.EsNestedChild;
 import com.t.medicaldocument.entity.EsSearch1;
 import com.t.medicaldocument.entity.PdfDescription;
+import com.t.medicaldocument.entity.Vo.EsNestedChildVo;
 import com.t.medicaldocument.entity.Vo.EsSearchVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.search.join.ScoreMode;
@@ -17,6 +18,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.join.query.HasChildQueryBuilder;
@@ -204,38 +206,39 @@ public class SearchServiceImpl {
 
 
         //条件搜索
-        SearchRequest searchRequest = new SearchRequest("pdfpage1");
+        SearchRequest searchRequest = new SearchRequest("");
         //构造器
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder boolQueryBuilder=QueryBuilders.boolQuery();
         //匹配
-        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("all", searchString);
+        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("all", searchString).fuzziness(Fuzziness.AUTO);
         sourceBuilder.query(queryBuilder);
-        if(userId!=null){
-            TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("userId", userId);
-            sourceBuilder.query(termQueryBuilder);
+        //TODO 使用bool的合并查询,(must/and)
+
+        if(userId!=0){
+            boolQueryBuilder.must(new TermQueryBuilder("userId", userId));
         }
-        if(docId!=null){
-            TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("docId", docId);
-            sourceBuilder.query(termQueryBuilder);
+        if(docId!=0){
+            boolQueryBuilder.must(new TermQueryBuilder("docId", docId));
         }
 
-
-
+        sourceBuilder.query(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("all",searchString)).filter(boolQueryBuilder));
+        //设置最长超时
         sourceBuilder.timeout(TimeValue.timeValueSeconds(30));
         //执行搜索
         searchRequest.source(sourceBuilder);
         SearchResponse searchResponse=restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
         log.info("获得结果数:"+searchResponse.getHits().getHits().length);
         //解析结果
-
+        System.out.println(JSON.toJSONString(searchResponse.getHits().getHits()));
         //存入list
         ArrayList<EsSearch1> list =new ArrayList<>();
 
         //遍历收集成map集合
         for (SearchHit hit : searchResponse.getHits()) {
             EsSearch1 esSearch1=new EsSearch1(
-                    (Long) hit.getSourceAsMap().get("pdfId"),//TODO 如果错了就用用下面的
-                    //Integer.toUnsignedLong((Integer) hit.getSourceAsMap().get("pdfId")),
+                    //(Long) hit.getSourceAsMap().get("pdfId"),//TODO 如果错了就用用下面的
+                    Integer.toUnsignedLong((Integer) hit.getSourceAsMap().get("pdfId")),
                     (Integer) hit.getSourceAsMap().get("pdfPage"),
                     (String)hit.getSourceAsMap().get("createtime"),
                     hit.getScore()
@@ -257,14 +260,16 @@ public class SearchServiceImpl {
                 if(i==0){
                     //循环初始化
                     esSearchVo.setPdfId(esSearch1.getPdfId());
-                    if(userId!=null)//正常状态
+                    if(userId!=0)//正常状态
                         esSearchVo.setTitle(pdfFileService.fileEcho(userId, esSearch1.getPdfId()).getPdfTitle());
                     else //测试状态
                         esSearchVo.setTitle("测试显示");
                     esSearchVo.setScore(0f);
                     esSearchVo.setCreatetime(esSearch1.getCreatetime());
+                    esSearchVo.setPdfPages("");
                 }
-                esSearchVo.setPdfPages(esSearchVo.getPdfPages()+" "+esSearch1.getPdfPage());
+
+                esSearchVo.setPdfPages(esSearchVo.getPdfPages()+esSearch1.getPdfPage()+" ");
                 esSearchVo.setScore(esSearchVo.getScore()+esSearch1.getScore());
             }
             esSearchVoList.add(esSearchVo);
@@ -332,7 +337,7 @@ public class SearchServiceImpl {
 
 
         //构造请求
-        SearchRequest searchRequest = new SearchRequest("pdfpage1");
+        SearchRequest searchRequest = new SearchRequest("pdfpage");
         searchRequest.source(searchSourceBuilder);
         //获得响应
         SearchResponse searchResponse=restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
@@ -344,12 +349,12 @@ public class SearchServiceImpl {
 
         log.info(JSON.toJSONString(hits));
         //构造前端显示结果
-        Map<Integer,List<EsNestedChild>> listMap=new HashMap<>();
+
+
+        List<EsNestedChildVo> esNestedChildrenVo=new ArrayList<>();
 
         //构造返回结果
         for (SearchHit hit : hits) {//遍历父文档
-
-            List<EsNestedChild> esNestedChildren=new ArrayList<>();
 
             Map<String, SearchHits> innerHits = hit.getInnerHits();
 
@@ -364,17 +369,14 @@ public class SearchServiceImpl {
                 String[] valueStrings = Texts2Strings(fragments);
                 ////////
                 for (int i = 0; i < valueStrings.length; i++) {
-                    esNestedChildren.add(new EsNestedChild(estype,valueStrings[i]));
+                    esNestedChildrenVo.add(new EsNestedChildVo((Integer) hit.getSourceAsMap().get("pdfPage"),estype,valueStrings[i]));
                 }
-
             }
 
-            if(esNestedChildren.size()!=0)
-            listMap.put((Integer) hit.getSourceAsMap().get("pdfPage"),esNestedChildren);
         }
 
 
-        return listMap;
+        return esNestedChildrenVo;
     }
 
 
