@@ -20,7 +20,7 @@ export default {
 <style scoped>
 .app-main {
   /*50 = navbar  */
-  background-image: url("../../assets/img.png");
+  background-image: url("../../assets/img_1.png");
   background-repeat: no-repeat;
   /*背景图像的位置是在视口内固定，或者随着包含它的区块滚动。*/
   /*background-attachment: local;*/
