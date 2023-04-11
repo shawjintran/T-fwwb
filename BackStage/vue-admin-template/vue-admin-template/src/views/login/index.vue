@@ -1,9 +1,9 @@
 <template>
 
   <div class="login-container">
-    <div style="text-align: center;margin-top: 30px">
-      <h1 style="margin: 20px 20px;color: #76aeb7;font-min-size:45px">医寻--智能文献检索平台</h1>
-      <h1 style="margin: 40px 40px;color: #76aeb7;font-min-size:45px">后台管理</h1>
+    <div style="text-align: center;margin-top: 60px">
+      <div style="margin: 20px 20px;color: #99c1ec;font-size:55px;font-weight: bold;letter-spacing: 3px" >医寻——智能文献检索平台</div>
+      <div style="margin: 40px 40px;color: #99c1ec;font-size:55px;font-weight: bold">后台管理</div>
     </div>
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
       <div class="loginarea">
@@ -44,7 +44,7 @@
 
         <el-button :loading="loading" type="primary" style="background-color: #1f2d3d;width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
         <div class="tips">
-          <span style=" font-weight: bolder;margin-right:20px;color: #974949;">* 本管理页面只向管理人员开放</span>
+          <span style=" font-weight: bolder;margin-right:20px;color: #b60404;letter-spacing: 3px">* 本管理页面只向管理人员开放</span>
         </div>
       </div>
 
@@ -155,6 +155,15 @@ $cursor: #fff;
 
 /* reset element-ui css */
 .login-container {
+  background-image: url("../../assets/index.jpg");
+  background-repeat: no-repeat;
+  /*背景图像的位置是在视口内固定，或者随着包含它的区块滚动。*/
+  background-attachment: fixed;
+  /*把背景图像扩展至足够大，以使背景图像完全覆盖背景区域*/
+  background-size: cover ;
+  background-position: center;
+  /*设置了元素溢出时所需的行为，出现滑动*/
+  overflow:auto;
   .el-input {
     display: inline-block;
     height: 47px;
@@ -200,7 +209,7 @@ $light_gray:#eee;
   overflow: hidden;
 .loginarea{
   border-radius: 20px;
-  background-color: #cee5e9;
+  background-color: rgba(113, 180, 252, 0.42);
   padding: 30px;
   box-shadow: #f4f4f5;
 }

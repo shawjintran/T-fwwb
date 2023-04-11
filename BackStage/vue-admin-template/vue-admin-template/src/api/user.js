@@ -5,7 +5,7 @@ export function login(data) {
     url: '/api/employ/login',
     method: 'post',
     // params:data
-    data:data
+    params:data
   })
 }
 
