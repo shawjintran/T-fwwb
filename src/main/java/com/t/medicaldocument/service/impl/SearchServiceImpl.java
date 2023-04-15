@@ -235,11 +235,6 @@ public class SearchServiceImpl {
         ArrayList<EsSearch1> list =new ArrayList<>();
 
         //遍历收集成map集合
-
-
-
-
-
         for (SearchHit hit : searchResponse.getHits()) {
             EsSearch1 esSearch1=new EsSearch1(
                     //(Long) hit.getSourceAsMap().get("pdfId"),//TODO 如果错了就用用下面的
@@ -250,6 +245,7 @@ public class SearchServiceImpl {
                     );
             list.add(esSearch1);
         }
+
         //前端显示的对象列表
         List<EsSearchVo> esSearchVoList=new ArrayList<>();
         //分类处理map<pdf的id,分数>
@@ -272,10 +268,12 @@ public class SearchServiceImpl {
                     esSearchVo.setCreatetime(esSearch1.getCreatetime());
                     esSearchVo.setPdfPages("");
                 }
+
                 esSearchVo.setPdfPages(esSearchVo.getPdfPages()+esSearch1.getPdfPage()+" ");
                 esSearchVo.setScore(esSearchVo.getScore()+esSearch1.getScore());
             }
             esSearchVoList.add(esSearchVo);
+
         }
         return esSearchVoList;
     }
@@ -320,6 +318,7 @@ public class SearchServiceImpl {
     public Object getdoc(Long pdfId,String searchString) throws IOException {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
+
         //高亮设置
         HighlightBuilder highlightBuilder = new HighlightBuilder();
         highlightBuilder.field("esfathernested.esvalue")
@@ -332,7 +331,10 @@ public class SearchServiceImpl {
                 .must(QueryBuilders.termQuery("pdfId", pdfId))
                 .should(QueryBuilders.nestedQuery("esfathernested",QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("esfathernested.esvalue",searchString)), ScoreMode.Avg)
                         .innerHit(new InnerHitBuilder().setName("inner_hits").setHighlightBuilder(highlightBuilder)));//内部高亮
+
         searchSourceBuilder.query(queryBuilder);
+
+
 
         //构造请求
         SearchRequest searchRequest = new SearchRequest("pdfpage");
@@ -340,11 +342,14 @@ public class SearchServiceImpl {
         //获得响应
         SearchResponse searchResponse=restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
 
+
         // 获取搜索结果
         SearchHit[] hits = searchResponse.getHits().getHits();
 
+
         log.info(JSON.toJSONString(hits));
         //构造前端显示结果
+
 
         List<EsNestedChildVo> esNestedChildrenVo=new ArrayList<>();
 

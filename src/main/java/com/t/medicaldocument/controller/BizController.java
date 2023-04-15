@@ -28,7 +28,7 @@ public class BizController {
 		boolean save = businessService.save(biz);
 		if (!save)
 			return R.fail().setMes("保存出错");
-		return R.ok();
+		return R.ok().setMes("添加业务成功");
 	};
 	@GetMapping("list/{page}/{size}")
 	@ApiOperation("(已定)分页列出所有的业务")

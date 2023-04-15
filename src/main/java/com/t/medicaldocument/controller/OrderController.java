@@ -77,6 +77,7 @@ public class OrderController {
 		Order order = new Order().setUserId(userId)
 				.setOrderPoint(byId.getBizPoint())
 				.setOrderPrice(byId.getBizPrice())
+				.setBizId(bizId)
 				.setOrderStatus(0);
 		boolean save = orderService.save(order);
 		if (save)

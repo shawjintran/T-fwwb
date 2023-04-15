@@ -227,6 +227,22 @@ public class FileController {
 			return R.fail().setMes("没有对应文件,请删除当前文献信息,重新上传文件");
 		return R.ok("/file/"+vo.getPdfFileName()+".pdf");
 	}
+	@GetMapping("view2/{userId}/{pdfId}")
+	@ApiOperation("文献pdf图片的展示")
+	public R fileView2(@ApiParam(required = true)
+						  @PathVariable Long pdfId,
+					  @ApiParam(required = true)
+						  @PathVariable Long userId){
+		PdfFileVo vo = pdfFileService.fileExist(userId, pdfId);
+		if (vo==null)
+			return R.fail().setMes("没有对应文件,请删除当前文献信息,重新上传文件");
+		ArrayList<String> picList = new ArrayList<>();
+		for (Integer integer = 0; integer < vo.getPdfPagecount(); integer++) {
+			picList.add("http://192.168.43.222:8081/pic/"+vo.getPdfFileName()+"/"+integer+".jpg");
+		}
+		return R.ok(picList);
+	}
+
 	@GetMapping("echo/{userId}/{pdfId}")
 	@ApiOperation("文献信息的回显")
 	@Cacheable(cacheNames = "PdfFile+'_'+#userId",

@@ -1,4 +1,5 @@
 <template>
+
   <div class="app-container">
     <el-table
       :data="list"
@@ -55,6 +56,7 @@
       @current-change="changeCurrentPage" />
   </div>
 </template>
+
 
 <script>
 import bizApi from '@/api/Business/biz';
