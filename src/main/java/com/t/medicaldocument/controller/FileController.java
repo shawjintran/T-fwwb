@@ -310,6 +310,11 @@ public class FileController {
 		map.put("data",list);
 		return R.ok(map);
 	}
+	@GetMapping("fetch/{userId}/{status}")
+	@ApiOperation("（已定）根据文件夹id和用户id 分页 查询文件夹中的文献")
+	public R fileFetchByStatus(@PathVariable Long userId,@PathVariable Integer status){
+		return null;
+	}
 	@PutMapping("place/{userId}/{newDocId}")
 	@ApiOperation("(归档)将多个文献从同一个文件夹归入到另一个文档")
 	@CacheEvict(cacheNames = "PdfFile+'_'+#userId",
