@@ -311,9 +311,16 @@ public class FileController {
 		return R.ok(map);
 	}
 	@GetMapping("fetch/{userId}/{status}")
-	@ApiOperation("（已定）根据文件夹id和用户id 分页 查询文件夹中的文献")
+	@ApiOperation("（已定）根据用户id和状态 查询时间前10的文献")
 	public R fileFetchByStatus(@PathVariable Long userId,@PathVariable Integer status){
-		return null;
+		if(userId==null)
+			return R.fail().setMes("请登录");
+		if(status==null)
+			return R.fail().setMes("错误");
+		List<PdfFileVo> list=pdfFileService.fileGetLats10(userId,status);
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("data",list);
+		return R.ok(map);
 	}
 	@PutMapping("place/{userId}/{newDocId}")
 	@ApiOperation("(归档)将多个文献从同一个文件夹归入到另一个文档")

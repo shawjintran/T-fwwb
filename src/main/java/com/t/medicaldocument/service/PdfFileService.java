@@ -38,4 +38,6 @@ public interface PdfFileService extends IService<PdfFile> {
 
 
 	String upload(MultipartFile file);
+
+	List<PdfFileVo> fileGetLats10(Long userId, Integer status);
 }

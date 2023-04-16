@@ -14,6 +14,7 @@ import com.t.medicaldocument.service.PdfDescriptionService;
 import com.t.medicaldocument.service.PdfFileService;
 import com.t.medicaldocument.mapper.PdfFileMapper;
 import com.t.medicaldocument.utils.FileUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -76,6 +78,26 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		}
 		return split[0];
 	}
+
+	@Override
+	public List<PdfFileVo> fileGetLats10(Long userId, Integer status) {
+		QueryWrapper<PdfFile> pdfFileQueryWrapper = new QueryWrapper<>();
+		pdfFileQueryWrapper.eq("user_id",userId)
+				.eq("pdf_status",status)
+				.orderByDesc("update_time")
+						.last("limit 0,10");
+		List<PdfFile> pdfFiles = baseMapper.selectList(pdfFileQueryWrapper);
+
+		List<PdfFileVo> pdfFileVoList=new ArrayList<>();
+
+		for (int i = 0; i < pdfFiles.size(); i++) {
+			PdfFileVo pdfFileVo = new PdfFileVo();
+			BeanUtils.copyProperties(pdfFiles.get(i),pdfFileVo);
+			pdfFileVoList.add(pdfFileVo);
+		}
+		return pdfFileVoList;
+	}
+
 	public void downloadPdfFile(HttpServletResponse response,String filename)
 			 {
 		response.setContentType("application/pdf");
