@@ -30,6 +30,7 @@ export default {
   /*设置了元素溢出时所需的行为，出现滑动*/
   overflow:auto;
   /*filter: opacity(40%);*/
+  background-color: #ffffff;
   min-height: calc(100vh - 50px);
   width: 100%;
   position: relative;

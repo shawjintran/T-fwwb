@@ -62,7 +62,7 @@ export default{
         if (response.code==200)
         {this.$message({
           type: 'success',
-          message: response.message
+          message:'添加成功'
         });
         this.$router.push({path:'/ex/biz/list'})
         }
@@ -77,7 +77,7 @@ export default{
         if (response.code==200)
         {this.$message({
           type: 'success',
-          message: response.message
+          message:'修改成功'
         });
           this.$router.push({path:'/ex/biz/list'})
         }

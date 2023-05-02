@@ -8,7 +8,7 @@
         <el-input v-model="form.userPwd" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" style="background: #91a7c4" @click="onSubmit">创建用户</el-button>
+        <el-button type="primary" plain  @click="onSubmit">创建用户</el-button>
         <el-button @click="onSet">重置</el-button>
       </el-form-item>
     </el-form>

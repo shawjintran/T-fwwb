@@ -2,8 +2,8 @@
 
   <div class="login-container">
     <div style="text-align: center;margin-top: 60px">
-      <div style="margin: 20px 20px;color: #99c1ec;font-size:55px;font-weight: bold;letter-spacing: 3px" >医寻——智能文献检索平台</div>
-      <div style="margin: 40px 40px;color: #99c1ec;font-size:55px;font-weight: bold">后台管理</div>
+      <div style="margin: 20px 20px;color: #0093d5;font-size:55px;font-weight: bold;letter-spacing: 3px" >医寻——智能文献检索平台</div>
+      <div style="margin: 40px 40px;color: #0093D5FF;font-size:55px;font-weight: bold">后台管理</div>
     </div>
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
       <div class="loginarea">
@@ -42,7 +42,7 @@
         </span>
         </el-form-item>
 
-        <el-button :loading="loading" type="primary" style="background-color: #1f2d3d;width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
+        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
         <div class="tips">
           <span style=" font-weight: bolder;margin-right:20px;color: #b60404;letter-spacing: 3px">* 本管理页面只向管理人员开放</span>
         </div>
@@ -155,15 +155,16 @@ $cursor: #fff;
 
 /* reset element-ui css */
 .login-container {
-  background-image: url("../../assets/index.jpg");
-  background-repeat: no-repeat;
-  /*背景图像的位置是在视口内固定，或者随着包含它的区块滚动。*/
-  background-attachment: fixed;
-  /*把背景图像扩展至足够大，以使背景图像完全覆盖背景区域*/
-  background-size: cover ;
-  background-position: center;
-  /*设置了元素溢出时所需的行为，出现滑动*/
-  overflow:auto;
+  //background-image: url("../../assets/index.jpg");
+  //background-repeat: no-repeat;
+  ///*背景图像的位置是在视口内固定，或者随着包含它的区块滚动。*/
+  //background-attachment: fixed;
+  ///*把背景图像扩展至足够大，以使背景图像完全覆盖背景区域*/
+  //background-size: cover ;
+  //background-position: center;
+  ///*设置了元素溢出时所需的行为，出现滑动*/
+  //overflow:auto;
+  background-color: #effafb;
   .el-input {
     display: inline-block;
     height: 47px;
@@ -209,13 +210,13 @@ $light_gray:#eee;
   overflow: hidden;
 .loginarea{
   border-radius: 20px;
-  background-color: rgba(113, 180, 252, 0.42);
+  background-color: rgb(239, 240, 240);
   padding: 30px;
   box-shadow: #f4f4f5;
 }
   .loginarea:hover{
     transform: translateY(-5px);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.55);
+    box-shadow: 15px 15px 10px rgba(0, 0, 0, 0.1);
   }
   .login-form {
     position: relative;
