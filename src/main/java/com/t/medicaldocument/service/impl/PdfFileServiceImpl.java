@@ -235,6 +235,7 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean fileUpdate(PdfFileVo2 pdf) {
+		System.out.println(pdf.toString());
 		if (pdf.getPdfId()==null||pdf.getPdfTitle()==null||pdf.getDocId()==null)
 			return false;
 		UpdateWrapper<PdfFile> wrapper = new UpdateWrapper<>();

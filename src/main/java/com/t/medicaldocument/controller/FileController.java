@@ -238,7 +238,7 @@ public class FileController {
 			return R.fail().setMes("没有对应文件,请删除当前文献信息,重新上传文件");
 		ArrayList<String> picList = new ArrayList<>();
 		for (Integer integer = 0; integer < vo.getPdfPagecount(); integer++) {
-			picList.add("http://192.168.43.222:8081/pic/"+vo.getPdfFileName()+"/"+integer+".jpg");
+			picList.add("http://192.168.43.61:8081/pic/"+vo.getPdfFileName()+"/"+integer+".jpg");
 		}
 		return R.ok(picList);
 	}
