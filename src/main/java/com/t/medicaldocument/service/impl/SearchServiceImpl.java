@@ -269,7 +269,8 @@ public class SearchServiceImpl {
                     esSearchVo.setPdfPages("");
                 }
 
-                esSearchVo.setPdfPages(esSearchVo.getPdfPages()+esSearch1.getPdfPage()+" ");
+
+                esSearchVo.setPdfPages(esSearchVo.getPdfPages()+(esSearch1.getPdfPage()+1)+" ");//避免第0页开始数
                 esSearchVo.setScore(esSearchVo.getScore()+esSearch1.getScore());
             }
             esSearchVoList.add(esSearchVo);
@@ -369,7 +370,7 @@ public class SearchServiceImpl {
                 String[] valueStrings = Texts2Strings(fragments);
                 ////////
                 for (int i = 0; i < valueStrings.length; i++) {
-                    esNestedChildrenVo.add(new EsNestedChildVo((Integer) hit.getSourceAsMap().get("pdfPage"),estype,valueStrings[i]));
+                    esNestedChildrenVo.add(new EsNestedChildVo((Integer) hit.getSourceAsMap().get("pdfPage")+1,estype,valueStrings[i]));
                 }
             }
 
