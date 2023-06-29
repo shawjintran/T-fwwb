@@ -3,6 +3,7 @@ package com.t.medicaldocument.mapper;
 import com.t.medicaldocument.entity.PdfFile;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.t.medicaldocument.entity.Vo.PdfFileVo;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 * @createDate 2023-02-02 20:23:28
 * @Entity com.t.medicaldocument.entity.PdfFile
 */
+@Mapper
 public interface PdfFileMapper extends BaseMapper<PdfFile> {
 
 	Integer modifyDocId(List<Long> ids, Long docId,Long userId);

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.t.medicaldocument.entity.Vo.DocumentVo;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.MapKey;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +20,7 @@ import java.util.Map;
 * @createDate 2023-02-13 09:58:09
 * @Entity com.t.medicaldocument.entity.Document
 */
+@Mapper
 public interface DocumentMapper extends BaseMapper<Document> {
 	String nameRepeat(String name,Long uId);
 	@MapKey("docId")

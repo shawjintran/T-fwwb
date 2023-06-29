@@ -25,6 +25,7 @@ public class RedisConfig {
 		//hash的value采用FastJson的序列化工具
 		redisTemplate.setHashValueSerializer(fastJsonRedisSerializer);
 		redisTemplate.afterPropertiesSet();
+
 		return redisTemplate;
 	}
 

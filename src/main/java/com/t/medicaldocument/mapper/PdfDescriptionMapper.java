@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.t.medicaldocument.entity.Vo.PdfDescVo;
 
 import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
 * @author sky
@@ -12,6 +13,7 @@ import java.util.List;
 * @createDate 2023-02-02 20:41:15
 * @Entity com.t.medicaldocument.entity.PdfDescription
 */
+@Mapper
 public interface PdfDescriptionMapper extends BaseMapper<PdfDescription> {
 
 	Integer deleteByPdfIds(List<Long> ids);

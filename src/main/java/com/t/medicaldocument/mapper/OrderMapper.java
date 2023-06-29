@@ -2,6 +2,7 @@ package com.t.medicaldocument.mapper;
 
 import com.t.medicaldocument.entity.Order;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
 * @author sky
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2023-03-27 15:14:25
 * @Entity com.t.medicaldocument.entity.Order
 */
+@Mapper
 public interface OrderMapper extends BaseMapper<Order> {
 
 }

@@ -35,7 +35,7 @@ public class ApiController {
 
 
 
-        String replyStr = chartGPTService.send("请只回复相关医学名词以及医学药品,一一列举,不要说其他任何修饰词:"+gptRequest);
+        String replyStr = chartGPTService.send("请只回复相关医学名词以及医学药品,一一列举,不要有其他词语，词语用逗号隔开，不要序列:"+gptRequest);
 
 
         return replyStr;
