@@ -2,6 +2,7 @@ package com.t.medicaldocument.mapper;
 
 import com.t.medicaldocument.entity.Business;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
 * @author sky
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2023-03-27 15:11:19
 * @Entity com.t.medicaldocument.entity.Business
 */
+@Mapper
 public interface BusinessMapper extends BaseMapper<Business> {
 
 }

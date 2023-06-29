@@ -82,10 +82,14 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	@Override
 	public List<PdfFileVo> fileGetLats10(Long userId, Integer status) {
 		QueryWrapper<PdfFile> pdfFileQueryWrapper = new QueryWrapper<>();
-		pdfFileQueryWrapper.eq("user_id",userId)
-				.eq("pdf_status",status)
-				.orderByDesc("update_time")
+		pdfFileQueryWrapper.eq("user_id",userId);
+		if (status==1)
+				pdfFileQueryWrapper.orderByDesc("update_time")
 						.last("limit 0,10");
+		else
+			pdfFileQueryWrapper.orderByAsc("update_time")
+					.last("limit 0,10");
+
 		List<PdfFile> pdfFiles = baseMapper.selectList(pdfFileQueryWrapper);
 
 		List<PdfFileVo> pdfFileVoList=new ArrayList<>();

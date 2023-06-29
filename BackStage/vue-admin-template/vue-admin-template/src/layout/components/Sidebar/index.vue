@@ -1,7 +1,7 @@
 <template>
   <div :class="{'has-logo':showLogo}" style="color: rgba(255,255,255,0)">
     <logo v-if="showLogo" :collapse="isCollapse" />
-    <el-scrollbar wrap-class="scrollbar-wrapper" style="background-color: rgba(118,168,229,0.75)">
+    <el-scrollbar wrap-class="scrollbar-wrapper" >
       <el-menu style="background-color: rgba(244,244,245,0)"
         :default-active="activeMenu"
         :collapse="isCollapse"
