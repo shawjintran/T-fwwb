@@ -38,7 +38,7 @@
     <select id = "fileSearchPageById" resultType="com.t.medicaldocument.entity.Vo.PdfFileVo">
         select pdf_id, doc_id,pdf_title, pdf_status,create_time,update_time from pdf_file
         where  user_id=#{userId}
-          <if test = "_parameter.containsKey('docId') and docId!=null and docId!=''">
+          <if test = "_parameter.containsKey('docId') and docId!=null and docId!='' or docId==0">
               and doc_id=#{docId}
           </if>
            and is_delete = 0
@@ -53,7 +53,7 @@
     </select>
     <select id="fileCount" resultType="java.lang.Integer">
         select count(1) from pdf_file where  user_id=#{userId}
-        <if test = "_parameter.containsKey('docId') and docId!=null and docId!=''">
+        <if test = "_parameter.containsKey('docId') and docId!=null and docId!='' or docId==0">
             and doc_id=#{docId}
         </if>
     </select>
