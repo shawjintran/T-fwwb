@@ -3,10 +3,15 @@ package com.t.medicaldocument;
 
 
 import com.alibaba.fastjson2.JSONObject;
+import com.t.medicaldocument.Task.TestCallable;
 import com.t.medicaldocument.entity.EsNestedChild;
 import com.t.medicaldocument.entity.User;
 import com.t.medicaldocument.service.PdfFileService;
+import com.t.medicaldocument.service.TestService;
 import com.t.medicaldocument.service.UserService;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.annotations.Mapper;
@@ -15,6 +20,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -26,10 +32,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 @SpringBootTest
 @MapperScan("com.t.medical.medicaldocument.mapper")
+//@Transactional(rollbackFor = Exception.class)
 @Slf4j
+//@EnableTransactionManagement
 class MedicalDocumentApplicationTests {
 
 	@Autowired
@@ -40,6 +53,9 @@ class MedicalDocumentApplicationTests {
 	@Autowired
 	// 事务定义:事务的一些基础信息，如超时时间、隔离级别、传播属性等
 	TransactionDefinition transactionDefinition;
+	@Autowired
+	TestService testService;
+
 	@Test
 	void contextLoads() {
 //		String end=System.getProperty("user.dir")+"fileName";
@@ -102,15 +118,38 @@ class MedicalDocumentApplicationTests {
 		System.out.println(Arrays.toString(a));
 	}
 	@Test
-	void Tran(){
+//	@Transactional
+	public void Tran(){
+
 		TransactionStatus transaction = platformTransaction.
-				getTransaction(transactionDefinition);
-		for (int i = 0; i < 5; i++) {
+				getTransaction(new DefaultTransactionDefinition(3));
+		System.out.println(transaction);
+		try
+		{
+			we();
+		}catch (Exception e){
 
 		}
-		System.out.println("yes");
+		String a= String.valueOf(System.currentTimeMillis());
+		System.out.println(a.substring(6,9));
+
+		testService.save(new com.t.medicaldocument.entity.Test(Integer.parseInt(a.substring(6,9)),221));
 		platformTransaction.rollback(transaction);
+		TransactionStatus transaction1 = platformTransaction
+				.getTransaction(new DefaultTransactionDefinition(0));
+		testService.save(new com.t.medicaldocument.entity.Test(Integer.parseInt(a.substring(6,9)+1),221));
+		platformTransaction.commit(transaction1);
 	}
+//	@Transactional
+	public void we(){
+//		TransactionStatus transaction = platformTransaction.
+//				getTransaction(new DefaultTransactionDefinition(3));
+//		System.out.println(transaction);
+	String a= String.valueOf(System.currentTimeMillis());
+	System.out.println(a.substring(6,9));
+	testService.save(new com.t.medicaldocument.entity.Test(Integer.parseInt(a.substring(6,9)+32),221));
+//	platformTransaction.commit(transaction);
+}
 	@Test
 	void User(){
 		// System.out.println(userService.updateById(new User().setUserId(1L).setUserPoints(3)));
@@ -129,7 +168,41 @@ class MedicalDocumentApplicationTests {
 		long finish = System.currentTimeMillis();
 		long timeElapsed = finish - start;
 		System.out.println(timeElapsed);
+	}
+	@Test
+	@Transactional
+	public void test2() throws ExecutionException, InterruptedException {
 
+		ThreadPoolTaskExecutor threadPool = new ThreadPoolTaskExecutor();
+		//设置核心线程数，默认为1
+		threadPool.setCorePoolSize(6);
+		// 当核心线程都在跑任务，还有多余的任务会存到此处。
+		threadPool.setQueueCapacity(100);
+		//最大线程数，默认为Integer.MAX_VALUE，如果queueCapacity存满了，还有任务就会启动更多的线程，直到线程数达到maxPoolSize。如果还有任务，则根据拒绝策略进行处理。
+		threadPool.setMaxPoolSize(12);
+		threadPool.setWaitForTasksToCompleteOnShutdown(true);
+		threadPool.setAwaitTerminationSeconds(60 * 80);
+		threadPool.setThreadNamePrefix("MyAsync-");
+		threadPool.initialize();
+		Object savePoint = TransactionAspectSupport.currentTransactionStatus().createSavepoint();
+		List<Future<String>> futures = new ArrayList<>();
+		for (Integer i = 0; i < 5; i++) {
+			futures.add(threadPool.submit(new TestCallable(i, i + 2, testService)));
+		}
+		ArrayList<String> tests = new ArrayList<>();
+		try {
+			for (Future<String> future : futures) {
+				if (future.get() != null) {
+					tests.add(future.get());
+					continue;
+				}
+				throw new Exception();
+			}
+		} catch (Exception e)
+		{
+			TransactionAspectSupport.currentTransactionStatus().rollbackToSavepoint(savePoint);
+		}
 
 	}
+
 }

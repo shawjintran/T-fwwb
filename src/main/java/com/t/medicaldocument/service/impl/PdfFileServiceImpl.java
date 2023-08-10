@@ -301,6 +301,7 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 		int update = baseMapper.update(null, wrapper);
 		if (update==1)
 			return true;
+		log.error("Pdf File status update error");
 		return false;
 	}
 }

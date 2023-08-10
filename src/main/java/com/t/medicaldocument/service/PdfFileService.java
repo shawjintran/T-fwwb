@@ -28,6 +28,7 @@ public interface PdfFileService extends IService<PdfFile> {
 	boolean fileDelete(List<Long> ids, Long docId, Long userId);
 	boolean statusUpdate(Long pdfId,Integer status);
 	boolean fileUpdate(PdfFileVo2 pdf);
+	@Deprecated
 	boolean placeFile(List<Long> ids, Long docId, Long userId);
 	void downloadPdfFile(HttpServletResponse response, String filename) throws IOException;
 
