@@ -168,14 +168,19 @@ public class SearchServiceImpl {
      * @throws IOException
      */
     public List<EsSearchVo> searchPageByScore(String searchString, int pageNo, int pageSize, Long userId,Long docId) throws IOException {
-        if(pageNo<0)//检验分页合法性
-            pageNo=0;
+        if(pageNo<1)//检验分页合法性
+        {
+            pageNo=1;
+        }
         List<EsSearchVo> esSearchVoList = searchPage(searchString, userId,docId);
         esSearchVoList=  esSearchVoList.stream()
                 .sorted(Comparator.comparing(EsSearchVo::getScore).reversed())//按分数排序
-                .skip((pageNo)*pageSize).limit(pageSize)//分页
+                .skip((pageNo-1)*pageSize).limit(pageSize)//分页
                 .collect(Collectors.toList());
+
+
         return esSearchVoList;
+
     }
 
 
@@ -189,12 +194,12 @@ public class SearchServiceImpl {
      * @throws IOException
      */
     public List<EsSearchVo> searchPageByTime(String searchString, int pageNo, int pageSize, Long userId,Long docId) throws IOException {
-        if(pageNo<0)//检验分页合法性
-            pageNo=0;
+        if(pageNo<1)//检验分页合法性
+            pageNo=1;
         List<EsSearchVo> esSearchVoList = searchPage(searchString, userId,docId);
         esSearchVoList= esSearchVoList.stream()
                 .sorted(Comparator.comparing(EsSearchVo::getCreatetime,String::compareTo).reversed())//按时间排序近到远
-                .skip((pageNo)*pageSize).limit(pageSize)
+                .skip((pageNo-1)*pageSize).limit(pageSize)
                 .collect(Collectors.toList());
         return esSearchVoList;
     }
@@ -626,5 +631,22 @@ public class SearchServiceImpl {
         }
         return  !bulk.hasFailures();//返回成功与否
 
+    }
+
+    /**
+     * 获取总条数
+     * @param searchString
+     * @param pageNo
+     * @param pageSize
+     * @param userId
+     * @param docId
+     * @return
+     */
+    public int searchPageCount(String searchString, int pageNo, int pageSize, Long userId, Long docId) throws IOException {
+        if(pageNo<0)//检验分页合法性
+            pageNo=0;
+        List<EsSearchVo> esSearchVoList = searchPage(searchString, userId,docId);
+
+        return esSearchVoList.size();
     }
 }

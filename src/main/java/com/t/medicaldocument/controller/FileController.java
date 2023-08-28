@@ -225,6 +225,38 @@ public class FileController {
 		PdfFileVo vo = pdfFileService.fileExist(userId, pdfId);
 		if (vo==null)
 			return R.fail().setMes("没有对应文件,请删除当前文献信息,重新上传文件");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		return R.ok("/file/"+vo.getPdfFileName()+".pdf");
 	}
 	@GetMapping("view2/{userId}/{pdfId}")
