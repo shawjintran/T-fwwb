@@ -192,6 +192,7 @@ public class SearchServiceImpl {
         if(pageNo<0)//检验分页合法性
             pageNo=0;
         List<EsSearchVo> esSearchVoList = searchPage(searchString, userId,docId);
+//        Todo: 缓存
         esSearchVoList= esSearchVoList.stream()
                 .sorted(Comparator.comparing(EsSearchVo::getCreatetime,String::compareTo).reversed())//按时间排序近到远
                 .skip((pageNo)*pageSize).limit(pageSize)
@@ -210,11 +211,6 @@ public class SearchServiceImpl {
         //构造器
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder=QueryBuilders.boolQuery();
-        //匹配
-        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("all", searchString).fuzziness(Fuzziness.AUTO);
-        sourceBuilder.query(queryBuilder);
-        //TODO 使用bool的合并查询,(must/and)
-
         if(userId!=0){
             boolQueryBuilder.must(new TermQueryBuilder("userId", userId));
         }
@@ -222,7 +218,9 @@ public class SearchServiceImpl {
             boolQueryBuilder.must(new TermQueryBuilder("docId", docId));
         }
 
-        sourceBuilder.query(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("all",searchString)).filter(boolQueryBuilder));
+        sourceBuilder.query(QueryBuilders.boolQuery().must(
+            QueryBuilders.matchQuery("all",searchString)).filter(boolQueryBuilder)
+        );
         //设置最长超时
         sourceBuilder.timeout(TimeValue.timeValueSeconds(30));
         //执行搜索
@@ -330,8 +328,12 @@ public class SearchServiceImpl {
         searchSourceBuilder.highlighter(highlightBuilder);
         QueryBuilder queryBuilder = QueryBuilders.boolQuery()
                 .must(QueryBuilders.termQuery("pdfId", pdfId))
-                .should(QueryBuilders.nestedQuery("esfathernested",QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("esfathernested.esvalue",searchString)), ScoreMode.Avg)
-                        .innerHit(new InnerHitBuilder().setName("inner_hits").setHighlightBuilder(highlightBuilder)));//内部高亮
+                .should(QueryBuilders.nestedQuery(
+                    "esfathernested",
+                    QueryBuilders.boolQuery().must(
+                        QueryBuilders.matchQuery("esfathernested.esvalue",searchString)), ScoreMode.Avg
+                )
+                .innerHit(new InnerHitBuilder().setName("inner_hits").setHighlightBuilder(highlightBuilder)));//内部高亮
 
         searchSourceBuilder.query(queryBuilder);
 
