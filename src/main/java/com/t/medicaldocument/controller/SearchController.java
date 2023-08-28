@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 @Api(tags = "与检索信息的相关请求，检索文献等")
@@ -44,8 +45,16 @@ public class SearchController {
 			list= searchService.searchPageByScore(searchString, pageNo, pageSize,userId,docId);
 		if(searchType==2)//按照创建时间搜索
 			list=searchService.searchPageByTime(searchString, pageNo, pageSize,userId,docId);
-		System.out.println(list);
-		return R.ok(list);
+		int count=searchService.searchPageCount(searchString, pageNo, pageSize,userId,docId);
+// Todo: 性能优化
+
+		HashMap map=new HashMap();
+
+		map.put("count",count);
+		map.put("list",list);
+
+		System.out.println(map);
+		return R.ok(map);
 	}
 
 
