@@ -66,7 +66,7 @@ public class AsyncTask {
 		for (Future<Boolean> future : futures) {
 			if (future.get())
 				continue;
-			pdfFileService.statusUpdate(pdfId, 2);
+			pdfFileService.statusUpdate(pdfId, 4);
 			platformTransaction.commit(transaction);
 			return;
 		}
@@ -78,9 +78,13 @@ public class AsyncTask {
 			platformTransaction.commit(transaction);
 			return;
 		}
-		//当前进程事务无任何提交以及回滚，直接使用当前事务
+		//当前进程事务无任何提交以及回滚，直接使用当前事务(修改逻辑为状态机，这里应当提交事务后，另开新事务)
 
 		boolean update = pdfFileService.statusUpdate(pdfId, 1);
+		//提交事务
+		//状态失败则进行补偿，返回
+		//新事务
+
 		//结合ES 存入
 		ArrayList<EsDocumentBo> objects = PdfDataUtils.parseList(pdfEs,userId);
 		//将要存储进Es的对象先收集起
@@ -88,7 +92,7 @@ public class AsyncTask {
 		boolean save = searchService.save2ES(objects);
 		log.info("ES save status:" + save);
 		//通过es批量存储
-		if (!update || !save){
+		if (!save){
 			platformTransaction.rollback(transaction);
 			pdfFileService.statusUpdate(pdfId, 2);
 			return;
