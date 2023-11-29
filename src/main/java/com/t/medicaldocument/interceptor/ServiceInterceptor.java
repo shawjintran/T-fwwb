@@ -15,21 +15,27 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Component
 @Slf4j
-public class OcrInterceptor implements HandlerInterceptor {
+public class ServiceInterceptor implements HandlerInterceptor {
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
+//    判断服务存在 逻辑
+
     log.info(request.getRemoteHost());
+//  需要先设置编码，再获取流，避免乱码
+    response.setCharacterEncoding("utf-8");
     PrintWriter writer = response.getWriter();
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Cache-Control", "no-cache");
-    response.setCharacterEncoding("utf-8");
-    response.setContentType("application/json;charset=utf-8");
-    String jsonString = JSON.toJSONString(R.ok("").setMes("Sorry,Server not provide this service"));
+
+//    response.setContentType("application/json;charset=utf-8");
+//    String jsonString = JSON.toJSONString(R.fail("").setMes("Sorry,Server not provide this service").setCode(400));
+    response.setContentType("text/html;charset=utf-8");
+    String jsonString = "服务器暂不提供此服务，";
     writer.write(jsonString);
     writer.flush();
-// TODO: 2023/3/31  无法解决中文乱码
+//  2023/3/31  无法解决中文乱码  2023/11/24 解决
     return false;
   }
 

@@ -24,6 +24,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -56,6 +57,8 @@ public class FileController {
 	PdfFileService pdfFileService;
 	@Autowired
 	DocumentService documentService;
+	@Autowired
+	private KafkaTemplate<String, Object> kafkaTemplate;
 
 //	@PostMapping("upload/")
 //	@ApiOperation("（已定2.0）文献的上传,并转换为图片")
@@ -196,7 +199,19 @@ public class FileController {
 			return R.fail().setMes("没有对应文件,请删除当前文献信息,请重新上传文件");
 		if (vo.getPdfStatus()==1)
 			return R.fail().setMes("文件已经预测");
-		task.predictByPython(pdfId,userId, vo.getPdfFileName(), vo.getPdfPagecount());
+//
+//		kafka 生产者
+		if (false){
+			return R.fail().setCode(400).setMes("服务繁忙，稍后再试");
+		}
+//	map设置参数
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("pdfId",pdfId);
+		map.put("userId",userId);
+		map.put("file_name",vo.getPdfFileName());
+		map.put("page_count",vo.getPdfPagecount());
+		kafkaTemplate.send("predict-task",map);
+//		task.predictByPython(pdfId,userId, vo.getPdfFileName(), vo.getPdfPagecount());
 		return R.ok().setMes("系统将对文献进行分析");
 	}
 	@GetMapping(value = "download/{pdfId}", produces = "application/pdf")

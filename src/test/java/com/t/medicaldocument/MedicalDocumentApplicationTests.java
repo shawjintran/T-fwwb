@@ -9,6 +9,8 @@ import com.t.medicaldocument.entity.User;
 import com.t.medicaldocument.service.PdfFileService;
 import com.t.medicaldocument.service.TestService;
 import com.t.medicaldocument.service.UserService;
+import com.t.medicaldocument.utils.JwtUtils;
+import io.jsonwebtoken.Claims;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -204,5 +206,11 @@ class MedicalDocumentApplicationTests {
 		}
 
 	}
+	@Test
+	public void test_jwt(){
+		String s = JwtUtils.generateToken(1);
+		System.out.println(s);
+		Claims claimsByToken = JwtUtils.getClaimsByToken(s);
 
+	}
 }

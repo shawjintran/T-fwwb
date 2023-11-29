@@ -1,7 +1,7 @@
 package com.t.medicaldocument.config;
 
 
-import com.t.medicaldocument.interceptor.OcrInterceptor;
+import com.t.medicaldocument.interceptor.ServiceInterceptor;
 import com.t.medicaldocument.utils.FileUtils;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,11 +36,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	}
 
 	@Override
-//	@ConditionalOnProperty(value = "spring.profiles.active",havingValue = "test")
-	// TODO: 2023/3/31 Conditional注解失效
+	//  2023/3/31 Conditional注解失效  2023/11/24 @Condition 注解无法在此处生效
 	public void addInterceptors(InterceptorRegistry registry) {
 
-		registry.addInterceptor(new OcrInterceptor())
+		registry.addInterceptor(new ServiceInterceptor())
 //				.addPathPatterns("/file/upload/**")
 				.addPathPatterns("/file/analyze/structure/**")
 				.addPathPatterns("/desc/**");
