@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.t.logic.mapper.PdfFileMapper">
+
+    <resultMap id="BaseResultMap" type="com.t.logic.entity.PdfFile">
+            <id property="pdfId" column="pdf_id" jdbcType="BIGINT"/>
+            <id property="userId" column="user_id" jdbcType="BIGINT"/>
+            <id property="docId" column="doc_id" jdbcType="BIGINT"/>
+            <result property="pdfFileName" column="pdf_file_name" jdbcType="VARCHAR"/>
+            <result property="pdfTitle" column="pdf_title" jdbcType="VARCHAR"/>
+            <result property="pdfAuthor" column="pdf_author" jdbcType="VARCHAR"/>
+            <result property="pdfPagecount" column="pdf_pagecount" jdbcType="TINYINT"/>
+            <result property="pdfStatus" column="pdf_status" jdbcType="TINYINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        pdf_id,doc_id,user_id,pdf_file_name,pdf_title,
+        pdf_author,pdf_pagecount,pdf_status,
+        create_time,update_time,is_delete
+    </sql>
+    <update id = "modifyDocId" >
+        update pdf_file set doc_id= #{docId},update_time= now() where pdf_id in
+    <foreach collection = "ids" item="item" index="index" open="(" close=")" separator=",">
+        #{item}
+    </foreach>
+    </update>
+    <delete id="fileDeleteByIds">
+        delete from pdf_file where pdf_id in
+        <foreach collection = "pdfIds" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </delete>
+    <select id = "fileSearchPageById" resultType="com.t.logic.entity.Vo.PdfFileVo">
+        select pdf_id, doc_id,pdf_title, pdf_status,create_time,update_time from pdf_file
+        where  user_id=#{userId}
+          <if test = "_parameter.containsKey('docId') and docId!=null and docId!='' or docId==0">
+              and doc_id=#{docId}
+          </if>
+           and is_delete = 0
+        limit #{offset},#{limit}
+    </select>
+    <select id = "judgeIfRational" resultType="long" parameterType="list">
+        SELECT doc_id FROM medical.pdf_file  WHERE pdf_id IN
+        <foreach collection = "ids" item="item" separator="," close=")" open="(">
+            #{item}
+        </foreach>
+        GROUP BY doc_id;
+    </select>
+    <select id="fileCount" resultType="java.lang.Integer">
+        select count(1) from pdf_file where  user_id=#{userId}
+        <if test = "_parameter.containsKey('docId') and docId!=null and docId!='' or docId==0">
+            and doc_id=#{docId}
+        </if>
+    </select>
+    <select id="fileSearchPageOrderByCT" resultType="com.t.logic.entity.Vo.PdfFileVo">
+        select pdf_id, doc_id,pdf_title, pdf_status,create_time,update_time from pdf_file
+        where  user_id=#{userId}
+        and is_delete = 0
+        ORDER BY create_time
+        limit #{offset},#{limit}
+    </select>
+    <select id="fileSearchPageOrderByUT" resultType="com.t.logic.entity.Vo.PdfFileVo">
+        select pdf_id, doc_id,pdf_title, pdf_status,create_time,update_time from pdf_file
+        where  user_id=#{userId}
+        and is_delete = 0
+        ORDER BY update_time
+        limit #{offset},#{limit}
+    </select>
+    <select id="fileSearchPageOrderByTiT" resultType="com.t.logic.entity.Vo.PdfFileVo">
+        select pdf_id, doc_id,pdf_title, pdf_status,create_time,update_time from pdf_file
+        where  user_id=#{userId}
+        and is_delete = 0
+        ORDER BY pdf_title
+        limit #{offset},#{limit}
+    </select>
+</mapper>

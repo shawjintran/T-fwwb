@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.t.logic.mapper.BusinessMapper">
+
+    <resultMap id="BaseResultMap" type="com.t.logic.entity.Business">
+            <id property="bizId" column="biz_id" jdbcType="BIGINT"/>
+            <result property="bizPrice" column="biz_price" jdbcType="DECIMAL"/>
+            <result property="bizPoint" column="biz_point" jdbcType="BIGINT"/>
+            <result property="bizStatus" column="biz_status" jdbcType="TINYINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        biz_id,biz_price,biz_point,
+        biz_status,create_time,update_time
+    </sql>
+</mapper>

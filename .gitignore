@@ -30,7 +30,7 @@ build/
 ### VS Code ###
 .vscode/
 .gitignore
-/src/main/resources/application-test.properties
+logic/src/main/resources/application-test.properties
 
 .DS_Store
 node_modules/

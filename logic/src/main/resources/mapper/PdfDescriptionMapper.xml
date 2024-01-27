@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.t.logic.mapper.PdfDescriptionMapper">
+
+    <resultMap id="BaseResultMap" type="com.t.logic.entity.PdfDescription">
+            <id property="pdfDescId" column="pdf_desc_id" jdbcType="BIGINT"/>
+            <result property="pdfId" column="pdf_id" jdbcType="BIGINT"/>
+            <result property="pdfPage" column="pdf_page" jdbcType="TINYINT"/>
+            <result property="pdfTextStructure" column="pdf_text_structure" jdbcType="OTHER"/>
+            <result property="pdfPicUrl" column="pdf_pic_url" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        pdf_desc_id,pdf_id,pdf_page,
+        pdf_text_structure,pdf_pic_url,create_time,
+        update_time,is_delete
+    </sql>
+    <!--直接删除-->
+    <delete id = "deleteByPdfIds">
+        delete from pdf_description where pdf_id in
+    <foreach collection = "ids" open="(" close=")" separator="," item="pdfId">
+        #{pdfId}
+    </foreach>
+    </delete>
+    <select id = "descSearchByPdfId" resultType="com.t.logic.entity.Vo.PdfDescVo">
+        select pdf_desc_id,pdf_text_structure,pdf_page from pdf_description  where pdf_id=#{pdfId} order by  pdf_page  asc ;
+    </select>
+</mapper>
