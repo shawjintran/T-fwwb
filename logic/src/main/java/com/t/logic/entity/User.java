@@ -25,6 +25,12 @@ public class User implements Serializable {
     private Long userId;
 
     /**
+     * 用户
+     */
+    @ApiParam(required = true)
+    private String userName;
+
+    /**
      * 用户电话
      */
     @ApiParam(required = true)

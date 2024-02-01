@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.t.logic.mapper.DocumentMapper">
 
-    <resultMap id="BaseResultMap" type="com.t.logic.entity.Document">
-            <result property="docId" column="doc_id" jdbcType="BIGINT"/>
-            <result property="userId" column="user_id" jdbcType="BIGINT"/>
-            <result property="docName" column="doc_name" jdbcType="VARCHAR"/>
-            <result property="docSize" column="doc_size" jdbcType="BIGINT"/>
-            <result property="docCapacity" column="doc_capacity" jdbcType="BIGINT"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-            <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
-    </resultMap>
+  <resultMap id="BaseResultMap" type="com.t.logic.entity.Document">
+    <result property="docId" column="doc_id" jdbcType="BIGINT"/>
+    <result property="userId" column="user_id" jdbcType="BIGINT"/>
+    <result property="docName" column="doc_name" jdbcType="VARCHAR"/>
+    <result property="docSize" column="doc_size" jdbcType="BIGINT"/>
+    <result property="docAuth" column="doc_auth" jdbcType="TINYINT"/>
+    <result property="docCapacity" column="doc_capacity" jdbcType="BIGINT"/>
+    <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+  </resultMap>
 
-    <sql id="Base_Column_List">
-        doc_id,user_id,doc_name,
+  <sql id="Base_Column_List">
+    doc_id,user_id,doc_name,
         doc_size,doc_capacity,create_time,update_time,
         is_delete
-    </sql>
-    <delete id="removeByDouble">
-        delete from document where user_id =#{userId}
-                     <if test = "_parameter.containsKey('docId') and docId!=null and docId!=''">
-                         and doc_id =#{docId}
-                     </if>
-    </delete>
-    <select id = "nameRepeat" resultType="string" >
-        select  doc_name from document where doc_name = #{name} and user_id=#{uId};
-    </select>
-    <select id="searchDocById" resultType="java.util.HashMap">
-        select  doc_name as name, doc_size as size, doc_id as docId, doc_capacity as capacity from document where user_id = #{uId};
-    </select>
+  </sql>
+  <delete id="removeByDouble">
+    delete from document where user_id =#{userId}
+    <if test = "_parameter.containsKey('docId') and docId!=null and docId!=''">
+      and doc_id =#{docId}
+    </if>
+  </delete>
+  <select id = "nameRepeat" resultType="string" >
+    select  doc_name from document where doc_name = #{name} and user_id=#{uId};
+  </select>
+  <select id="searchDocById" resultType="java.util.HashMap">
+    select  doc_name as name, doc_size as size, doc_id as docId, doc_capacity as capacity, doc_auth as auth from document where user_id = #{uId};
+  </select>
 </mapper>

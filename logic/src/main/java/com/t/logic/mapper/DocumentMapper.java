@@ -15,7 +15,7 @@ import java.util.Map;
 * @author sky
 * @description 针对表【document】的数据库操作Mapper
 * @createDate 2023-02-13 09:58:09
-* @Entity com.t.medicaldocument.entity.Document
+* @Entity com.t.logic.entity.Document
 */
 @Mapper
 public interface DocumentMapper extends BaseMapper<Document> {
@@ -30,10 +30,14 @@ public interface DocumentMapper extends BaseMapper<Document> {
 	@Update("update document set doc_size = doc_size-${size} ,update_time =now() where doc_id=#{docId} and user_id=#{userId}")
 	Integer SubSize(Long docId, Integer size, Long userId);
 	@Update("update document set doc_capacity=doc_capacity+5, update_time=now() where doc_id=#{docId} and user_id=#{userId}")
-	Integer addDocCapacity(Long docId,Long userI);
+	Integer addDocCapacity(Long docId,Long userId);
 	Integer removeByDouble(Long docId, Long userId);
 	@Select("select doc_name from document where doc_id=#{docId} and user_id=#{userId}")
 	DocumentVo searchDoc(Long docId, Long userId);
+	@Select("update document set doc_auth=#{auth} where doc_id=#{docId} and user_id=#{userId}")
+	Integer updateDocAuth(Long docId,Long userID, Integer auth);
+	@Select("select doc_auth from document where doc_id=#{docId} and user_id=#{userId}")
+	Integer selectAuth(Long docId,Long userID);
 }
 
 

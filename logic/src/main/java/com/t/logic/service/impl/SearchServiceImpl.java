@@ -210,6 +210,7 @@ public class SearchServiceImpl {
         //构造器
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder=QueryBuilders.boolQuery();
+//        Todo: 不得只搜索当前用户的，而应该是所有共享的文件夹
         if(userId!=0){
             boolQueryBuilder.must(new TermQueryBuilder("userId", userId));
         }

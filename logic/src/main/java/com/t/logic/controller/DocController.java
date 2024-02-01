@@ -1,7 +1,9 @@
 package com.t.logic.controller;
 
+import com.t.logic.entity.Document;
 import com.t.logic.entity.Vo.DocumentVo;
 import com.t.logic.service.DocumentService;
+import com.t.logic.service.GroupUserService;
 import com.t.logic.utils.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,13 +22,28 @@ import java.util.Map;
 public class DocController {
 	@Autowired
 	DocumentService documentService;
+	@Autowired
+	GroupUserService groupUserService;
 	@GetMapping("search/{userId}")
-	@ApiOperation("（已定）根据用户Id查询文件夹")
+	@ApiOperation("（未定）根据用户Id查询文件夹，以及查询共享文件夹")
 	public R searchDocById(@ApiParam(required = true) @PathVariable Long userId){
 		if (userId==null)
 			return R.fail().setMes("请先登录");
 		List<Map<String, Object>> map = documentService.searchDocByUser(userId);
 		//预期是装入 docid,docname,docsize,
+		List<Long>docIds =groupUserService.selectShareDoc(userId);
+		if (docIds!=null&& docIds.size()>0){
+			List<Document> documents = documentService.listByIds(docIds);
+			documents.stream().forEach(item ->{
+				Map<String, Object>map1= new HashMap<String, Object>();
+				map1.put("name",item.getDocName());
+				map1.put("size",item.getDocSize());
+				map1.put("capacity",item.getDocCapacity());
+				map1.put("docId",item.getDocId());
+				map1.put("auth",item.getDocAuth());
+				map.add(map1);
+			});
+		}
 		Map<String,Object> data= new HashMap<>();
 		data.put("data",map);
 		data.put("size",map.size());

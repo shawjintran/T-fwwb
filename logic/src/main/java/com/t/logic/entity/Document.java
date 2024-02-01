@@ -35,6 +35,12 @@ public class Document implements Serializable {
      */
 
     private Integer docCapacity;
+
+    /**
+     *
+     */
+
+    private Integer docAuth;
     /**
      *
      */

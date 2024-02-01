@@ -7,6 +7,7 @@
     <resultMap id="BaseResultMap" type="com.t.logic.entity.User">
             <id property="userId" column="user_id" jdbcType="BIGINT"/>
             <result property="userPhone" column="user_phone" jdbcType="VARCHAR"/>
+            <result property="userName" column="user_name" jdbcType="VARCHAR"/>
             <result property="userPwd" column="user_pwd" jdbcType="VARCHAR"/>
             <result property="userUrl" column="user_url" jdbcType="VARCHAR"/>
             <result property="userPoints" column="user_points" jdbcType="INTEGER"/>
@@ -17,7 +18,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        user_id,user_phone,user_pwd,
+        user_id,user_phone,user_name,user_pwd,
         user_url,user_points,user_capacity,create_time,
         update_time,is_delete
     </sql>
