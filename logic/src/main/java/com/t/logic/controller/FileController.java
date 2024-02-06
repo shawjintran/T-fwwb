@@ -251,7 +251,9 @@ public class FileController {
 			return R.fail().setMes("没有对应文件,请删除当前文献信息,重新上传文件");
 		ArrayList<String> picList = new ArrayList<>();
 		for (Integer integer = 0; integer < vo.getPdfPagecount(); integer++) {
-			picList.add("http://192.168.43.61:8081/pic/"+vo.getPdfFileName()+"/"+integer+".jpg");
+//			Todo: 应动态的添加参数
+//			picList.add("http://192.168.43.61:8081/pic/"+vo.getPdfFileName()+"/"+integer+".jpg");
+			picList.add("http://localhost:8081/pic/"+vo.getPdfFileName()+"/"+integer+".jpg");
 		}
 		return R.ok(picList);
 	}
@@ -274,7 +276,7 @@ public class FileController {
 		return R.ok(vo);
 	}
 	@PostMapping("update")
-	@ApiOperation("（已定）文献信息的修改(可以实现文献的文件夹的变动)")
+	@ApiOperation("（已定）单个文献信息的修改(可以实现文献的文件夹的变动)")
 	@CacheEvict(cacheNames = "PdfFile+'_'+#pdf.getUserId()",
 			condition = "#result.getCode()==200",
 			allEntries = true)
@@ -352,8 +354,20 @@ public class FileController {
 		boolean moveFile = pdfFileService.fileMove(ids, userId, newDocId);
 		if (moveFile)
 			return R.ok().setMes("归档成功");
-		return R.fail().setMes("归档失败,请检查目标文件夹容量大小");
+		return R.fail().setMes("归档失败,请检查目标文件夹容量大小与权限");
 	}
+//	Todo
+	@GetMapping("/doi")
+	@ApiOperation("根据DOI获取PDF文件")
+	R fileGetByDOI(){
+		return null;
+	}
+	@PutMapping("/parse")
+	@ApiOperation("根据DOI Excel文件获取PDF文件")
+	R fileGetByFileDOI(){
+		return null;
+	}
+
 	// @DeleteMapping("remove/{userId}/{oldDocId}")
 	// @ApiOperation("移除同个文件夹中的文献(到默认文件夹中)")
 	// public R fileRemove( @ApiParam(required = true)@RequestBody List<Long> ids,

@@ -1,12 +1,15 @@
 package com.t.logic.service.impl;
 
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.t.logic.entity.User;
 import com.t.logic.entity.Vo.UserVo;
 import com.t.logic.mapper.UserMapper;
 import com.t.logic.service.DocumentService;
 import com.t.logic.service.UserService;
+import java.util.Collection;
+import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -19,10 +19,6 @@ public class GroupUserVo {
    * 用户
    */
   private String userName;
-  /**
-   * 用户头像链接
-   */
-  private String userUrl;
 
   /**
    *

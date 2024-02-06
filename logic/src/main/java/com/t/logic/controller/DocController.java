@@ -25,8 +25,8 @@ public class DocController {
 	@Autowired
 	GroupUserService groupUserService;
 	@GetMapping("search/{userId}")
-	@ApiOperation("（未定）根据用户Id查询文件夹，以及查询共享文件夹")
-	public R searchDocById(@ApiParam(required = true) @PathVariable Long userId){
+	@ApiOperation("（未定）根据用户Id查询文件夹，以及查询可读的共享文件夹")
+	public R searchReadDocById(@ApiParam(required = true) @PathVariable Long userId){
 		if (userId==null)
 			return R.fail().setMes("请先登录");
 		List<Map<String, Object>> map = documentService.searchDocByUser(userId);
@@ -96,5 +96,10 @@ public class DocController {
 		if (updateDoc)
 			return R.ok().setMes("更改成功");
 		return R.fail().setMes("更改失败");
+	}
+//	Todo
+	@ApiOperation("导出文献信息")
+	R getDocRecord(){
+		return null;
 	}
 }

@@ -178,13 +178,14 @@ public class PdfFileServiceImpl extends ServiceImpl<PdfFileMapper, PdfFile>
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean fileMove(List<Long> ids,Long userId,Long newDocId){
+//		Todo 权限变更
 		//限制只能同时，从同一个文件夹进行移动
 		List<Long> longs = baseMapper.judgeIfRational(ids);
 		if (longs.size()!=1)
 			return false;
 		if (longs.get(0)==newDocId)
 			return false;
-		boolean fullCapacity = documentService.isFullCapacity(userId, newDocId,ids.size());
+		boolean fullCapacity = documentService.isFullCapacity(newDocId,userId,ids.size());
 		if (fullCapacity)
 			return false;
 		//移入到新的文件夹

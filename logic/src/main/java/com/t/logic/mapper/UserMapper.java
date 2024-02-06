@@ -19,6 +19,7 @@ public interface UserMapper extends BaseMapper<User> {
 	Integer addPoint(Integer size, Long userId);
 	@Update("update user set user_points = user_points-${size} ,update_time =now() where user_id=#{userId}")
 	Integer subPoint( Integer size, Long userId);
+
 }
 
 
