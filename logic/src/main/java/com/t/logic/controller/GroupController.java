@@ -1,7 +1,4 @@
 package com.t.logic.controller;
-
-import com.t.logic.entity.Group;
-import com.t.logic.entity.Vo.GroupUserVo;
 import com.t.logic.service.GroupService;
 import com.t.logic.service.GroupUserService;
 import com.t.logic.utils.R;
@@ -25,10 +22,9 @@ public class GroupController {
   @Autowired
   GroupUserService groupUserService;
   @GetMapping("docUsers")
-  @ApiOperation("未定，查找当前文件夹共享成员")
+  @ApiOperation("未定，查找群组中共享成员")
   R selectGroupUsers(Long docId){
-     List<GroupUserVo> users=groupUserService.selectDocUsers(docId);
-     return R.ok().setData(users);
+     return null;
   }
 
 }

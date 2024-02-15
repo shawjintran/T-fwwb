@@ -42,9 +42,9 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 	public boolean addDoc(DocumentVo doc) {
 		Document document = new Document();
 		document.setDocName(doc.getDocName());
-		document.setUserId(doc.getUserId());
+		document.setOwnId(doc.getOwnId());
 
-		User byId = userService.getById(doc.getUserId());
+		User byId = userService.getById(doc.getOwnId());
 		document.setDocCapacity(byId.getUserCapacity());
 
 		if(doc.getDocId()!=null)
@@ -58,8 +58,8 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 	}
 
 	@Override
-	public List<Map<String, Object>> searchDocByUser(Long uId) {
-		List<Map<String, Object>> maps = baseMapper.searchDocById(uId);
+	public List<Map<String, Object>> searchReadDocByUser(Long uId) {
+		List<Map<String, Object>> maps = baseMapper.searchDocByUser(uId);
 		return maps;
 	}
 
@@ -107,7 +107,7 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 		if (vo==null||vo.getDocName()==null)
 			return null;
 		vo.setDocId(docId);
-		vo.setUserId(userId);
+		vo.setOwnId(userId);
 		return vo;
 	}
 
@@ -132,6 +132,15 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 			return true;
 		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 		return false;
+	}
+
+	@Override
+	public List<Map<String, Object>> searchWriteDocNameByUser(Long userId) {
+		List<Map<String, Object>> maps = baseMapper.searchDocByUser(userId);
+		maps.stream().forEach( item ->{
+			item.remove("auth");
+		});
+		return null;
 	}
 
 }

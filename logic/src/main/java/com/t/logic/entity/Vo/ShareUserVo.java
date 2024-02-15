@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupUserVo {
+public class ShareUserVo {
   @ApiParam(required = true)
   private Long userId;
   /**

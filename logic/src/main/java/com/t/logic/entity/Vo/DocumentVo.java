@@ -18,7 +18,7 @@ public class DocumentVo {
 	 *
 	 */
 	@ApiParam(required = true)
-	private Long userId;
+	private Long ownId;
 
 	/**
 	 *

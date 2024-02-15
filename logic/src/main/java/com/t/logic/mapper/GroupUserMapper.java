@@ -3,7 +3,7 @@ package com.t.logic.mapper;
 import com.t.logic.entity.Group;
 import com.t.logic.entity.GroupUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.t.logic.entity.Vo.GroupUserVo;
+import com.t.logic.entity.Vo.ShareUserVo;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -16,16 +16,10 @@ import org.apache.ibatis.annotations.Select;
 */
 @Mapper
 public interface GroupUserMapper extends BaseMapper<GroupUser> {
-  @Select("select doc_id from medical.group_user where user_id=#{userId}")
-  List<Long> selectShareDoc(Long userId);
-  @Select("select user_id,user_role from medical.group_user where doc_id=#{docId}")
-  List<GroupUserVo> selectDocUsers(Long docId);
   @Select("select group_id from medical.group_user where user_id=#{userId}")
   List<Long> selectUserGroup(Long userId);
   @Select("select user_id,user_role from medical.group_user where group_id=#{groupId}")
-  List<GroupUserVo> selectGroupUsers(Long groupId);
-  @Select("select doc_id from medical.group_user where group_id=#{groupId} group by doc_id")
-  List<Long> selectGroupDoc(Long groupId);
+  List<ShareUserVo> selectGroupUsers(Long groupId);
 }
 
 

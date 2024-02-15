@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.t.logic.mapper.GroupUserMapper">
+<mapper namespace="com.t.logic.mapper.DocUserMapper">
 
-    <resultMap id="BaseResultMap" type="com.t.logic.entity.GroupUser">
+    <resultMap id="BaseResultMap" type="com.t.logic.entity.DocUser">
             <result property="docId" column="doc_id" jdbcType="BIGINT"/>
             <result property="userId" column="user_id" jdbcType="BIGINT"/>
             <result property="userRole" column="user_role" jdbcType="TINYINT"/>
@@ -14,8 +14,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        group_id,doc_id,user_id,
-        user_role,joint_status,create_time,
-        update_time
+        doc_id,user_id,user_role,
+        joint_status,create_time,update_time
     </sql>
 </mapper>

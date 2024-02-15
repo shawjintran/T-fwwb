@@ -15,7 +15,7 @@ import java.util.Map;
 public interface DocumentService extends IService<Document> {
 	boolean nameRepeat(String name,Long uId);
 	boolean addDoc(DocumentVo doc);
-	List<Map<String,Object>> searchDocByUser(Long uId);
+	List<Map<String,Object>> searchReadDocByUser(Long uId);
 	boolean updateDoc(DocumentVo doc);
 	boolean updateSize(Integer mode,Long docId,Integer size,Long userId);
 	boolean removeByDocIdAndUserId(Long DocId,Long UserId);
@@ -23,4 +23,6 @@ public interface DocumentService extends IService<Document> {
 	DocumentVo docEcho(Long docId, Long userId);
 	boolean isFullCapacity(Long docId,Long userId,Integer size);
 	boolean expandCapacity(Long docId,Long userId);
+
+	List<Map<String, Object>> searchWriteDocNameByUser(Long userId);
 }

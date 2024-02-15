@@ -2,7 +2,7 @@ package com.t.logic.service;
 
 import com.t.logic.entity.GroupUser;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.t.logic.entity.Vo.GroupUserVo;
+import com.t.logic.entity.Vo.ShareUserVo;
 import java.util.List;
 
 /**
@@ -14,11 +14,9 @@ public interface GroupUserService extends IService<GroupUser> {
 
   List<Long> selectUserGroup(Long userId);
 
-  List<GroupUserVo> selectDocUsers(Long docId);
-
   List<Long> selectShareDoc(Long userId);
 
-  List<GroupUserVo> selectGroupUsers(Long groupId);
+  List<ShareUserVo> selectGroupUsers(Long groupId);
 
   List<Long> selectGroupDoc(Long groupId);
 }

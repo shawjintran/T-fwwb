@@ -23,7 +23,7 @@ public class Document implements Serializable {
     /**
      *
      */
-    private Long userId;
+    private Long ownId;
 
     /**
      *

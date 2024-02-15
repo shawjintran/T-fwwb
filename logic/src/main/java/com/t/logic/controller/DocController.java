@@ -2,6 +2,8 @@ package com.t.logic.controller;
 
 import com.t.logic.entity.Document;
 import com.t.logic.entity.Vo.DocumentVo;
+import com.t.logic.entity.Vo.ShareUserVo;
+import com.t.logic.service.DocUserService;
 import com.t.logic.service.DocumentService;
 import com.t.logic.service.GroupUserService;
 import com.t.logic.utils.R;
@@ -24,13 +26,41 @@ public class DocController {
 	DocumentService documentService;
 	@Autowired
 	GroupUserService groupUserService;
+	@Autowired
+	DocUserService docUserService;
+
 	@GetMapping("search/{userId}")
 	@ApiOperation("（未定）根据用户Id查询文件夹，以及查询可读的共享文件夹")
 	public R searchReadDocById(@ApiParam(required = true) @PathVariable Long userId){
 		if (userId==null)
 			return R.fail().setMes("请先登录");
-		List<Map<String, Object>> map = documentService.searchDocByUser(userId);
+		List<Map<String, Object>> map = documentService.searchReadDocByUser(userId);
 		//预期是装入 docid,docname,docsize,
+		List<Long>docIds =docUserService.selectShareDoc(userId);
+		if (docIds!=null&& docIds.size()>0){
+			List<Document> documents = documentService.listByIds(docIds);
+			documents.stream().forEach(item ->{
+				Map<String, Object>map1= new HashMap<String, Object>();
+				map1.put("name",item.getDocName());
+				map1.put("size",item.getDocSize());
+				map1.put("capacity",item.getDocCapacity());
+				map1.put("docId",item.getDocId());
+				map1.put("auth",item.getDocAuth());
+				map.add(map1);
+			});
+		}
+		Map<String,Object> data= new HashMap<>();
+		data.put("data",map);
+		data.put("size",map.size());
+		return R.ok(data);
+	}
+	@GetMapping("sread/{userId}")
+	@ApiOperation("（未定）根据用户Id查询文件夹，以及查询可写的共享文件夹名字")
+	public R searchWriteDocNameById(@ApiParam(required = true) @PathVariable Long userId){
+		if (userId==null)
+			return R.fail().setMes("请先登录");
+		List<Map<String, Object>> map = documentService.searchWriteDocNameByUser(userId);
+		//预期是装入 docid,docname
 		List<Long>docIds =groupUserService.selectShareDoc(userId);
 		if (docIds!=null&& docIds.size()>0){
 			List<Document> documents = documentService.listByIds(docIds);
@@ -52,16 +82,22 @@ public class DocController {
 	@PostMapping("add")
 	@ApiOperation("（已定）添加文件夹")
 	public R addDoc( DocumentVo doc){
-		if(doc.getUserId()==null)
+		if(doc.getOwnId()==null)
 			return R.fail().setMes("先登录");
 		if (doc.getDocName()==null)
 			return R.fail().setMes("请输入文件夹名字");
-		if (documentService.nameRepeat(doc.getDocName(),doc.getUserId()))
+		if (documentService.nameRepeat(doc.getDocName(),doc.getOwnId()))
 			return R.fail().setMes("文件夹名重复");
 		boolean b = documentService.addDoc(doc);
 		if (b)
 			return R.ok().setMes("创建成功");
 		return R.fail().setMes("未知错误,请等待");
+	}
+	@GetMapping("docUsers")
+	@ApiOperation("未定，查找当前文件夹的共享成员")
+	R selectDocUsers(Long docId){
+		List<ShareUserVo> users=docUserService.selectDocUsers(docId);
+		return R.ok().setData(users);
 	}
 	@DeleteMapping("delete/{userId}/{docId}")
 	@ApiOperation("（已定）删除文件夹(非默认)")
@@ -89,7 +125,7 @@ public class DocController {
 	@PutMapping("update")
 	@ApiOperation("更改文件夹的名字")
 	public R updateDoc(DocumentVo doc){
-		boolean b = documentService.nameRepeat(doc.getDocName(), doc.getUserId());
+		boolean b = documentService.nameRepeat(doc.getDocName(), doc.getOwnId());
 		if (b)
 			return R.fail().setMes("文件夹名重复");
 		boolean updateDoc = documentService.updateDoc(doc);

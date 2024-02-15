@@ -9,40 +9,39 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- *
- * @TableName group_user
+ * 
+ * @TableName doc_user
  */
-@TableName(value ="group_user")
+@TableName(value ="doc_user")
 @Data
-public class GroupUser implements Serializable {
-
+public class DocUser implements Serializable {
     /**
-     *
+     * 
      */
     private Long docId;
 
     /**
-     *
+     * 
      */
     private Long userId;
 
     /**
-     *
+     * 
      */
     private Integer userRole;
 
     /**
-     *
+     * 
      */
     private Integer jointStatus;
 
     /**
-     *
+     * 
      */
     private Date createTime;
 
     /**
-     *
+     * 
      */
     private Date updateTime;
 
