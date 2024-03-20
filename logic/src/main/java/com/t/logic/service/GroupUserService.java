@@ -14,9 +14,5 @@ public interface GroupUserService extends IService<GroupUser> {
 
   List<Long> selectUserGroup(Long userId);
 
-  List<Long> selectShareDoc(Long userId);
-
   List<ShareUserVo> selectGroupUsers(Long groupId);
-
-  List<Long> selectGroupDoc(Long groupId);
 }

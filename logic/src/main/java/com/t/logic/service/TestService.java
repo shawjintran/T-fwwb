@@ -9,5 +9,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2023-08-09 10:42:36
 */
 public interface TestService extends IService<Test> {
-
+  public void batchsave();
 }

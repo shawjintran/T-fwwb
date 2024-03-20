@@ -26,11 +26,11 @@ public interface DocumentMapper extends BaseMapper<Document> {
 
 	@Update("update medical.document set doc_name = #{docName},update_time =now() where own_id =#{docId}")
 	Integer updateDoc(Long docId, String docName);
-	@Update("update medical.document set doc_size = doc_size+${size} ,update_time =now() where own_id=#{docId} and user_id=#{userId}")
+	@Update("update medical.document set doc_size = doc_size+${size} ,update_time =now() where own_id=#{docId} and own_id=#{userId}")
 	Integer AddSize(Long docId, Integer size, Long userId);
-	@Update("update medical.document set doc_size = doc_size-${size} ,update_time =now() where own_id =#{docId} and user_id=#{userId}")
+	@Update("update medical.document set doc_size = doc_size-${size} ,update_time =now() where own_id =#{docId} and own_id=#{userId}")
 	Integer SubSize(Long docId, Integer size, Long userId);
-	@Update("update medical.document set doc_capacity=doc_capacity+5, update_time=now() where doc_id=#{docId} and user_id=#{userId}")
+	@Update("update medical.document set doc_capacity=doc_capacity+5, update_time=now() where doc_id=#{docId} and own_id=#{userId}")
 	Integer addDocCapacity(Long docId,Long userId);
 
 	@Select("select doc_name from medical.document where doc_id=#{docId} and own_id=#{userId}")
@@ -39,7 +39,7 @@ public interface DocumentMapper extends BaseMapper<Document> {
 	Integer updateDocAuth(Long docId,Long userID, Integer auth);
 	@Select("select doc_auth from medical.document where doc_id=#{docId} and own_id=#{userId}")
 	Integer selectAuth(Long docId,Long userID);
-	@Select("select doc_id from medical.document where own_id=#{groupId} group by doc_id")
+	@Select("select doc_id from medical.document where own_id=#{groupId}")
 	List<Long> selectGroupDoc(Long groupId);
 }
 

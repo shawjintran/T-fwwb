@@ -142,6 +142,10 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 		});
 		return null;
 	}
+	@Override
+	public List<Long> selectGroupDocs(Long groupId) {
+		return baseMapper.selectGroupDoc(groupId);
+	}
 
 }
 

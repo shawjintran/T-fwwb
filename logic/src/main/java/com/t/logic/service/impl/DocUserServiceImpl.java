@@ -27,11 +27,6 @@ public class DocUserServiceImpl extends ServiceImpl<DocUserMapper, DocUser>
   UserService userService;
 
   @Override
-  public List<Long> selectShareDoc(Long userId) {
-    return null;
-  }
-
-  @Override
   public List<ShareUserVo> selectDocUsers(Long docId) {
     List<ShareUserVo> shareUserVos = baseMapper.selectDocUsers(docId);
     if (shareUserVos==null|| shareUserVos.size()<1)
@@ -56,6 +51,11 @@ public class DocUserServiceImpl extends ServiceImpl<DocUserMapper, DocUser>
       user.setUserPhone(userMap.get(user.getUserId()).getUserPhone());
     });
     return shareUserVos;
+  }
+  @Override
+  public List<Long> selectShareDoc(Long userId) {
+    List<Long> docs = baseMapper.selectShareDoc(userId);
+    return docs;
   }
 }
 

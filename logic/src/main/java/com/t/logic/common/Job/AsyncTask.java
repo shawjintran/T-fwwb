@@ -61,6 +61,7 @@ public class AsyncTask {
 		AsyncConfig asyncConfig = BeanContext.getBean(AsyncConfig.class);
 		ThreadPoolTaskExecutor executor = (ThreadPoolTaskExecutor) asyncConfig.getAsyncExecutor();
 		for (Integer i = 0; i < count; i++) {
+			assert executor != null;
 			futures.add(executor.submit(new DescCallable(pdfId, filename, i)));
 		}
 		for (Future<Boolean> future : futures) {

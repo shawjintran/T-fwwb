@@ -25,14 +25,8 @@ public class GroupUserServiceImpl extends ServiceImpl<GroupUserMapper, GroupUser
   UserService userService;
   @Override
   public List<Long> selectUserGroup(Long userId) {
-    List<Long> longs = baseMapper.selectUserGroup(userId);
+    List<Long> longs = baseMapper.selectUserGroups(userId);
     return longs;
-  }
-
-  @Override
-  public List<Long> selectShareDoc(Long userId) {
-    List<Long> docs = baseMapper.selectShareDoc(userId);
-    return docs;
   }
 
   @Override
@@ -41,10 +35,7 @@ public class GroupUserServiceImpl extends ServiceImpl<GroupUserMapper, GroupUser
   }
 
 
-  @Override
-  public List<Long> selectGroupDoc(Long groupId) {
-    return baseMapper.selectGroupDoc(groupId);
-  }
+
 }
 
 

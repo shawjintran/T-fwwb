@@ -4,13 +4,14 @@ import com.alibaba.nacos.spring.context.annotation.discovery.EnableNacosDiscover
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@SpringBootApplication
 @MapperScan("com.t.logic.mapper")
 @EnableSwagger2
 @EnableAsync
+@SpringBootApplication()
 //@EnableNacosDiscovery
 // @EnableCaching
 public class LogicApplication {

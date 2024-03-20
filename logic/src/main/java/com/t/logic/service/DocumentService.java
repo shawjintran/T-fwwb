@@ -25,4 +25,5 @@ public interface DocumentService extends IService<Document> {
 	boolean expandCapacity(Long docId,Long userId);
 
 	List<Map<String, Object>> searchWriteDocNameByUser(Long userId);
+	 List<Long> selectGroupDocs(Long groupId);
 }

@@ -61,7 +61,7 @@ public class DocController {
 			return R.fail().setMes("请先登录");
 		List<Map<String, Object>> map = documentService.searchWriteDocNameByUser(userId);
 		//预期是装入 docid,docname
-		List<Long>docIds =groupUserService.selectShareDoc(userId);
+		List<Long>docIds =docUserService.selectShareDoc(userId);
 		if (docIds!=null&& docIds.size()>0){
 			List<Document> documents = documentService.listByIds(docIds);
 			documents.stream().forEach(item ->{

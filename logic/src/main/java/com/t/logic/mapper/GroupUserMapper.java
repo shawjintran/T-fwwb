@@ -16,8 +16,8 @@ import org.apache.ibatis.annotations.Select;
 */
 @Mapper
 public interface GroupUserMapper extends BaseMapper<GroupUser> {
-  @Select("select group_id from medical.group_user where user_id=#{userId}")
-  List<Long> selectUserGroup(Long userId);
+  @Select("select group_id,user_role from medical.group_user where user_id=#{userId}")
+  List<Long> selectUserGroups(Long userId);
   @Select("select user_id,user_role from medical.group_user where group_id=#{groupId}")
   List<ShareUserVo> selectGroupUsers(Long groupId);
 }

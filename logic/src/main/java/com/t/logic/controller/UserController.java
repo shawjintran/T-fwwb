@@ -75,7 +75,7 @@ public class UserController {
 		//生成默认文件夹
 		DocumentVo documentVo = new DocumentVo();
 		documentVo.setDocId(0L);
-		documentVo.setUserId(user.getUserId());
+		documentVo.setOwnId(user.getUserId());
 		documentVo.setDocName("默认文件夹");
 		documentService.addDoc(documentVo);
 		return R.ok().setMes("注册成功,请登录");
