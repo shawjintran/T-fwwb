@@ -199,8 +199,45 @@ public class SearchServiceImpl {
         return esSearchVoList;
     }
 
+    /*
 
-    //实现搜索功能
+
+        //实现搜索功能
+        public Object searchPage(String searchString, int pageNo, int pageSize) throws IOException {
+            //如果分页太小也从第一个开始分页
+            if(pageNo<=0){
+                pageNo=0;
+            }
+
+            log.info("搜索内容为"+searchString+"开始页:"+pageNo+"结束页:"+pageSize);
+
+
+            //条件搜索
+            SearchRequest searchRequest = new SearchRequest("pdf");
+            //构造器
+            SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+
+            //分页
+            sourceBuilder.from(pageNo);
+            sourceBuilder.size(pageSize);
+            //匹配
+            MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("text", searchString);
+            sourceBuilder.query(queryBuilder)
+                    .timeout(TimeValue.timeValueSeconds(10));
+
+            //执行搜索
+            searchRequest.source(sourceBuilder);
+            SearchResponse searchResponse=restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
+            log.info("es响应:"+searchResponse.getHits().getHits().length);
+            //解析结果
+
+            System.out.println(JSON.toJSONString(searchResponse.getHits()));//打印命中集合
+
+
+            return searchResponse.getHits().getHits();
+        }*/
+    //实现搜索功能 第一次检索
     public List<EsSearchVo> searchPage(String searchString,  Long userId,Long docId) throws IOException {
         //如果分页太小也从第一个开始分页
 
@@ -276,44 +313,7 @@ public class SearchServiceImpl {
         }
         return esSearchVoList;
     }
-/*
-
-
-    //实现搜索功能
-    public Object searchPage(String searchString, int pageNo, int pageSize) throws IOException {
-        //如果分页太小也从第一个开始分页
-        if(pageNo<=0){
-            pageNo=0;
-        }
-
-        log.info("搜索内容为"+searchString+"开始页:"+pageNo+"结束页:"+pageSize);
-
-
-        //条件搜索
-        SearchRequest searchRequest = new SearchRequest("pdf");
-        //构造器
-        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-
-
-        //分页
-        sourceBuilder.from(pageNo);
-        sourceBuilder.size(pageSize);
-        //匹配
-        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("text", searchString);
-        sourceBuilder.query(queryBuilder)
-                .timeout(TimeValue.timeValueSeconds(10));
-
-        //执行搜索
-        searchRequest.source(sourceBuilder);
-        SearchResponse searchResponse=restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
-        log.info("es响应:"+searchResponse.getHits().getHits().length);
-        //解析结果
-
-        System.out.println(JSON.toJSONString(searchResponse.getHits()));//打印命中集合
-
-
-        return searchResponse.getHits().getHits();
-    }*/
+//    第二次检索
     public Object getdoc(Long pdfId,String searchString) throws IOException {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
@@ -372,7 +372,11 @@ public class SearchServiceImpl {
                 String[] valueStrings = Texts2Strings(fragments);
                 ////////
                 for (int i = 0; i < valueStrings.length; i++) {
-                    esNestedChildrenVo.add(new EsNestedChildVo((Integer) hit.getSourceAsMap().get("pdfPage")+1,estype,valueStrings[i]));
+                    esNestedChildrenVo.add(
+                        new EsNestedChildVo(
+                            (Integer) hit.getSourceAsMap()
+                                .get("pdfPage")+1,estype,valueStrings[i])
+                    );
                 }
             }
 

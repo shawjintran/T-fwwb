@@ -15,6 +15,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		//把本地静态资源映射到项目
 		try {
 			registry.addResourceHandler("/file/**").addResourceLocations("file:"+FileUtils.pdf_location);
+			registry.addResourceHandler("/temp/**").addResourceLocations("file:"+FileUtils.temp_location);
 			registry.addResourceHandler("/pic/**").addResourceLocations("file:"+FileUtils.pic_location);
 			// 也可以映射项目里的static路径
 			/*

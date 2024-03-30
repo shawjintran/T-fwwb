@@ -14,6 +14,7 @@ import io.swagger.annotations.Api;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,17 +56,18 @@ public class UserController {
 		{
 			return R.fail().setMes("手机号,密码或验证码为空");
 		}
+		if(code!=1111)
+			return R.fail().setMes("验证码无效,请重新输入");
+
 		QueryWrapper<User> wrapper = new QueryWrapper<>();
 		wrapper.eq("user_phone",phone);
 		User one = userService.getOne(wrapper);
 		if(!ObjectUtils.isEmpty(one)) {
+
 			return R.fail().setMes("手机号已被注册");
 		}
 		//验证code
-		if(code!=1234)
-		{
-			return R.fail().setMes("验证码已失效,请重新发送");
-		}
+
 		User user = new User()
 				.setUserPhone(phone)
 				.setUserPwd(pwd);
@@ -74,19 +76,23 @@ public class UserController {
 			return R.fail().setMes("系统错误");
 		//生成默认文件夹
 		DocumentVo documentVo = new DocumentVo();
-		documentVo.setDocId(0L);
 		documentVo.setOwnId(user.getUserId());
 		documentVo.setDocName("默认文件夹");
 		documentService.addDoc(documentVo);
 		return R.ok().setMes("注册成功,请登录");
 
 	}
-//	@GetMapping("SMS")
-	@ApiOperation("(遗弃)发送验证码")
+	@GetMapping("SMS")
+	@ApiOperation("发送验证码")
 	public R sendSMS(@ApiParam(required = true)
 								 String phone){
+		if(ObjectUtils.isEmpty(phone))
+			return R.fail().setMes("手机号不能为空");
+		long seed = System.currentTimeMillis(); // 用当前时间作为种子，也可以指定固定的种子值
+		Random random = new Random(seed);
+		int fourDigitRandomNumber = random.nextInt(10000) + 1000;
 		//通过电话号通过相关服务,发送验证码
-		return null;
+		return R.ok().setMes("验证码发送成功").setData(1111);
 	}
 	@PostMapping("login")
 	@ApiOperation("（已定）登录用户")

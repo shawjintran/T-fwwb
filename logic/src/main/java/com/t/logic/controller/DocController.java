@@ -5,7 +5,6 @@ import com.t.logic.entity.Vo.DocumentVo;
 import com.t.logic.entity.Vo.ShareUserVo;
 import com.t.logic.service.DocUserService;
 import com.t.logic.service.DocumentService;
-import com.t.logic.service.GroupUserService;
 import com.t.logic.utils.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,8 +23,6 @@ import java.util.Map;
 public class DocController {
 	@Autowired
 	DocumentService documentService;
-	@Autowired
-	GroupUserService groupUserService;
 	@Autowired
 	DocUserService docUserService;
 
@@ -86,8 +83,8 @@ public class DocController {
 			return R.fail().setMes("先登录");
 		if (doc.getDocName()==null)
 			return R.fail().setMes("请输入文件夹名字");
-		if (documentService.nameRepeat(doc.getDocName(),doc.getOwnId()))
-			return R.fail().setMes("文件夹名重复");
+//		if (documentService.nameRepeat(doc.getDocName(),doc.getOwnId()))
+//			return R.fail().setMes("文件夹名重复");
 		boolean b = documentService.addDoc(doc);
 		if (b)
 			return R.ok().setMes("创建成功");
@@ -100,13 +97,13 @@ public class DocController {
 		return R.ok().setData(users);
 	}
 	@DeleteMapping("delete/{userId}/{docId}")
-	@ApiOperation("（已定）删除文件夹(非默认)")
+	@ApiOperation("（已定）删除文件夹")
 	public R deleteDoc(@ApiParam (required = true)
 						   @PathVariable Long userId,
 					   @ApiParam(required = true)
 					   @PathVariable Long docId){
-		if (docId==0L)
-			return R.fail().setMes("默认文件夹不可删除");
+//		if (docId==0L)
+//			return R.fail().setMes("默认文件夹不可删除");
 		boolean b = documentService.removeByDocIdAndUserId(docId,userId);
 		if (b)
 			return R.ok().setMes("删除成功");
@@ -125,9 +122,9 @@ public class DocController {
 	@PutMapping("update")
 	@ApiOperation("更改文件夹的名字")
 	public R updateDoc(DocumentVo doc){
-		boolean b = documentService.nameRepeat(doc.getDocName(), doc.getOwnId());
-		if (b)
-			return R.fail().setMes("文件夹名重复");
+//		boolean b = documentService.nameRepeat(doc.getDocName(), doc.getOwnId());
+//		if (b)
+//			return R.fail().setMes("文件夹名重复");
 		boolean updateDoc = documentService.updateDoc(doc);
 		if (updateDoc)
 			return R.ok().setMes("更改成功");

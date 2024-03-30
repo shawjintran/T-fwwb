@@ -24,7 +24,7 @@
           {{ scope.row.bizPrice }}
         </template>
       </el-table-column>
-      <el-table-column label="业务积分" width="90" align="center">
+      <el-table-column label="业务内容" width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.bizPoint }}</span>
         </template>

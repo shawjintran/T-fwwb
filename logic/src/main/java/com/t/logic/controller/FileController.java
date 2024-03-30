@@ -10,7 +10,9 @@ import com.t.logic.entity.Vo.PdfFileVo;
 import com.t.logic.entity.Vo.PdfFileVo2;
 import com.t.logic.entity.Vo.PdfFileVo3;
 import com.t.logic.service.DocumentService;
+import com.t.logic.service.LikesService;
 import com.t.logic.service.PdfFileService;
+import com.t.logic.service.impl.LikeServiceImpl;
 import com.t.logic.utils.FileUtils;
 import com.t.logic.utils.R;
 import io.swagger.annotations.Api;
@@ -56,6 +58,9 @@ public class FileController {
 	DocumentService documentService;
 	@Autowired
 	private KafkaTemplate<String, Object> kafkaTemplate;
+
+	@Autowired
+	LikeServiceImpl likesService;
 
 //	@PostMapping("upload/")
 //	@ApiOperation("（已定2.0）文献的上传,并转换为图片")
@@ -274,6 +279,16 @@ public class FileController {
 		if (vo==null)
 			return R.fail().setMes("错误");
 		return R.ok(vo);
+	}
+	@GetMapping("collect")
+	@ApiOperation("（已定）文献的收藏")
+	public R fileCollect(
+						 @ApiParam(required = true)
+							@PathVariable Long docId){
+		boolean fileCollect=likesService.addLike(new Long(1),docId);
+		if (fileCollect)
+			return R.ok().setMes("收藏成功");
+		return R.fail().setMes("收藏失败");
 	}
 	@PostMapping("update")
 	@ApiOperation("（已定）单个文献信息的修改(可以实现文献的文件夹的变动)")

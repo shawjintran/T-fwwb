@@ -15,10 +15,6 @@ public class ShareUserVo {
    * 用户电话
    */
   private String userPhone;
-  /**
-   * 用户
-   */
-  private String userName;
 
   /**
    *

@@ -43,7 +43,7 @@ public class EmployController {
 		// 		employee_pwd,employee_status
 		wrapper.eq("employee_phone",phone)
 				.eq("employee_pwd",pwd)
-				.eq("employee_status",0);
+				.eq("is_delete",0);
 		Employee one = employeeService.getOne(wrapper);
 		if (one==null)
 			return R.fail().setMes("用户不存在");

@@ -6,14 +6,16 @@
 
     <resultMap id="BaseResultMap" type="com.t.logic.entity.Employee">
             <id property="employeeId" column="employee_id" jdbcType="BIGINT"/>
-            <result property="employeeStation" column="employee_station" jdbcType="TINYINT"/>
             <result property="employeePhone" column="employee_phone" jdbcType="VARCHAR"/>
             <result property="employeePwd" column="employee_pwd" jdbcType="VARCHAR"/>
-            <result property="employeeStatus" column="employee_status" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        employee_id,employee_station,employee_phone,
-        employee_pwd,employee_status
+        employee_id,employee_phone,
+        employee_pwd,
+        create_time,update_time,is_delete
     </sql>
 </mapper>

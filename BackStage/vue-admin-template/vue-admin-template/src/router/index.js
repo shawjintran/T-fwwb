@@ -83,19 +83,43 @@ export const constantRoutes = [
       }
     ]
   },
-
   {
-    path: '/form',
+    path: '/examine',
     component: Layout,
     children: [
       {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: '企业定制', icon: 'form' }
+        path: 'examine',
+        name: '',
+        component: () => import('@/views/examine/examine'),
+        meta: { title: '审核文献', icon: 'form' }
       }
     ]
   },
+  {
+    path: '/log',
+    component: Layout,
+    children: [
+      {
+        path: 'log',
+        name: '',
+        component: () => import('@/views/log/log'),
+        meta: { title: '日志查看', icon: 'form' }
+      }
+    ]
+  },
+
+  // {
+  //   path: '/form',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       name: 'Form',
+  //       component: () => import('@/views/form/index'),
+  //       meta: { title: '企业定制', icon: 'form' }
+  //     }
+  //   ]
+  // },
 
   // {
   //   path: '/nested',

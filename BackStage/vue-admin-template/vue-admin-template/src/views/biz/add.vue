@@ -2,14 +2,28 @@
   <div class="app-container">
     <!-- 输入表单 -->
     <el-form label-width="120px">
-      <el-form-item label="业务价格">
-        <el-input v-model="business.bizPrice" />
+      <el-form-item label="业务价格" required>
+        <el-input v-model="business.bizPrice" style="width: 300px" />
       </el-form-item>
-      <el-form-item label="业务积分">
+      <el-form-item label="业务类型" required>
+        <el-radio-group size="mini" v-model="bizType">
+          <el-radio-button
+            :label="1"
+          >
+            积分
+          </el-radio-button>
+          <el-radio-button
+            :label="2"
+          >
+            容量
+          </el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="业务积分" required>
         <el-input-number v-model="business.bizPoint" :min="1"/>
       </el-form-item>
-      <el-form-item label="业务状态">
-        <el-select v-model="business.bizStatus">
+      <el-form-item label="业务状态" required >
+        <el-select v-model="business.bizStatus" disabled>
           <!--
             数据类型一定要和取出的json中的一致，否则没法回填
             因此，这里value使用动态绑定的值，保证其数据类型是number
@@ -33,9 +47,11 @@ export default{
       business:{
         // 初始值
         bizPoint:0,
+        bizContent:'',
+
         bizPrice:0.0,
         bizStatus:1
-      },
+      },bizType:1,
     }
   },
   created(){

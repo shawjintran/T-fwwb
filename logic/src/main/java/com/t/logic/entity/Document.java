@@ -60,6 +60,8 @@ public class Document implements Serializable {
     /**
      *
      */
+    @TableLogic//用于逻辑删除
+    @TableField(fill = FieldFill.INSERT)//添加这个注解是为了在后面设置初始值
     private Integer isDelete;
 
 

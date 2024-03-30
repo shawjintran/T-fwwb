@@ -47,10 +47,6 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 		User byId = userService.getById(doc.getOwnId());
 		document.setDocCapacity(byId.getUserCapacity());
 
-		if(doc.getDocId()!=null)
-			document.setDocId(doc.getDocId());
-		else
-			document.setDocId(System.currentTimeMillis());
 		int insert = baseMapper.insert(document);
 		if (insert==1)
 			return true;
@@ -86,6 +82,9 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document>
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean removeByDocIdAndUserId(Long DocId, Long UserId) {
+
+
+
 		//Mapper层添加了docId判断
 		Integer delete=baseMapper.removeByDouble(DocId,UserId);
 		if (delete<1)

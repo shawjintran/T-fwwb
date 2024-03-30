@@ -16,14 +16,6 @@ public class UserVo {
 	 */
 	private String userPhone;
 	/**
-	 * 用户
-	 */
-	private String userName;
-	/**
-	 * 用户头像链接
-	 */
-	private String userUrl;
-	/**
 	 * 用户积分
 	 */
 	private Integer userPoints;

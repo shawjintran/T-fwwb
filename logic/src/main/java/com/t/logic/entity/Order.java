@@ -62,6 +62,10 @@ public class Order implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 
+    @TableLogic//用于逻辑删除
+    @TableField(fill = FieldFill.INSERT)//添加这个注解是为了在后面设置初始值
+    private Integer isDelete;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

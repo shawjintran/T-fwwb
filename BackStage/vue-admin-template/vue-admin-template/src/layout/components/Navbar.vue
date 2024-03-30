@@ -7,7 +7,7 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img src="https://tran-1313418796.cos.ap-shanghai.myqcloud.com/ney.jpg" class="user-avatar">
+          <img src="" class="user-avatar">
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">

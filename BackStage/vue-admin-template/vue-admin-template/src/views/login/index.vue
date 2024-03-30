@@ -2,8 +2,8 @@
 
   <div class="login-container">
     <div style="text-align: center;margin-top: 60px">
-      <div style="margin: 20px 20px;color: #0093d5;font-size:55px;font-weight: bold;letter-spacing: 3px" >医寻——智能文献检索平台</div>
-      <div style="margin: 40px 40px;color: #0093D5FF;font-size:55px;font-weight: bold">后台管理</div>
+      <div style="margin: 20px 20px;color: #0093d5;font-size:55px;font-weight: bold;letter-spacing: 3px" >文献检索管理系统</div>
+      <div style="margin: 40px 40px;color: #0093D5FF;font-size:55px;font-weight: bold">后台端</div>
     </div>
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
       <div class="loginarea">
@@ -42,7 +42,7 @@
         </span>
         </el-form-item>
 
-        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
+        <el-button :loading="loading" type="success" plain style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
         <div class="tips">
           <span style=" font-weight: bolder;margin-right:20px;color: #b60404;letter-spacing: 3px">* 本管理页面只向管理人员开放</span>
         </div>
@@ -210,7 +210,7 @@ $light_gray:#eee;
   overflow: hidden;
 .loginarea{
   border-radius: 20px;
-  background-color: rgb(239, 240, 240);
+  background-color: rgb(113, 171, 194);
   padding: 30px;
   box-shadow: #f4f4f5;
 }

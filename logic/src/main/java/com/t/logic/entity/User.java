@@ -25,12 +25,6 @@ public class User implements Serializable {
     private Long userId;
 
     /**
-     * 用户
-     */
-    @ApiParam(required = true)
-    private String userName;
-
-    /**
      * 用户电话
      */
     @ApiParam(required = true)
@@ -42,10 +36,6 @@ public class User implements Serializable {
     @ApiParam(required = true)
     private String userPwd;
 
-    /**
-     * 用户头像链接
-     */
-    private String userUrl;
 
     /**
      * 用户积分
@@ -72,6 +62,8 @@ public class User implements Serializable {
     /**
      *
      */
+    @TableLogic//用于逻辑删除
+    @TableField(fill = FieldFill.INSERT)//添加这个注解是为了在后面设置初始值
     private Integer isDelete;
 
     @TableField(exist = false)

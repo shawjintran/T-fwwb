@@ -28,29 +28,30 @@ public class DocUserServiceImpl extends ServiceImpl<DocUserMapper, DocUser>
 
   @Override
   public List<ShareUserVo> selectDocUsers(Long docId) {
-    List<ShareUserVo> shareUserVos = baseMapper.selectDocUsers(docId);
-    if (shareUserVos==null|| shareUserVos.size()<1)
-      return shareUserVos;
-    Set<Long> userIds = shareUserVos.stream().map(ShareUserVo::getUserId)
-        .collect(Collectors.toSet());
-//    lambda表达式
-//    不能非空
-    List<User> users = userService.list(
-        Wrappers.lambdaQuery(User.class)
-            .select(User::getUserId,User::getUserName,User::getUserPhone)
-            .in(User::getUserId, userIds));
-//    若参数单一，可以直接转换map 进行
-    Map<Long, User> userMap = users.stream()
-        .collect(Collectors.toMap(User::getUserId, user -> user));
-//    Map<Long, String> userNames = users.stream()
-//        .collect(Collectors.toMap(User::getUserId, User::getUserName));
-//    Map<Long, String> userPhones = users.stream()
-//        .collect(Collectors.toMap(User::getUserId, User::getUserPhone));
-    shareUserVos.stream().forEach(user ->{
-      user.setUserName(userMap.get(user.getUserId()).getUserName());
-      user.setUserPhone(userMap.get(user.getUserId()).getUserPhone());
-    });
-    return shareUserVos;
+//    List<ShareUserVo> shareUserVos = baseMapper.selectDocUsers(docId);
+//    if (shareUserVos==null|| shareUserVos.size()<1)
+//      return shareUserVos;
+//    Set<Long> userIds = shareUserVos.stream().map(ShareUserVo::getUserId)
+//        .collect(Collectors.toSet());
+////    lambda表达式
+////    不能非空
+//    List<User> users = userService.list(
+//        Wrappers.lambdaQuery(User.class)
+//            .select(User::getUserId,User::getUserName,User::getUserPhone)
+//            .in(User::getUserId, userIds));
+////    若参数单一，可以直接转换map 进行
+//    Map<Long, User> userMap = users.stream()
+//        .collect(Collectors.toMap(User::getUserId, user -> user));
+////    Map<Long, String> userNames = users.stream()
+////        .collect(Collectors.toMap(User::getUserId, User::getUserName));
+////    Map<Long, String> userPhones = users.stream()
+////        .collect(Collectors.toMap(User::getUserId, User::getUserPhone));
+//    shareUserVos.stream().forEach(user ->{
+//      user.setUserName(userMap.get(user.getUserId()).getUserName());
+//      user.setUserPhone(userMap.get(user.getUserId()).getUserPhone());
+//    });
+//    return shareUserVos;
+    return null;
   }
   @Override
   public List<Long> selectShareDoc(Long userId) {

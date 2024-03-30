@@ -21,9 +21,9 @@ public class LoginInterceptor implements HandlerInterceptor {
     boolean tokenExpired = JwtUtils.isTokenExpired(claimsByToken);
     if (tokenExpired)
       return false;
-    Integer integer = claimsByToken.get("id", Integer.class);
-    ThreadLocal<Integer> integerThreadLocal = new ThreadLocal<>();
-    integerThreadLocal.set(integer);
+    Long id = claimsByToken.get("id", Long.class);
+    ThreadLocal<Long> idLocal = new ThreadLocal<>();
+    idLocal.set(id);
     return true;
   }
 

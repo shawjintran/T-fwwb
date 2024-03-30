@@ -1,12 +1,11 @@
 package com.t.logic.service.impl;
 
-import cn.caohd.seata.async.util.SeataAsyncUtil;
+
+//import cn.caohd.seata.async.util.SeataAsyncUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.t.logic.entity.Test;
 import com.t.logic.service.TestService;
 import com.t.logic.mapper.TestMapper;
-import io.seata.core.context.RootContext;
-import io.seata.spring.annotation.GlobalTransactional;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -18,29 +17,34 @@ import org.springframework.stereotype.Service;
 @Service
 public class TestServiceImpl extends ServiceImpl<TestMapper, Test>
     implements TestService{
-  @Resource
-  SeataAsyncUtil seataAsyncUtil;
-  @GlobalTransactional(rollbackFor = Exception.class)
-  public void batchsave(){
-    int size = 3-1;
-    final int[] s = {111};
-    for (int i = 0; i < size; i++) {
 
-      seataAsyncUtil.async(() -> {
-        Thread.sleep(1000);
-        int insert = baseMapper.insert(new Test(s[0]++, s[0]++));
-//        int insert = baseMapper.insert(new Test(33, 33));
-        if (insert==1)
-        {
-          System.out.println(Thread.currentThread()+"保存");
-          return true;
-        }
-        System.out.println(Thread.currentThread()+"回滚");
-        return false;
-//				throw new Exception();
-      });
-    }
+  @Override
+  public void batchsave() {
+    return;
   }
+//  @Resource
+//  SeataAsyncUtil seataAsyncUtil;
+//  @GlobalTransactional(rollbackFor = Exception.class)
+//  public void batchsave(){
+//    int size = 3-1;
+//    final int[] s = {111};
+//    for (int i = 0; i < size; i++) {
+//
+//      seataAsyncUtil.async(() -> {
+//        Thread.sleep(1000);
+//        int insert = baseMapper.insert(new Test(s[0]++, s[0]++));
+////        int insert = baseMapper.insert(new Test(33, 33));
+//        if (insert==1)
+//        {
+//          System.out.println(Thread.currentThread()+"保存");
+//          return true;
+//        }
+//        System.out.println(Thread.currentThread()+"回滚");
+//        return false;
+////				throw new Exception();
+//      });
+//    }
+//  }
 }
 
 
